@@ -29,6 +29,13 @@ final class FormController
             $this->redirectBack();
         }
 
+        // Honeypot: боты заполняют скрытое поле или отправляют форму мгновенно.
+        // Тихо показываем «успех», чтобы не подсказывать спамеру о срабатывании.
+        if (Csrf::isSpam()) {
+            Flash::success($form['success_message'] ?: 'Спасибо! Ваша заявка отправлена.');
+            $this->redirectBack();
+        }
+
         $data = [];
         $missing = [];
 
@@ -82,9 +89,9 @@ final class FormController
         }
         $body = implode("\n", $lines);
 
-        // Best-effort уведомление через нативный SMTP-клиент; ошибка отправки
-        // не должна ломать сохранение заявки (Mailer::send сам логирует сбои).
-        (new Mailer())->send((string) $form['notify_email'], $subject, $body);
+        // Ставим письмо в очередь — фронтенд отрабатывает мгновенно, отправку
+        // выполняет CLI-воркер app/Console/mail_worker.php по Cron.
+        \App\Models\MailQueue::enqueue((string) $form['notify_email'], $subject, $body);
     }
 
     private function redirectBack(): never

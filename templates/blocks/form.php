@@ -13,6 +13,7 @@ $form = $data['form'] ?? null;
         <?php if (!empty($form['name'])): ?><h2><?= htmlspecialchars($form['name'], ENT_QUOTES) ?></h2><?php endif; ?>
         <form method="post" action="/forms/<?= htmlspecialchars($form['slug'], ENT_QUOTES) ?>/submit" class="block-form__form">
             <?= Csrf::field() ?>
+            <?= Csrf::honeypotField() ?>
             <?php foreach ($form['fields'] as $field): ?>
                 <?php
                 $fieldName = htmlspecialchars($field['name'] ?? '', ENT_QUOTES);

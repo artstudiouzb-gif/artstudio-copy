@@ -38,6 +38,10 @@ final class SettingsController
 
         Setting::set('counter_codes', (string) ($_POST['counter_codes'] ?? ''));
 
+        // Режим обслуживания.
+        Setting::set('maintenance_mode', !empty($_POST['maintenance_mode']) ? '1' : '0');
+        Setting::set('maintenance_message', trim((string) ($_POST['maintenance_message'] ?? '')));
+
         Flash::success('Настройки сохранены.');
         header('Location: /admin/settings');
         exit;

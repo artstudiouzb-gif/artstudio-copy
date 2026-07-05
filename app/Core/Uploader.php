@@ -17,6 +17,11 @@ final class Uploader
 {
     private const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20 МБ
 
+    // Disk Space Guard: минимум свободного места, ниже которого загрузки
+    // блокируются (максимум из 500 МБ и 5% от общего объёма диска).
+    private const MIN_FREE_BYTES = 500 * 1024 * 1024;
+    private const MIN_FREE_RATIO = 0.05;
+
     private const ALLOWED = [
         'jpg' => 'image/jpeg',
         'jpeg' => 'image/jpeg',
@@ -51,18 +56,49 @@ final class Uploader
             throw new RuntimeException('Файл превышает максимальный размер 20 МБ.');
         }
 
-        $originalName = (string) $fileInput['name'];
-        $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        return self::storeFromPath(
+            (string) $fileInput['tmp_name'],
+            (string) $fileInput['name'],
+            (int) $fileInput['size'],
+            $accessType,
+            $uploadedBy,
+            true
+        );
+    }
 
+    /**
+     * Сохраняет файл из произвольного пути (используется загрузкой из $_FILES
+     * и сборкой чанковой загрузки). Общая валидация, санитизация, оптимизация
+     * и запись в БД.
+     *
+     * @param bool $isUploadedFile true если источник — временный файл PHP-загрузки
+     * @return array файл-запись из таблицы files
+     */
+    public static function storeFromPath(
+        string $sourcePath,
+        string $originalName,
+        int $size,
+        string $accessType,
+        ?int $uploadedBy,
+        bool $isUploadedFile,
+        int $maxSize = self::MAX_SIZE_BYTES
+    ): array {
+        if (!is_file($sourcePath)) {
+            throw new RuntimeException('Файл не найден.');
+        }
+        if ($size > $maxSize) {
+            throw new RuntimeException('Файл превышает максимальный размер ' . (int) round($maxSize / (1024 * 1024)) . ' МБ.');
+        }
+
+        self::assertDiskSpace($accessType);
+
+        $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         if (!isset(self::ALLOWED[$extension])) {
             throw new RuntimeException('Недопустимый тип файла: .' . $extension);
         }
 
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $detectedMime = (string) $finfo->file($fileInput['tmp_name']);
-
-        // SVG определяется finfo как text/plain или image/svg+xml в зависимости от системы,
-        // остальные типы должны строго совпадать с ожидаемым MIME по расширению.
+        $detectedMime = (string) $finfo->file($sourcePath);
         $expectedMime = self::ALLOWED[$extension];
         if ($extension !== 'svg' && $detectedMime !== $expectedMime) {
             throw new RuntimeException('Содержимое файла не соответствует расширению.');
@@ -79,19 +115,18 @@ final class Uploader
             throw new RuntimeException('Не удалось создать директорию для загрузки.');
         }
 
-        $destination = rtrim($basePath, '/') . '/' . $storedName;
+        $destination = rtrim((string) $basePath, '/') . '/' . $storedName;
 
-        if (!move_uploaded_file($fileInput['tmp_name'], $destination)) {
+        $moved = $isUploadedFile
+            ? move_uploaded_file($sourcePath, $destination)
+            : rename($sourcePath, $destination);
+        if (!$moved) {
             throw new RuntimeException('Не удалось сохранить файл на диске.');
         }
 
-        // XSS-защита: SVG может содержать <script>, обработчики on*, javascript:
-        // в href — очищаем содержимое перед тем, как файл станет доступен.
         if ($extension === 'svg') {
             self::sanitizeSvgFile($destination);
         }
-
-        // Оптимизация растровой графики: WebP + адаптивные разрешения (best-effort).
         if (in_array($extension, ['jpg', 'jpeg', 'png'], true)) {
             self::optimizeImage($destination);
         }
@@ -102,7 +137,7 @@ final class Uploader
             'original_name' => $originalName,
             'stored_name' => $storedName,
             'mime_type' => $expectedMime,
-            'size' => (int) $fileInput['size'],
+            'size' => $size,
             'access_type' => $accessType,
             'access_token' => $accessToken,
             'uploaded_by' => $uploadedBy,
@@ -116,6 +151,40 @@ final class Uploader
      * обработчики событий, javascript:-URI, внешние ссылки). Работает через
      * DOMDocument (нативное расширение, без сторонних зависимостей).
      */
+    /**
+     * Disk Space Guard: блокирует загрузку при нехватке свободного места на
+     * диске, защищая сервер и БД от падения. Порог — максимум из 500 МБ и 5%
+     * от общего объёма диска.
+     */
+    public static function assertDiskSpace(string $accessType): void
+    {
+        $dir = $accessType === 'protected'
+            ? (string) Config::get('paths.protected_uploads')
+            : (string) Config::get('paths.public_uploads');
+
+        // Берём существующий родительский каталог для замера.
+        $probe = $dir;
+        while ($probe !== '' && !is_dir($probe)) {
+            $parent = dirname($probe);
+            if ($parent === $probe) {
+                break;
+            }
+            $probe = $parent;
+        }
+
+        $free = @disk_free_space($probe ?: '/');
+        $total = @disk_total_space($probe ?: '/');
+        if ($free === false || $total === false) {
+            return; // не удалось определить — не блокируем
+        }
+
+        $threshold = max(self::MIN_FREE_BYTES, (int) ($total * self::MIN_FREE_RATIO));
+        if ($free < $threshold) {
+            Logger::error(sprintf('Disk space guard: %d bytes free, threshold %d — upload blocked.', $free, $threshold));
+            throw new RuntimeException('Недостаточно свободного места на сервере. Загрузка временно недоступна — освободите место.');
+        }
+    }
+
     /**
      * Создаёт WebP-версию и адаптивные разрешения (desktop/mobile) для
      * растрового изображения через нативный GD. Best-effort: любые ошибки

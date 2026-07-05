@@ -39,4 +39,39 @@ final class Csrf
             }
         }
     }
+
+    /**
+     * Honeypot-поля для публичных форм: невидимое текстовое поле, которое
+     * заполняют боты, и скрытая метка времени рендера формы. Капча не нужна.
+     */
+    public static function honeypotField(): string
+    {
+        $ts = (string) time();
+
+        return '<div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">'
+            . '<label>Не заполняйте это поле<input type="text" name="hp_website" tabindex="-1" autocomplete="off" value=""></label>'
+            . '</div>'
+            . '<input type="hidden" name="hp_ts" value="' . htmlspecialchars($ts, ENT_QUOTES) . '">';
+    }
+
+    /**
+     * Признак спам-отправки: honeypot заполнен либо форма отправлена
+     * подозрительно быстро (менее 2 секунд после рендера).
+     */
+    public static function isSpam(int $minSeconds = 2): bool
+    {
+        if (trim((string) ($_POST['hp_website'] ?? '')) !== '') {
+            return true;
+        }
+
+        $ts = (int) ($_POST['hp_ts'] ?? 0);
+        if ($ts <= 0) {
+            return true;
+        }
+        if ((time() - $ts) < $minSeconds) {
+            return true;
+        }
+
+        return false;
+    }
 }

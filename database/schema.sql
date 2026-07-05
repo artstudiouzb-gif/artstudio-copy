@@ -307,6 +307,23 @@ CREATE TABLE IF NOT EXISTS widgets (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
+-- Очередь исходящих писем (обрабатывается CLI-воркером по Cron)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mail_queue (
+    id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    to_email        VARCHAR(190) NOT NULL,
+    to_name         VARCHAR(190) NULL,
+    subject         VARCHAR(255) NOT NULL,
+    body            LONGTEXT NOT NULL,
+    status          ENUM('pending', 'sent', 'failed') NOT NULL DEFAULT 'pending',
+    attempts        INT UNSIGNED NOT NULL DEFAULT 0,
+    last_error      VARCHAR(500) NULL,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at         DATETIME NULL,
+    KEY idx_mail_queue_status (status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
 -- Применённые миграции (для CLI database/migrate.php)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS migrations (
@@ -322,7 +339,8 @@ CREATE TABLE IF NOT EXISTS migrations (
 -- этапов 1–2, накатят их через migrate.php.)
 INSERT INTO migrations (filename) VALUES
     ('2026_07_05_block5_multilang_header_widgets.sql'),
-    ('2026_07_05_soft_deletes.sql')
+    ('2026_07_05_soft_deletes.sql'),
+    ('2026_07_05_mail_queue.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

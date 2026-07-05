@@ -30,6 +30,29 @@ require __DIR__ . '/../layout/header.php';
     </form>
 </div>
 
+<div class="form-card" style="margin-bottom:30px;">
+    <h2 style="margin-top:0;">Загрузка больших файлов (по частям)</h2>
+    <p class="form-hint">Для больших файлов (видео, PDF-презентации) — загрузка чанками в обход ограничений хостинга. До 200 МБ.</p>
+    <div class="form-grid">
+        <div class="form-field">
+            <label for="chunk_file">Файл</label>
+            <input type="file" id="chunk_file">
+        </div>
+        <div class="form-field">
+            <label for="chunk_access">Доступ</label>
+            <select id="chunk_access">
+                <option value="public">Открытый (прямая ссылка)</option>
+                <option value="protected">Защищённый (только по сессии или токену)</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button type="button" id="chunk_upload_btn" class="btn"
+                data-csrf="<?= htmlspecialchars(\App\Core\Csrf::token(), ENT_QUOTES) ?>">Загрузить по частям</button>
+        </div>
+        <div id="chunk_progress" class="form-hint"></div>
+    </div>
+</div>
+
 <table class="data-table">
     <thead>
         <tr>

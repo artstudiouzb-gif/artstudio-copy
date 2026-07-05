@@ -44,6 +44,19 @@ if (!APP_INSTALLED) {
     exit;
 }
 
+// --- Режим обслуживания: гостям 503-заглушка, авторизованным админам —
+// полный доступ (чтобы можно было наполнять сайт при закрытом фронтенде). ---
+$maintenancePath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+if (\App\Models\Setting::get('maintenance_mode', '0') === '1'
+    && !\App\Core\Auth::check()
+    && !str_starts_with($maintenancePath, '/admin')
+    && !str_starts_with($maintenancePath, '/assets')) {
+    http_response_code(503);
+    header('Retry-After: 3600');
+    \App\Core\View::render('errors/maintenance');
+    exit;
+}
+
 $router = new Router();
 
 // --- Установщик после установки: аппаратно заблокирован (403) ---
@@ -158,6 +171,7 @@ $router->post('/admin/backup', [\App\Controllers\Admin\BackupController::class, 
 // --- Admin: файловый менеджер ---
 $router->get('/admin/files', [AdminFileController::class, 'index']);
 $router->post('/admin/files/upload', [AdminFileController::class, 'upload']);
+$router->post('/admin/files/chunk', [\App\Controllers\Admin\ChunkedUploadController::class, 'chunk']);
 $router->post('/admin/files/{id}/delete', [AdminFileController::class, 'destroy']);
 $router->post('/admin/files/{id}/regenerate-token', [AdminFileController::class, 'regenerateToken']);
 

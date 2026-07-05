@@ -62,6 +62,15 @@ require __DIR__ . '/../layout/header.php';
             <span class="form-hint">Вставляется в конец страницы как есть (доступно только администраторам).</span>
         </div>
 
+        <div class="form-field form-field--checkbox">
+            <input type="checkbox" id="maintenance_mode" name="maintenance_mode" value="1" <?= ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : '' ?>>
+            <label for="maintenance_mode">Режим обслуживания (сайт закрыт для гостей, админам доступен)</label>
+        </div>
+        <div class="form-field">
+            <label for="maintenance_message">Сообщение на странице обслуживания</label>
+            <input type="text" id="maintenance_message" name="maintenance_message" value="<?= htmlspecialchars($settings['maintenance_message'] ?? '', ENT_QUOTES) ?>" placeholder="Сайт временно закрыт на техническое обслуживание.">
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn--primary">Сохранить настройки</button>
         </div>
