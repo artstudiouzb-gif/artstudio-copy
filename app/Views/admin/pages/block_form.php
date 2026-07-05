@@ -200,6 +200,22 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             </div>
         <?php endif; ?>
 
+        <?php $spacing = $data['_spacing'] ?? 'premium'; ?>
+        <div class="form-field">
+            <label for="spacing">Вертикальные отступы («воздух»)</label>
+            <select id="spacing" name="spacing">
+                <option value="none" <?= $spacing === 'none' ? 'selected' : '' ?>>Нет</option>
+                <option value="small" <?= $spacing === 'small' ? 'selected' : '' ?>>Малый</option>
+                <option value="premium" <?= $spacing === 'premium' ? 'selected' : '' ?>>Премиум</option>
+                <option value="max" <?= $spacing === 'max' ? 'selected' : '' ?>>Максимальный</option>
+            </select>
+            <span class="form-hint">Адаптивные отступы через CSS clamp() — масштабируются под ширину экрана.</span>
+        </div>
+        <div class="form-field form-field--checkbox">
+            <input type="checkbox" id="reveal" name="reveal" value="1" <?= !empty($data['_reveal']) ? 'checked' : '' ?>>
+            <label for="reveal">Плавное появление при прокрутке (анимация)</label>
+        </div>
+
         <?php if (\App\Core\Auth::isSuperAdmin()): ?>
         <div class="form-field">
             <label for="custom_css">Собственный CSS блока</label>

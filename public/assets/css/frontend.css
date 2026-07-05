@@ -1,10 +1,47 @@
 * { box-sizing: border-box; }
 
+/* Семантическая дизайн-система: светлая тема по умолчанию.
+   --color-primary/--color-accent/--font-family задаются из настроек в <head>. */
+:root {
+    --bg-primary: #ffffff;
+    --bg-surface: #f4f5f7;
+    --text-main: #1a1a1a;
+    --text-muted: #666666;
+    --border-color: #e1e3e8;
+
+    /* Пресеты вертикальных отступов блоков (адаптивные через clamp). */
+    --space-small: clamp(16px, 3vw, 28px);
+    --space-premium: clamp(40px, 7vw, 96px);
+    --space-max: clamp(72px, 12vw, 180px);
+}
+
+/* Тёмная тема: явное переключение через data-theme="dark". */
+:root[data-theme="dark"] {
+    --bg-primary: #14161c;
+    --bg-surface: #1d212b;
+    --text-main: #eceef3;
+    --text-muted: #9aa2b1;
+    --border-color: #2b303c;
+}
+
+/* Авто-тема: следуем системным настройкам, если тема не задана явно. */
+@media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] {
+        --bg-primary: #14161c;
+        --bg-surface: #1d212b;
+        --text-main: #eceef3;
+        --text-muted: #9aa2b1;
+        --border-color: #2b303c;
+    }
+}
+
 body {
     margin: 0;
     font-family: var(--font-family, sans-serif);
-    color: #1a1a1a;
+    color: var(--text-main);
+    background: var(--bg-primary);
     line-height: 1.6;
+    transition: background-color .3s ease, color .3s ease;
 }
 
 img { max-width: 100%; display: block; }
@@ -43,6 +80,11 @@ a { color: var(--color-accent, #e63946); }
 .site-cta--filled { background: var(--color-accent, #e63946); color: #fff; }
 .site-cta--outline { border: 2px solid var(--color-accent, #e63946); color: var(--color-accent, #e63946); }
 
+.site-theme-toggle {
+    background: transparent; border: 1px solid var(--border-color); color: var(--text-main);
+    width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; line-height: 1;
+}
+
 @media (max-width: 720px) {
     .site-header__inner { flex-wrap: wrap; }
     .site-header__zone { flex-wrap: wrap; gap: 12px; }
@@ -60,15 +102,15 @@ a { color: var(--color-accent, #e63946); }
 .widget-latest-news, .widget-projects, .widget-team { list-style: none; margin: 0; padding: 0; }
 .widget-latest-news li { margin-bottom: 12px; }
 .widget-latest-news a { text-decoration: none; color: var(--color-primary, #1a1a1a); font-weight: 600; display: block; }
-.widget-latest-news time { font-size: 12px; color: #999; }
+.widget-latest-news time { font-size: 12px; color: var(--text-muted); }
 .widget-projects li, .widget-team li { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .widget-projects img, .widget-team img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
 .widget-team div { display: flex; flex-direction: column; }
-.widget-team span { font-size: 13px; color: #888; }
+.widget-team span { font-size: 13px; color: var(--text-muted); }
 .widget-contacts__line { margin: 6px 0; }
 .widget-contacts__social { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .widget-social-link { font-size: 13px; text-decoration: none; color: var(--color-accent, #e63946); font-weight: 600; }
-.widget-empty { color: #999; font-size: 14px; }
+.widget-empty { color: var(--text-muted); font-size: 14px; }
 .site-header__logo {
     display: inline-flex;
     align-items: center;
@@ -80,13 +122,25 @@ a { color: var(--color-accent, #e63946); }
 .site-header__logo img { max-height: 48px; }
 
 .site-content { max-width: 1140px; margin: 0 auto; padding: 20px; }
-.site-footer { text-align: center; padding: 30px 20px; color: #888; font-size: 14px; }
+.site-footer { text-align: center; padding: 30px 20px; color: var(--text-muted); font-size: 14px; }
 
-.cms-block { margin: 40px 0; }
+/* Система «воздуха»: вертикальные отступы блоков через пресеты (clamp). */
+.cms-block { margin: 0; padding: var(--space-premium) 0; }
+.cms-block--space-none { padding: 0; }
+.cms-block--space-small { padding: var(--space-small) 0; }
+.cms-block--space-premium { padding: var(--space-premium) 0; }
+.cms-block--space-max { padding: var(--space-max) 0; }
+
+/* Микро-анимации появления при скролле (Intersection Observer). */
+.cms-block[data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+.cms-block[data-reveal].is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+    .cms-block[data-reveal] { opacity: 1; transform: none; transition: none; }
+}
 
 .block-text__title { font-size: 28px; margin-bottom: 12px; }
 
-.block-cta { text-align: center; padding: 40px; background: #f4f5f7; border-radius: 12px; }
+.block-cta { text-align: center; padding: 40px; background: var(--bg-surface); border-radius: 12px; }
 .block-cta__button {
     display: inline-block;
     margin-top: 16px;
@@ -142,12 +196,12 @@ a { color: var(--color-accent, #e63946); }
 .site-alert--success { background: #e6f4ea; color: #1e7e34; }
 .site-alert--error { background: #fdecea; color: #e63946; }
 
-.news-list__item { display: flex; gap: 20px; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #eee; }
+.news-list__item { display: flex; gap: 20px; margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid var(--border-color); }
 .news-list__item img { width: 220px; border-radius: 8px; flex-shrink: 0; }
 .news-list__body h2 { margin: 6px 0; }
-.news-list__body time { font-size: 13px; color: #888; }
+.news-list__body time { font-size: 13px; color: var(--text-muted); }
 
-.news-single time { display: block; font-size: 13px; color: #888; margin-bottom: 16px; }
+.news-single time { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
 .news-single img { border-radius: 12px; margin-bottom: 20px; }
 
 /* Лайтбокс для блоков галереи */

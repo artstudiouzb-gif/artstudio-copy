@@ -16,6 +16,7 @@ final class SettingsController
     private const TEXT_KEYS = [
         'site_name', 'color_primary', 'color_accent', 'font_family',
         'contact_phone', 'contact_email', 'contact_address',
+        'font_url', 'font_face_name',
     ];
 
     public function index(): void
@@ -37,6 +38,11 @@ final class SettingsController
         Setting::set('logo_url', $logoUrl ?? '');
 
         Setting::set('counter_codes', (string) ($_POST['counter_codes'] ?? ''));
+
+        // Тема оформления.
+        $theme = in_array($_POST['default_theme'] ?? 'light', ['light', 'dark', 'auto'], true)
+            ? $_POST['default_theme'] : 'light';
+        Setting::set('default_theme', $theme);
 
         // Режим обслуживания.
         Setting::set('maintenance_mode', !empty($_POST['maintenance_mode']) ? '1' : '0');

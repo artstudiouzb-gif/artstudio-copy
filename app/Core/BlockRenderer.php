@@ -57,11 +57,18 @@ final class BlockRenderer
             $scopedCss = CssScoper::scope((string) $block['custom_css'], '#block-' . $blockId);
         }
 
+        // Дизайн-система: пресет отступов и опция анимации появления.
+        $spacing = in_array($data['_spacing'] ?? 'premium', ['none', 'small', 'premium', 'max'], true)
+            ? $data['_spacing'] : 'premium';
+        $reveal = !empty($data['_reveal']) ? ' data-reveal' : '';
+
         $wrapped = sprintf(
-            '<section id="block-%d" class="cms-block cms-block--%s" data-block-type="%s">%s</section>',
+            '<section id="block-%d" class="cms-block cms-block--%s cms-block--space-%s" data-block-type="%s"%s>%s</section>',
             $blockId,
             htmlspecialchars($type, ENT_QUOTES),
+            htmlspecialchars($spacing, ENT_QUOTES),
             htmlspecialchars($type, ENT_QUOTES),
+            $reveal,
             $html
         );
 

@@ -20,6 +20,14 @@ $accentColor = Setting::get('color_accent', '#e63946');
 $font = Setting::get('font_family', "'Inter', sans-serif");
 $extraHeadCss = $extraHeadCss ?? '';
 
+// --- Дизайн-система: тема и локальный шрифт ---
+$defaultTheme = Setting::get('default_theme', 'light'); // light | dark | auto
+if (!in_array($defaultTheme, ['light', 'dark', 'auto'], true)) {
+    $defaultTheme = 'light';
+}
+$fontUrl = Setting::get('font_url', '');           // ссылка на .woff2 локального шрифта
+$fontFaceName = Setting::get('font_face_name', ''); // имя семейства для @font-face
+
 // --- SEO / Open Graph ---
 $appUrl = rtrim((string) \App\Core\Config::get('app.url', ''), '/');
 $canonicalUrl = $appUrl . Locale::url(Locale::path());
@@ -96,18 +104,28 @@ if ($hcfg['cta']['enabled'] && $hcfg['cta']['text'] !== '') {
         . htmlspecialchars($hcfg['cta']['text'], ENT_QUOTES) . '</a>';
 }
 
+// --- Переключатель темы (показываем, если тема не фиксирована как auto) ---
+$themeToggle = '';
+if ($defaultTheme !== 'auto') {
+    $themeToggle = '<button type="button" class="site-theme-toggle" aria-label="Сменить тему" title="Светлая/тёмная тема">◐</button>';
+}
+
 // --- Раскладка по зонам ---
 $zones = ['left' => '', 'center' => '', 'right' => ''];
 $zones[$hcfg['logo_position']] .= $logoHtml;
 $zones[$hcfg['menu_position']] .= $menuHtml;
-// Утилиты (язык, соцсети, CTA) — в правую зону.
-$zones['right'] .= $langHtml . $socialHtml . $ctaHtml;
+// Утилиты (язык, соцсети, CTA, тема) — в правую зону.
+$zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
 ?>
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES) ?>">
+<html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES) ?>" data-theme="<?= htmlspecialchars($defaultTheme, ENT_QUOTES) ?>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+/* Применяем сохранённую тему до отрисовки, исключая мигание (FOUC). */
+(function(){try{var t=localStorage.getItem('theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();
+</script>
 <title><?= htmlspecialchars($metaTitle, ENT_QUOTES) ?></title>
 <?php if (!empty($metaDescription)): ?>
 <meta name="description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES) ?>">
@@ -123,6 +141,17 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml;
 <?php if ($ogImageRaw !== ''): ?>
 <meta property="og:image" content="<?= htmlspecialchars($ogImageRaw, ENT_QUOTES) ?>">
 <meta name="twitter:card" content="summary_large_image">
+<?php endif; ?>
+<?php if ($fontUrl !== '' && $fontFaceName !== ''): ?>
+<link rel="preload" href="<?= htmlspecialchars($fontUrl, ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face {
+    font-family: '<?= htmlspecialchars($fontFaceName, ENT_QUOTES) ?>';
+    src: url('<?= htmlspecialchars($fontUrl, ENT_QUOTES) ?>') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+}
+</style>
 <?php endif; ?>
 <link rel="stylesheet" href="/assets/css/frontend.css">
 <style>

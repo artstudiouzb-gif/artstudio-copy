@@ -93,6 +93,11 @@ final class BlockController
         $locale = ((string) $block['lang'] === 'en') ? 'en' : 'ru';
         $data = $this->collectData($block['type'], $locale);
 
+        // Дизайн-система (общие для всех типов): пресет отступов и анимация.
+        $data['_spacing'] = in_array($_POST['spacing'] ?? 'premium', ['none', 'small', 'premium', 'max'], true)
+            ? $_POST['spacing'] : 'premium';
+        $data['_reveal'] = !empty($_POST['reveal']);
+
         Block::update((int) $block['id'], $title !== '' ? $title : null, $data, $customCss);
         \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 

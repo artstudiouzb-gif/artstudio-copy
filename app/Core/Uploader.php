@@ -36,7 +36,13 @@ final class Uploader
         'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'zip' => 'application/zip',
         'txt' => 'text/plain',
+        'woff2' => 'font/woff2',
+        'woff' => 'font/woff',
     ];
+
+    // Типы, для которых finfo часто возвращает application/octet-stream —
+    // строгую проверку MIME по расширению для них не применяем.
+    private const LENIENT_MIME = ['svg', 'woff2', 'woff'];
 
     /**
      * @param array $fileInput один элемент $_FILES, например $_FILES['file']
@@ -100,7 +106,7 @@ final class Uploader
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $detectedMime = (string) $finfo->file($sourcePath);
         $expectedMime = self::ALLOWED[$extension];
-        if ($extension !== 'svg' && $detectedMime !== $expectedMime) {
+        if (!in_array($extension, self::LENIENT_MIME, true) && $detectedMime !== $expectedMime) {
             throw new RuntimeException('Содержимое файла не соответствует расширению.');
         }
 
