@@ -32,13 +32,15 @@ final class Database
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
         } catch (PDOException $e) {
-            error_log('Database connection failed: ' . $e->getMessage());
-            if (PHP_SAPI !== 'cli') {
-                http_response_code(500);
-                echo 'Ошибка подключения к базе данных.';
-            }
-            exit(1);
+            // Бросаем исключение вместо exit — вызывающий код решает, что делать
+            // (fail-safe 503 в рабочем режиме или продолжение в режиме установки).
+            throw new \RuntimeException('Database connection failed: ' . $e->getMessage(), 0, $e);
         }
+    }
+
+    public static function isConnected(): bool
+    {
+        return self::$connection !== null;
     }
 
     public static function pdo(): PDO

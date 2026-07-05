@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Core\Database;
 use App\Models\Language;
 
 final class Router
@@ -64,6 +65,14 @@ final class Router
      */
     private function resolveLocale(string $path): string
     {
+        // В режиме установки (или при недоступной БД) языков ещё нет.
+        if (!Database::isConnected()) {
+            Locale::set('ru');
+            Locale::setPath($path);
+
+            return $path;
+        }
+
         if (str_starts_with($path, '/admin')) {
             Locale::set(Language::defaultCode());
 

@@ -5,4 +5,7 @@
 !/storage/protected_uploads/.gitkeep
 /public/uploads/public/*
 !/public/uploads/public/.gitkeep
+/storage/installed.lock
+/storage/backups/*
+/storage/cache/*
 .DS_Store

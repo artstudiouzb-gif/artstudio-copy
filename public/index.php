@@ -18,12 +18,39 @@ use App\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Controllers\Admin\SettingsController;
 use App\Controllers\Admin\TeamController as AdminTeamController;
 use App\Controllers\Admin\WidgetController as AdminWidgetController;
+use App\Controllers\InstallController;
 use App\Controllers\Site\FormController as SiteFormController;
 use App\Controllers\Site\NewsController as SiteNewsController;
 use App\Controllers\Site\PageController as SitePageController;
 use App\Core\Router;
 
+// --- Веб-инсталлятор: пока система не установлена, весь трафик идёт в установщик ---
+if (!APP_INSTALLED) {
+    $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+    if (!str_starts_with($requestPath, '/install')) {
+        header('Location: /install');
+        exit;
+    }
+
+    $installRouter = new Router();
+    $installRouter->get('/install', [InstallController::class, 'step1']);
+    $installRouter->get('/install/step2', [InstallController::class, 'step2']);
+    $installRouter->post('/install/step2', [InstallController::class, 'step2Submit']);
+    $installRouter->get('/install/step3', [InstallController::class, 'step3']);
+    $installRouter->post('/install/step3', [InstallController::class, 'step3Submit']);
+    $installRouter->get('/install/step4', [InstallController::class, 'step4']);
+    $installRouter->post('/install/step4', [InstallController::class, 'step4Submit']);
+    $installRouter->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+    exit;
+}
+
 $router = new Router();
+
+// --- Установщик после установки: аппаратно заблокирован (403) ---
+$router->get('/install', [InstallController::class, 'step1']);
+$router->post('/install/step2', [InstallController::class, 'step2Submit']);
+$router->post('/install/step3', [InstallController::class, 'step3Submit']);
+$router->post('/install/step4', [InstallController::class, 'step4Submit']);
 
 // --- Admin: аутентификация (без требования логина) ---
 $router->get('/admin/login', [AdminAuthController::class, 'showLogin']);
