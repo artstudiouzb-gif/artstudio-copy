@@ -10,15 +10,34 @@ final class Project
 {
     public static function all(): array
     {
-        $stmt = Database::pdo()->query('SELECT * FROM projects ORDER BY sort_order ASC, created_at DESC');
+        $stmt = Database::pdo()->query('SELECT * FROM projects WHERE deleted_at IS NULL ORDER BY sort_order ASC, created_at DESC');
 
         return $stmt->fetchAll();
+    }
+
+    public static function trashed(): array
+    {
+        $stmt = Database::pdo()->query('SELECT * FROM projects WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC');
+
+        return $stmt->fetchAll();
+    }
+
+    public static function restore(int $id): void
+    {
+        $stmt = Database::pdo()->prepare('UPDATE projects SET deleted_at = NULL WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+    }
+
+    public static function forceDelete(int $id): void
+    {
+        $stmt = Database::pdo()->prepare('DELETE FROM projects WHERE id = :id');
+        $stmt->execute([':id' => $id]);
     }
 
     public static function published(): array
     {
         $stmt = Database::pdo()->query(
-            "SELECT * FROM projects WHERE status = 'published' ORDER BY sort_order ASC, created_at DESC"
+            "SELECT * FROM projects WHERE status = 'published' AND deleted_at IS NULL ORDER BY sort_order ASC, created_at DESC"
         );
 
         return $stmt->fetchAll();
@@ -36,7 +55,7 @@ final class Project
     public static function findPublishedBySlug(string $slug): ?array
     {
         $stmt = Database::pdo()->prepare(
-            "SELECT * FROM projects WHERE slug = :slug AND status = 'published' LIMIT 1"
+            "SELECT * FROM projects WHERE slug = :slug AND status = 'published' AND deleted_at IS NULL LIMIT 1"
         );
         $stmt->execute([':slug' => $slug]);
         $row = $stmt->fetch();
@@ -95,7 +114,8 @@ final class Project
 
     public static function delete(int $id): void
     {
-        $stmt = Database::pdo()->prepare('DELETE FROM projects WHERE id = :id');
+        // Мягкое удаление: проект отправляется в корзину.
+        $stmt = Database::pdo()->prepare('UPDATE projects SET deleted_at = NOW() WHERE id = :id');
         $stmt->execute([':id' => $id]);
     }
 }

@@ -111,9 +111,17 @@ $router->post('/admin/widgets/{id}/edit', [AdminWidgetController::class, 'update
 $router->post('/admin/widgets/{id}/delete', [AdminWidgetController::class, 'destroy']);
 $router->post('/admin/widgets/{id}/move', [AdminWidgetController::class, 'move']);
 
+// --- Admin: корзина (soft deletes) ---
+$router->get('/admin/trash', [\App\Controllers\Admin\TrashController::class, 'index']);
+$router->post('/admin/trash/{type}/{id}/restore', [\App\Controllers\Admin\TrashController::class, 'restore']);
+$router->post('/admin/trash/{type}/{id}/force-delete', [\App\Controllers\Admin\TrashController::class, 'forceDelete']);
+
 // --- Admin: настройки дизайна ---
 $router->get('/admin/settings', [SettingsController::class, 'index']);
 $router->post('/admin/settings', [SettingsController::class, 'update']);
+
+// --- Admin: резервное копирование ---
+$router->post('/admin/backup', [\App\Controllers\Admin\BackupController::class, 'create']);
 
 // --- Admin: файловый менеджер ---
 $router->get('/admin/files', [AdminFileController::class, 'index']);

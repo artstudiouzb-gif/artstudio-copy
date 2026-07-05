@@ -10,9 +10,28 @@ final class News
 {
     public static function all(): array
     {
-        $stmt = Database::pdo()->query('SELECT * FROM news ORDER BY created_at DESC');
+        $stmt = Database::pdo()->query('SELECT * FROM news WHERE deleted_at IS NULL ORDER BY created_at DESC');
 
         return $stmt->fetchAll();
+    }
+
+    public static function trashed(): array
+    {
+        $stmt = Database::pdo()->query('SELECT * FROM news WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC');
+
+        return $stmt->fetchAll();
+    }
+
+    public static function restore(int $id): void
+    {
+        $stmt = Database::pdo()->prepare('UPDATE news SET deleted_at = NULL WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+    }
+
+    public static function forceDelete(int $id): void
+    {
+        $stmt = Database::pdo()->prepare('DELETE FROM news WHERE id = :id');
+        $stmt->execute([':id' => $id]);
     }
 
     /**
@@ -21,7 +40,7 @@ final class News
     public static function published(int $limit = 20, int $offset = 0, ?string $lang = null): array
     {
         $stmt = Database::pdo()->prepare(
-            "SELECT * FROM news WHERE status = 'published' AND published_at <= NOW()
+            "SELECT * FROM news WHERE status = 'published' AND published_at <= NOW() AND deleted_at IS NULL
              ORDER BY published_at DESC LIMIT :limit OFFSET :offset"
         );
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
@@ -51,7 +70,7 @@ final class News
     public static function findPublishedBySlug(string $slug, ?string $lang = null): ?array
     {
         $stmt = Database::pdo()->prepare(
-            "SELECT * FROM news WHERE slug = :slug AND status = 'published' AND published_at <= NOW() LIMIT 1"
+            "SELECT * FROM news WHERE slug = :slug AND status = 'published' AND published_at <= NOW() AND deleted_at IS NULL LIMIT 1"
         );
         $stmt->execute([':slug' => $slug]);
         $row = $stmt->fetch();
@@ -148,7 +167,8 @@ final class News
 
     public static function delete(int $id): void
     {
-        $stmt = Database::pdo()->prepare('DELETE FROM news WHERE id = :id');
+        // Мягкое удаление: запись отправляется в корзину.
+        $stmt = Database::pdo()->prepare('UPDATE news SET deleted_at = NOW() WHERE id = :id');
         $stmt->execute([':id' => $id]);
     }
 }

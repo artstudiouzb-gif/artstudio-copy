@@ -10,15 +10,34 @@ final class Page
 {
     public static function all(): array
     {
-        $stmt = Database::pdo()->query('SELECT * FROM pages ORDER BY created_at DESC');
+        $stmt = Database::pdo()->query('SELECT * FROM pages WHERE deleted_at IS NULL ORDER BY created_at DESC');
 
         return $stmt->fetchAll();
+    }
+
+    public static function trashed(): array
+    {
+        $stmt = Database::pdo()->query('SELECT * FROM pages WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC');
+
+        return $stmt->fetchAll();
+    }
+
+    public static function restore(int $id): void
+    {
+        $stmt = Database::pdo()->prepare('UPDATE pages SET deleted_at = NULL WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+    }
+
+    public static function forceDelete(int $id): void
+    {
+        $stmt = Database::pdo()->prepare('DELETE FROM pages WHERE id = :id');
+        $stmt->execute([':id' => $id]);
     }
 
     public static function findBySlug(string $slug, ?string $lang = null): ?array
     {
         $stmt = Database::pdo()->prepare(
-            "SELECT * FROM pages WHERE slug = :slug AND status = 'published' LIMIT 1"
+            "SELECT * FROM pages WHERE slug = :slug AND status = 'published' AND deleted_at IS NULL LIMIT 1"
         );
         $stmt->execute([':slug' => $slug]);
         $row = $stmt->fetch();
@@ -33,7 +52,7 @@ final class Page
     public static function findHome(?string $lang = null): ?array
     {
         $stmt = Database::pdo()->query(
-            "SELECT * FROM pages WHERE is_home = 1 AND status = 'published' LIMIT 1"
+            "SELECT * FROM pages WHERE is_home = 1 AND status = 'published' AND deleted_at IS NULL LIMIT 1"
         );
         $row = $stmt->fetch();
 
@@ -159,7 +178,8 @@ final class Page
 
     public static function delete(int $id): void
     {
-        $stmt = Database::pdo()->prepare('DELETE FROM pages WHERE id = :id');
+        // Мягкое удаление: страница отправляется в корзину (блоки сохраняются).
+        $stmt = Database::pdo()->prepare('UPDATE pages SET deleted_at = NOW(), is_home = 0 WHERE id = :id');
         $stmt->execute([':id' => $id]);
     }
 }

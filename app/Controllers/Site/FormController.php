@@ -6,6 +6,7 @@ namespace App\Controllers\Site;
 
 use App\Core\Csrf;
 use App\Core\Flash;
+use App\Core\Mailer;
 use App\Core\View;
 use App\Models\FormDef;
 use App\Models\FormSubmission;
@@ -70,6 +71,10 @@ final class FormController
 
     private function notify(array $form, array $data): void
     {
+        if (!Mailer::isConfigured()) {
+            return; // SMTP не настроен — уведомление просто пропускается
+        }
+
         $subject = 'Новая заявка: ' . $form['name'];
         $lines = [];
         foreach ($data as $key => $value) {
@@ -77,13 +82,9 @@ final class FormController
         }
         $body = implode("\n", $lines);
 
-        // Best-effort уведомление: на большинстве shared-хостингов mail() настроен
-        // из коробки, но ошибка отправки не должна ломать сохранение заявки.
-        try {
-            @mail($form['notify_email'], $subject, $body);
-        } catch (\Throwable $e) {
-            error_log('Form notify mail failed: ' . $e->getMessage());
-        }
+        // Best-effort уведомление через нативный SMTP-клиент; ошибка отправки
+        // не должна ломать сохранение заявки (Mailer::send сам логирует сбои).
+        (new Mailer())->send((string) $form['notify_email'], $subject, $body);
     }
 
     private function redirectBack(): never

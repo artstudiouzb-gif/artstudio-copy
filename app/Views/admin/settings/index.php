@@ -67,4 +67,13 @@ require __DIR__ . '/../layout/header.php';
         </div>
     </form>
 </div>
+
+<div class="form-card" style="margin-top:24px;">
+    <h2 style="margin-top:0;">Резервное копирование</h2>
+    <p class="form-hint">Скачать полный бэкап (дамп базы данных + загруженные файлы) одним архивом.</p>
+    <form method="post" action="/admin/backup">
+        <?= Csrf::field() ?>
+        <button type="submit" class="btn">Скачать бэкап (.zip)</button>
+    </form>
+</div>
 <?php require __DIR__ . '/../layout/footer.php'; ?>

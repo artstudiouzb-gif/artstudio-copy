@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS news (
     author_id       INT UNSIGNED NULL,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at      DATETIME NULL COMMENT 'мягкое удаление (корзина)',
     UNIQUE KEY uq_news_slug (slug),
     KEY idx_news_status_published (status, published_at),
     CONSTRAINT fk_news_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
@@ -106,6 +107,7 @@ CREATE TABLE IF NOT EXISTS pages (
     layout_type     ENUM('no_sidebar', 'left_sidebar', 'right_sidebar') NOT NULL DEFAULT 'no_sidebar',
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at      DATETIME NULL COMMENT 'мягкое удаление (корзина)',
     UNIQUE KEY uq_pages_slug (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -156,6 +158,7 @@ CREATE TABLE IF NOT EXISTS projects (
     sort_order      INT NOT NULL DEFAULT 0,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at      DATETIME NULL COMMENT 'мягкое удаление (корзина)',
     UNIQUE KEY uq_projects_slug (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -302,5 +305,24 @@ CREATE TABLE IF NOT EXISTS widgets (
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     KEY idx_widgets_sidebar (sidebar, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
+-- Применённые миграции (для CLI database/migrate.php)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS migrations (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    filename        VARCHAR(255) NOT NULL,
+    applied_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_migrations_filename (filename)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Этот schema.sql уже содержит структуру всех существующих миграций, поэтому
+-- для свежей установки помечаем их как применённые — database/migrate.php не
+-- будет пытаться накатить их повторно. (Старые установки, созданные на схеме
+-- этапов 1–2, накатят их через migrate.php.)
+INSERT INTO migrations (filename) VALUES
+    ('2026_07_05_block5_multilang_header_widgets.sql'),
+    ('2026_07_05_soft_deletes.sql')
+ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

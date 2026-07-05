@@ -18,6 +18,7 @@ $navItems = [
     'widgets' => ['/admin/widgets', 'Виджеты'],
     'header' => ['/admin/header', 'Шапка сайта'],
     'languages' => ['/admin/languages', 'Языки'],
+    'trash' => ['/admin/trash', 'Корзина'],
     'settings' => ['/admin/settings', 'Настройки'],
 ];
 ?>

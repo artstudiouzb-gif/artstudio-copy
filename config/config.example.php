@@ -37,4 +37,16 @@ return [
         'public_uploads' => __DIR__ . '/../public/uploads/public',
         'public_uploads_url' => '/uploads/public',
     ],
+    'mail' => [
+        // Если host пуст — письма не отправляются (уведомления просто пропускаются).
+        'host' => getenv('SMTP_HOST') ?: '',
+        'port' => (int) (getenv('SMTP_PORT') ?: 587),
+        // 'tls' (STARTTLS, порт 587), 'ssl' (implicit TLS, порт 465) или 'none'.
+        'encryption' => getenv('SMTP_ENCRYPTION') ?: 'tls',
+        'username' => getenv('SMTP_USERNAME') ?: '',
+        'password' => getenv('SMTP_PASSWORD') ?: '',
+        'from_email' => getenv('SMTP_FROM_EMAIL') ?: '',
+        'from_name' => getenv('SMTP_FROM_NAME') ?: 'ArtStudio CMS',
+        'timeout' => 15,
+    ],
 ];
