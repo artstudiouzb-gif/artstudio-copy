@@ -61,8 +61,17 @@ if (!is_file($fullPath)) {
 $update = Database::pdo()->prepare('UPDATE files SET download_count = download_count + 1 WHERE id = :id');
 $update->execute([':id' => $fileId]);
 
-header('Content-Type: ' . ($file['mime_type'] !== '' ? $file['mime_type'] : 'application/octet-stream'));
-header('Content-Disposition: inline; filename="' . basename($file['original_name']) . '"');
+$mimeType = $file['mime_type'] !== '' ? $file['mime_type'] : 'application/octet-stream';
+
+header('Content-Type: ' . $mimeType);
+// SVG исполняется браузером как документ — отдаём его как вложение и с жёстким
+// CSP, запрещающим любой активный контент (defense-in-depth к санитизации).
+if ($mimeType === 'image/svg+xml') {
+    header('Content-Disposition: attachment; filename="' . basename($file['original_name']) . '"');
+    header("Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox");
+} else {
+    header('Content-Disposition: inline; filename="' . basename($file['original_name']) . '"');
+}
 header('Content-Length: ' . (string) filesize($fullPath));
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: private, max-age=0, must-revalidate');

@@ -70,4 +70,26 @@ final class RateLimiter
         $stmt = Database::pdo()->prepare('DELETE FROM login_attempts WHERE identifier = :identifier');
         $stmt->execute([':identifier' => $identifier]);
     }
+
+    /**
+     * Garbage collector: удаляет записи login_attempts старше суток и
+     * ротирует лог-файлы. Вызывается вероятностно (не на каждый запрос),
+     * чтобы не нагружать БД. Вероятность ~2% на успешный вход.
+     */
+    public static function garbageCollect(int $probabilityPercent = 2): void
+    {
+        if (random_int(1, 100) > $probabilityPercent) {
+            return;
+        }
+
+        try {
+            Database::pdo()->exec(
+                'DELETE FROM login_attempts WHERE attempted_at < (NOW() - INTERVAL 1 DAY)'
+            );
+        } catch (\Throwable $e) {
+            Logger::error('login_attempts GC failed: ' . $e->getMessage());
+        }
+
+        Logger::rotateAll();
+    }
 }

@@ -85,6 +85,12 @@ final class Uploader
             throw new RuntimeException('Не удалось сохранить файл на диске.');
         }
 
+        // XSS-защита: SVG может содержать <script>, обработчики on*, javascript:
+        // в href — очищаем содержимое перед тем, как файл станет доступен.
+        if ($extension === 'svg') {
+            self::sanitizeSvgFile($destination);
+        }
+
         $accessToken = $accessType === 'protected' ? bin2hex(random_bytes(32)) : null;
 
         $id = FileEntry::create([
@@ -98,5 +104,92 @@ final class Uploader
         ]);
 
         return FileEntry::findById($id);
+    }
+
+    /**
+     * Санитизация SVG: удаляет опасные элементы и атрибуты (скрипты,
+     * обработчики событий, javascript:-URI, внешние ссылки). Работает через
+     * DOMDocument (нативное расширение, без сторонних зависимостей).
+     */
+    public static function sanitizeSvgFile(string $path): void
+    {
+        $content = file_get_contents($path);
+        if ($content === false || trim($content) === '') {
+            return;
+        }
+
+        $sanitized = self::sanitizeSvgString($content);
+        file_put_contents($path, $sanitized);
+    }
+
+    public static function sanitizeSvgString(string $svg): string
+    {
+        // Быстрая грубая очистка на случай, если DOM не сможет разобрать документ.
+        $svg = preg_replace('#<\?php.*?\?>#is', '', $svg) ?? $svg;
+
+        $dangerousTags = ['script', 'foreignObject', 'iframe', 'embed', 'object', 'audio', 'video', 'animate', 'set', 'handler', 'listener'];
+
+        $previous = libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        // LIBXML_NONET запрещает сетевые обращения при разборе (защита от SSRF/XXE).
+        $loaded = $dom->loadXML($svg, LIBXML_NONET | LIBXML_NOENT);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if (!$loaded || $dom->documentElement === null) {
+            // Не удалось разобрать как XML — возвращаем безопасную заглушку.
+            return '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>';
+        }
+
+        $xpath = new \DOMXPath($dom);
+
+        // 1. Удаляем опасные элементы.
+        foreach ($dangerousTags as $tag) {
+            $nodes = iterator_to_array($dom->getElementsByTagName($tag));
+            foreach ($nodes as $node) {
+                $node->parentNode?->removeChild($node);
+            }
+        }
+
+        // 2. Чистим атрибуты у всех элементов.
+        $allNodes = $xpath->query('//*');
+        if ($allNodes !== false) {
+            foreach ($allNodes as $node) {
+                if (!$node instanceof \DOMElement) {
+                    continue;
+                }
+                $attrs = iterator_to_array($node->attributes ?? []);
+                foreach ($attrs as $attr) {
+                    $name = strtolower($attr->nodeName);
+                    $value = $attr->nodeValue ?? '';
+
+                    // Обработчики событий on* — удаляем целиком.
+                    if (str_starts_with($name, 'on')) {
+                        $node->removeAttribute($attr->nodeName);
+                        continue;
+                    }
+
+                    // href / xlink:href / src с javascript:/data:text/html — удаляем.
+                    if (in_array($name, ['href', 'xlink:href', 'src'], true)) {
+                        $normalized = strtolower(preg_replace('/\s+/', '', $value) ?? '');
+                        if (str_starts_with($normalized, 'javascript:')
+                            || str_starts_with($normalized, 'data:text/html')
+                            || str_starts_with($normalized, 'vbscript:')) {
+                            $node->removeAttribute($attr->nodeName);
+                            continue;
+                        }
+                    }
+
+                    // Любое значение атрибута с javascript: внутри (например, style).
+                    if (stripos($value, 'javascript:') !== false || stripos($value, 'vbscript:') !== false) {
+                        $node->removeAttribute($attr->nodeName);
+                    }
+                }
+            }
+        }
+
+        $result = $dom->saveXML($dom->documentElement);
+
+        return $result !== false ? $result : '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>';
     }
 }

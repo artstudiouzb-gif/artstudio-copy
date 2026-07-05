@@ -1,9 +1,20 @@
 <?php
 
 use App\Core\Csrf;
+use App\Core\QrCode;
 
 /** @var string|null $error */
 /** @var string $secret */
+/** @var string $uri */
+
+$qrSvg = '';
+if (!empty($uri)) {
+    try {
+        $qrSvg = QrCode::svg($uri, 4, 4);
+    } catch (\Throwable $e) {
+        $qrSvg = ''; // при неудаче остаётся ручной ввод ключа
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -18,16 +29,19 @@ use App\Core\Csrf;
     <h1>Подключите 2FA</h1>
     <p class="auth-hint">
         Двухфакторная аутентификация обязательна для входа в панель управления.
-        Откройте приложение Google Authenticator или Яндекс Ключ, выберите
-        «Добавить аккаунт» → «Ввести ключ вручную» и введите ключ ниже
-        (имя аккаунта: ArtStudio CMS).
+        Откройте Google Authenticator или Яндекс Ключ и отсканируйте QR-код ниже.
+        Если сканировать неудобно — выберите «Ввести ключ вручную» и введите
+        секретный ключ (имя аккаунта: ArtStudio CMS).
     </p>
     <?php if (!empty($error)): ?>
         <div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div>
     <?php endif; ?>
+    <?php if ($qrSvg !== ''): ?>
+        <div class="totp-qr"><?= $qrSvg ?></div>
+    <?php endif; ?>
     <?php if (!empty($secret)): ?>
         <div class="totp-secret">
-            <label>Секретный ключ</label>
+            <label>Секретный ключ (для ручного ввода)</label>
             <code><?= htmlspecialchars(chunk_split($secret, 4, ' '), ENT_QUOTES) ?></code>
         </div>
     <?php endif; ?>

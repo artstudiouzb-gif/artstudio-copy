@@ -92,6 +92,7 @@ final class AuthController
         View::render('admin/auth/2fa-setup', [
             'error' => null,
             'secret' => $setup['secret'],
+            'uri' => $setup['uri'],
         ]);
     }
 
@@ -111,9 +112,11 @@ final class AuthController
             exit;
         }
 
+        $setup = Auth::beginTwoFactorSetup();
         View::render('admin/auth/2fa-setup', [
             'error' => 'Неверный код подтверждения. Попробуйте снова.',
-            'secret' => $_SESSION['pending_totp_secret'] ?? '',
+            'secret' => $setup['secret'],
+            'uri' => $setup['uri'],
         ]);
     }
 

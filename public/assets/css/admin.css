@@ -74,6 +74,9 @@ body {
 }
 .totp-secret code { font-size: 16px; letter-spacing: 1px; }
 
+.totp-qr { display: flex; justify-content: center; margin-bottom: 16px; }
+.totp-qr svg { width: 220px; height: 220px; border: 1px solid var(--admin-border); border-radius: 8px; }
+
 .admin-shell { display: flex; min-height: 100vh; }
 .admin-sidebar {
     width: 240px;

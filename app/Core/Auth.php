@@ -122,8 +122,35 @@ final class Auth
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
         $_SESSION['authenticated_at'] = time();
+        $_SESSION['fingerprint'] = self::fingerprint();
 
         User::touchLastLogin((int) $user['id']);
+
+        // Вероятностная очистка старых записей брутфорса и ротация логов.
+        RateLimiter::garbageCollect();
+    }
+
+    /**
+     * Фингерпринт клиента: хэш от User-Agent и первых двух октетов IP
+     * (подсеть /16). Привязывает сессию к устройству/сети, затрудняя
+     * использование украденного cookie с другого клиента, но не ломает
+     * сессию при смене последнего октета динамического IP.
+     */
+    private static function fingerprint(): string
+    {
+        $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $subnet = '';
+        if (str_contains($ip, '.')) {
+            $octets = explode('.', $ip);
+            $subnet = ($octets[0] ?? '') . '.' . ($octets[1] ?? '');
+        } elseif (str_contains($ip, ':')) {
+            // IPv6: первые два хекстета.
+            $parts = explode(':', $ip);
+            $subnet = ($parts[0] ?? '') . ':' . ($parts[1] ?? '');
+        }
+
+        return hash('sha256', $ua . '|' . $subnet);
     }
 
     private static function clearPending(): void
@@ -133,7 +160,17 @@ final class Auth
 
     public static function check(): bool
     {
-        return !empty($_SESSION['user_id']);
+        if (empty($_SESSION['user_id'])) {
+            return false;
+        }
+
+        // Защита от перехвата сессии: фингерпринт должен совпадать.
+        if (!isset($_SESSION['fingerprint']) || !hash_equals($_SESSION['fingerprint'], self::fingerprint())) {
+            self::logout();
+            return false;
+        }
+
+        return true;
     }
 
     public static function id(): ?int

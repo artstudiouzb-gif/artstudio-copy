@@ -16,15 +16,17 @@ spl_autoload_register(static function (string $class): void {
 
 use App\Core\Config;
 use App\Core\Database;
+use App\Core\ErrorHandler;
 
 $config = require __DIR__ . '/../../config/config.php';
 
 date_default_timezone_set($config['app']['timezone']);
 
-error_reporting(E_ALL);
-ini_set('display_errors', $config['app']['debug'] ? '1' : '0');
 ini_set('log_errors', '1');
 ini_set('error_log', __DIR__ . '/../../storage/logs/php-error.log');
+
+// Централизованный перехват ошибок и исключений (логирование + 500-заглушка).
+ErrorHandler::register((bool) $config['app']['debug']);
 
 Config::set($config);
 Database::init($config['db']);

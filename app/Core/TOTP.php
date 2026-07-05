@@ -21,13 +21,14 @@ final class TOTP
 
     public static function provisioningUri(string $secret, string $accountName, string $issuer): string
     {
+        // Компактный URI: algorithm=SHA1, digits=6, period=30 — это значения
+        // по умолчанию TOTP (RFC 6238), которые используют Google Authenticator
+        // и Яндекс Ключ, поэтому их не указываем — так otpauth-URI короче и
+        // помещается в компактный QR-код.
         $label = rawurlencode($issuer) . ':' . rawurlencode($accountName);
         $params = http_build_query([
             'secret' => $secret,
             'issuer' => $issuer,
-            'algorithm' => 'SHA1',
-            'digits' => self::DIGITS,
-            'period' => self::PERIOD,
         ], '', '&', PHP_QUERY_RFC3986);
 
         return "otpauth://totp/{$label}?{$params}";
