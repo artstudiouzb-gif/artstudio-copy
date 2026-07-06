@@ -1,0 +1,76 @@
+/* Версия для слабовидящих (accessibility). Активируется атрибутами на <html>:
+   data-a11y="1" data-a11y-scheme=(cw|wc|bb) data-a11y-size=(m|l|xl) data-a11y-images=(on|off).
+   Стили намеренно с высокой специфичностью и !important — перекрывают тему
+   сайта и scoped-CSS блоков, упрощая страницу до читаемого вида. */
+
+html[data-a11y="1"],
+html[data-a11y="1"] body {
+    background: var(--a11y-bg) !important;
+    color: var(--a11y-fg) !important;
+}
+
+/* --- Цветовые схемы --- */
+html[data-a11y="1"][data-a11y-scheme="cw"] { --a11y-bg: #ffffff; --a11y-fg: #000000; --a11y-link: #0000cc; --a11y-line: #000; }
+html[data-a11y="1"][data-a11y-scheme="wc"] { --a11y-bg: #000000; --a11y-fg: #ffffff; --a11y-link: #ffff00; --a11y-line: #fff; }
+html[data-a11y="1"][data-a11y-scheme="bb"] { --a11y-bg: #9dd1ff; --a11y-fg: #063462; --a11y-link: #063462; --a11y-line: #063462; }
+
+html[data-a11y="1"] * {
+    background-color: transparent !important;
+    color: var(--a11y-fg) !important;
+    border-color: var(--a11y-line) !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    font-family: Arial, 'Times New Roman', serif !important;
+    letter-spacing: .02em;
+}
+
+html[data-a11y="1"] a,
+html[data-a11y="1"] a * { color: var(--a11y-link) !important; text-decoration: underline !important; }
+
+/* --- Размер шрифта --- */
+html[data-a11y="1"][data-a11y-size="m"]  { font-size: 18px; }
+html[data-a11y="1"][data-a11y-size="l"]  { font-size: 22px; }
+html[data-a11y="1"][data-a11y-size="xl"] { font-size: 28px; }
+html[data-a11y="1"] body { line-height: 1.7 !important; }
+html[data-a11y="1"] h1 { font-size: 1.8em !important; }
+html[data-a11y="1"] h2 { font-size: 1.5em !important; }
+html[data-a11y="1"] p, html[data-a11y="1"] li, html[data-a11y="1"] td { font-size: 1em !important; }
+
+/* --- Изображения (скрываем только в основном контенте, оставляя управление
+   панели и логотип шапки доступными) --- */
+html[data-a11y="1"][data-a11y-images="off"] .site-content img,
+html[data-a11y="1"][data-a11y-images="off"] .site-content picture,
+html[data-a11y="1"][data-a11y-images="off"] .site-content svg,
+html[data-a11y="1"][data-a11y-images="off"] .site-content video { display: none !important; }
+
+/* Упрощаем раскладку — одна колонка, скрываем декоративные хром-элементы. */
+html[data-a11y="1"] .site-social,
+html[data-a11y="1"] .site-cta,
+html[data-a11y="1"] .site-theme-toggle { display: none !important; }
+html[data-a11y="1"] .layout,
+html[data-a11y="1"] .layout--left,
+html[data-a11y="1"] .layout--right { display: block !important; }
+html[data-a11y="1"] .layout__sidebar { margin-top: 24px; }
+
+/* --- Панель управления версией для слабовидящих --- */
+.a11y-toggle {
+    background: transparent; border: 1px solid currentColor; border-radius: 6px;
+    padding: 6px 12px; cursor: pointer; font: inherit; display: inline-flex; align-items: center; gap: 6px;
+}
+.a11y-panel {
+    display: none; position: relative; z-index: 50;
+    background: #063462; color: #fff; padding: 12px 16px; gap: 18px;
+    flex-wrap: wrap; align-items: center; justify-content: center; border-bottom: 2px solid #fff;
+}
+.a11y-panel.is-open { display: flex; }
+html[data-a11y="1"] .a11y-panel { background: var(--a11y-bg) !important; border-bottom: 2px solid var(--a11y-line) !important; }
+.a11y-panel__group { display: flex; align-items: center; gap: 6px; }
+.a11y-panel__group b { font-weight: 700; font-size: 14px; }
+.a11y-panel button {
+    background: rgba(255,255,255,.14); color: inherit; border: 1px solid currentColor;
+    border-radius: 4px; padding: 4px 10px; cursor: pointer; font: inherit; min-width: 34px;
+}
+.a11y-panel button[aria-pressed="true"] { background: #fff; color: #063462; font-weight: 700; }
+html[data-a11y="1"] .a11y-panel button[aria-pressed="true"] { background: var(--a11y-fg) !important; color: var(--a11y-bg) !important; }
+.a11y-panel__off { margin-left: auto; text-decoration: underline; }
+.a11y-panel__size-a1 { font-size: 13px; } .a11y-panel__size-a2 { font-size: 16px; } .a11y-panel__size-a3 { font-size: 20px; }

@@ -143,15 +143,29 @@ if ($defaultTheme !== 'auto') {
     $themeToggle = '<button type="button" class="site-theme-toggle" aria-label="Сменить тему" title="Светлая/тёмная тема">◐</button>';
 }
 
+// --- Версия для слабовидящих: состояние из cookie (без JS-мигания) ---
+$a11ySchemes = ['cw', 'wc', 'bb'];
+$a11ySizes = ['m', 'l', 'xl'];
+$a11yParts = explode(':', (string) ($_COOKIE['a11y'] ?? ''));
+$a11y = [
+    'on' => in_array($a11yParts[0] ?? '', $a11ySchemes, true),
+    'scheme' => in_array($a11yParts[0] ?? '', $a11ySchemes, true) ? $a11yParts[0] : 'cw',
+    'size' => in_array($a11yParts[1] ?? '', $a11ySizes, true) ? $a11yParts[1] : 'm',
+    'images' => ($a11yParts[2] ?? '') === 'off' ? 'off' : 'on',
+];
+$a11yToggle = '<button type="button" class="a11y-toggle" aria-label="Версия для слабовидящих" title="Версия для слабовидящих">'
+    . '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>'
+    . '<span>Для слабовидящих</span></button>';
+
 // --- Раскладка по зонам ---
 $zones = ['left' => '', 'center' => '', 'right' => ''];
 $zones[$hcfg['logo_position']] .= $logoHtml;
 $zones[$hcfg['menu_position']] .= $menuHtml;
 // Утилиты (язык, соцсети, CTA, тема) — в правую зону.
-$zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
+$zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle . $a11yToggle;
 ?>
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES) ?>" data-theme="<?= htmlspecialchars($defaultTheme, ENT_QUOTES) ?>">
+<html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES) ?>" data-theme="<?= htmlspecialchars($defaultTheme, ENT_QUOTES) ?>"<?= $a11y['on'] ? ' data-a11y="1" data-a11y-scheme="' . htmlspecialchars($a11y['scheme'], ENT_QUOTES) . '" data-a11y-size="' . htmlspecialchars($a11y['size'], ENT_QUOTES) . '" data-a11y-images="' . htmlspecialchars($a11y['images'], ENT_QUOTES) . '"' : '' ?>>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -200,6 +214,7 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
 <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars($pwaShortName, ENT_QUOTES) ?>">
 <?php endif; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/frontend.css'), ENT_QUOTES) ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/a11y.css'), ENT_QUOTES) ?>">
 <style>
 :root {
     --color-primary: <?= htmlspecialchars($primaryColor, ENT_QUOTES) ?>;
@@ -228,6 +243,26 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
 </div>
 <?php endif; ?>
 <?php if (empty($hideChrome)): // лендинг (группа 6) скрывает шапку сайта ?>
+<div class="a11y-panel<?= $a11y['on'] ? ' is-open' : '' ?>" role="region" aria-label="Настройки версии для слабовидящих">
+    <div class="a11y-panel__group">
+        <b>Цвет:</b>
+        <button type="button" data-a11y-set="scheme:cw" title="Чёрным по белому">Ч</button>
+        <button type="button" data-a11y-set="scheme:wc" title="Белым по чёрному">Б</button>
+        <button type="button" data-a11y-set="scheme:bb" title="Тёмно-синим по голубому">С</button>
+    </div>
+    <div class="a11y-panel__group">
+        <b>Размер:</b>
+        <button type="button" class="a11y-panel__size-a1" data-a11y-set="size:m" title="Обычный">А</button>
+        <button type="button" class="a11y-panel__size-a2" data-a11y-set="size:l" title="Крупный">А</button>
+        <button type="button" class="a11y-panel__size-a3" data-a11y-set="size:xl" title="Очень крупный">А</button>
+    </div>
+    <div class="a11y-panel__group">
+        <b>Изображения:</b>
+        <button type="button" data-a11y-set="images:on" title="Показывать">Вкл</button>
+        <button type="button" data-a11y-set="images:off" title="Скрыть">Выкл</button>
+    </div>
+    <a href="#" class="a11y-panel__off">Обычная версия</a>
+</div>
 <header class="site-header site-header--logo-<?= htmlspecialchars($hcfg['logo_position'], ENT_QUOTES) ?>">
     <div class="site-header__inner">
         <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>
