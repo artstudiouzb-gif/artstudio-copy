@@ -92,6 +92,51 @@ final class PageController
         ]);
     }
 
+    /**
+     * Предпросмотр страницы до публикации (группа 5.2). Рендерит страницу
+     * (в т.ч. черновик) со всеми блоками и scoped CSS, но: доступ только
+     * авторизованным, noindex, без записи в кэш и sitemap.
+     */
+    public function preview(array $params): void
+    {
+        Auth::requireLogin();
+
+        $page = Page::findById((int) $params['id']);
+        if (!$page) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        $lang = $this->resolveBlockLang();
+        $page = Page::localize($page, $lang);
+
+        // Рендерим блоки заново, минуя дисковый кэш (показываем актуальный черновик).
+        $blocks = Block::forPageLocalized((int) $page['id'], $lang);
+        $rendered = \App\Core\BlockRenderer::renderPage($blocks);
+        foreach ($rendered['assets'] ?? [] as $assetType) {
+            \App\Core\AssetCollector::requireJs($assetType);
+        }
+
+        $layoutType = $page['layout_type'] ?? 'no_sidebar';
+        $sidebar = null;
+        if ($layoutType === 'left_sidebar') {
+            $sidebar = ['position' => 'left', 'html' => \App\Models\Widget::renderSidebar('left', $lang)];
+        } elseif ($layoutType === 'right_sidebar') {
+            $sidebar = ['position' => 'right', 'html' => \App\Models\Widget::renderSidebar('right', $lang)];
+        }
+
+        View::render('site/page', [
+            'page' => $page,
+            'content' => $rendered['html'],
+            'blockCss' => $rendered['css'],
+            'layoutType' => $layoutType,
+            'sidebar' => $sidebar,
+            'robotsNoindex' => true,
+            'previewNotice' => true,
+        ]);
+    }
+
     public function update(array $params): void
     {
         Auth::requireLogin();

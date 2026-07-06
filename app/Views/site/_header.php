@@ -160,6 +160,9 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
 (function(){try{var t=localStorage.getItem('theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();
 </script>
 <title><?= htmlspecialchars($metaTitle, ENT_QUOTES) ?></title>
+<?php if (!empty($robotsNoindex)): ?>
+<meta name="robots" content="noindex, nofollow">
+<?php endif; ?>
 <?php if (!empty($metaDescription)): ?>
 <meta name="description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES) ?>">
 <?php endif; ?>
@@ -210,8 +213,13 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
 </style>
 <?php endif; ?>
 </head>
-<body>
+<body<?= !empty($previewNotice) ? ' class="is-preview"' : '' ?>>
 <a href="#main-content" class="skip-link">Перейти к содержимому</a>
+<?php if (!empty($previewNotice)): ?>
+<div class="preview-bar" role="status">
+    👁 Режим предпросмотра — эта версия не опубликована и закрыта от индексации.
+</div>
+<?php endif; ?>
 <header class="site-header site-header--logo-<?= htmlspecialchars($hcfg['logo_position'], ENT_QUOTES) ?>">
     <div class="site-header__inner">
         <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>

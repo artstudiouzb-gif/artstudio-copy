@@ -114,6 +114,10 @@ $blockTypeLabels = [
         <div class="form-actions">
             <button type="submit" class="btn btn--primary">Сохранить</button>
             <a href="/admin/pages" class="btn">Отмена</a>
+            <?php if ($isEdit): ?>
+                <a href="/admin/pages/<?= (int) $page['id'] ?>/preview?block_lang=<?= urlencode($blockLang) ?>"
+                   class="btn" target="_blank" rel="noopener">Предпросмотр ↗</a>
+            <?php endif; ?>
         </div>
     </form>
 </div>

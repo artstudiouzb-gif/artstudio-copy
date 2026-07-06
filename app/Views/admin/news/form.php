@@ -211,6 +211,9 @@ $languages = Language::active();
         <div class="form-actions">
             <button type="submit" class="btn btn--primary">Сохранить</button>
             <a href="/admin/news" class="btn">Отмена</a>
+            <?php if ($isEdit): ?>
+                <a href="/admin/news/<?= (int) $news['id'] ?>/preview" class="btn" target="_blank" rel="noopener">Предпросмотр ↗</a>
+            <?php endif; ?>
         </div>
     </form>
 </div>

@@ -94,6 +94,34 @@ final class NewsController
         ]);
     }
 
+    /**
+     * Предпросмотр новости до публикации (группа 5.2): рендер как на сайте,
+     * но только для авторизованных, с noindex и вне кэша/sitemap.
+     */
+    public function preview(array $params): void
+    {
+        Auth::requireLogin();
+        $news = News::findById((int) $params['id']);
+        if (!$news) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        $lang = (string) ($_GET['lang'] ?? Language::defaultCode());
+        if (!Language::isActive($lang)) {
+            $lang = Language::defaultCode();
+        }
+        $news = News::localize($news, $lang);
+
+        View::render('site/news_show', [
+            'news' => $news,
+            'gallery' => \App\Models\NewsImage::forNews((int) $news['id']),
+            'robotsNoindex' => true,
+            'previewNotice' => true,
+        ]);
+    }
+
     public function update(array $params): void
     {
         Auth::requireLogin();
