@@ -464,3 +464,20 @@ body.is-preview { outline: 3px solid #b45309; outline-offset: -3px; }
 @media (max-width: 640px) {
     .content-detail__row { grid-template-columns: 1fr; gap: 4px; }
 }
+
+/* --- Поиск по сайту --- */
+.site-search { display: inline-flex; align-items: center; border: 1px solid var(--border-color, #d5d9de); border-radius: 20px; overflow: hidden; background: var(--surface, #fff); }
+.site-search input { border: 0; outline: 0; padding: 6px 12px; font: inherit; background: transparent; color: inherit; width: 130px; max-width: 40vw; }
+.site-search button { border: 0; background: transparent; padding: 6px 10px; cursor: pointer; color: var(--color-accent, #e63946); display: inline-flex; }
+.site-search-page { max-width: 780px; margin: 0 auto; padding: 24px 16px 56px; }
+.site-search-page__form { display: flex; gap: 10px; margin: 16px 0 24px; }
+.site-search-page__form input { flex: 1; padding: 12px 16px; border: 1px solid var(--border-color, #d5d9de); border-radius: 8px; font: inherit; }
+.site-search-page__form button { padding: 12px 24px; border: 0; border-radius: 8px; background: var(--color-accent, #e63946); color: #fff; font-weight: 600; cursor: pointer; }
+.site-search-page__count { color: var(--text-muted); margin-bottom: 16px; }
+.site-search-results { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.site-search-results__item { padding: 14px 16px; border: 1px solid var(--border-color, #eee); border-radius: 8px; }
+.site-search-results__type { display: inline-block; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--color-accent, #e63946); font-weight: 700; margin-bottom: 4px; }
+.site-search-results__link { display: block; font-size: 1.1rem; font-weight: 600; text-decoration: none; color: var(--color-primary, #1a1a1a); }
+.site-search-results__link:hover { color: var(--color-accent, #e63946); }
+.site-search-results__excerpt { margin: 6px 0 0; color: var(--text-muted); font-size: .95rem; }
+@media (max-width: 640px) { .site-search { display: none; } }

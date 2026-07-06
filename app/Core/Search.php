@@ -52,4 +52,85 @@ final class Search
 
         return $results;
     }
+
+    /**
+     * Публичный поиск по сайту: только опубликованный контент, ссылки ведут на
+     * страницы фронтенда. Ищет по страницам, новостям и записям публичных
+     * пользовательских типов контента. URL локализуются под текущий язык.
+     *
+     * @return array<int, array{type: string, title: string, url: string, excerpt: string}>
+     */
+    public static function site(string $term, int $limit = 40): array
+    {
+        $term = trim($term);
+        if (mb_strlen($term) < 2) {
+            return [];
+        }
+        $like = '%' . str_replace(['%', '_'], ['\%', '\_'], $term) . '%';
+        $pdo = Database::pdo();
+        $lang = Locale::current();
+        $results = [];
+
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT title, slug FROM pages
+                 WHERE deleted_at IS NULL AND status = 'published' AND is_home = 0
+                   AND CONCAT_WS(' ', title, slug, meta_description) LIKE :q
+                 ORDER BY updated_at DESC LIMIT :n"
+            );
+            $stmt->bindValue(':q', $like);
+            $stmt->bindValue(':n', $limit, \PDO::PARAM_INT);
+            $stmt->execute();
+            foreach ($stmt->fetchAll() as $row) {
+                $results[] = [
+                    'type' => 'Страница',
+                    'title' => (string) $row['title'],
+                    'url' => Locale::url((string) $row['slug'], $lang),
+                    'excerpt' => '',
+                ];
+            }
+
+            $stmt = $pdo->prepare(
+                "SELECT title, slug, excerpt FROM news
+                 WHERE deleted_at IS NULL AND status = 'published'
+                   AND CONCAT_WS(' ', title, slug, excerpt, content) LIKE :q
+                 ORDER BY published_at DESC LIMIT :n"
+            );
+            $stmt->bindValue(':q', $like);
+            $stmt->bindValue(':n', $limit, \PDO::PARAM_INT);
+            $stmt->execute();
+            foreach ($stmt->fetchAll() as $row) {
+                $results[] = [
+                    'type' => 'Новость',
+                    'title' => (string) $row['title'],
+                    'url' => Locale::url('news/' . $row['slug'], $lang),
+                    'excerpt' => mb_substr(trim(strip_tags((string) ($row['excerpt'] ?? ''))), 0, 160),
+                ];
+            }
+
+            $stmt = $pdo->prepare(
+                "SELECT ce.title, ce.slug, ct.slug AS type_slug, ct.name AS type_name
+                 FROM content_entries ce
+                 JOIN content_types ct ON ct.id = ce.type_id
+                 WHERE ce.deleted_at IS NULL AND ce.status = 'published' AND ct.is_public = 1
+                   AND CONCAT_WS(' ', ce.title, ce.slug, ce.data) LIKE :q
+                 ORDER BY ce.created_at DESC LIMIT :n"
+            );
+            $stmt->bindValue(':q', $like);
+            $stmt->bindValue(':n', $limit, \PDO::PARAM_INT);
+            $stmt->execute();
+            foreach ($stmt->fetchAll() as $row) {
+                $results[] = [
+                    'type' => (string) $row['type_name'],
+                    'title' => (string) $row['title'],
+                    'url' => Locale::url('catalog/' . $row['type_slug'] . '/' . $row['slug'], $lang),
+                    'excerpt' => '',
+                ];
+            }
+        } catch (\Throwable $e) {
+            Logger::error('Site search failed: ' . $e->getMessage());
+        }
+
+        return $results;
+    }
 }

@@ -157,12 +157,19 @@ $a11yToggle = '<button type="button" class="a11y-toggle" aria-label="Верси�
     . '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>'
     . '<span>Для слабовидящих</span></button>';
 
+// --- Поиск по сайту ---
+$searchHtml = '<form class="site-search" method="get" action="' . htmlspecialchars(Locale::url('search', $currentLang), ENT_QUOTES) . '" role="search">'
+    . '<input type="search" name="q" placeholder="Поиск" aria-label="Поиск по сайту">'
+    . '<button type="submit" aria-label="Найти">'
+    . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>'
+    . '</button></form>';
+
 // --- Раскладка по зонам ---
 $zones = ['left' => '', 'center' => '', 'right' => ''];
 $zones[$hcfg['logo_position']] .= $logoHtml;
 $zones[$hcfg['menu_position']] .= $menuHtml;
 // Утилиты (язык, соцсети, CTA, тема) — в правую зону.
-$zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle . $a11yToggle;
+$zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeToggle . $a11yToggle;
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES) ?>" data-theme="<?= htmlspecialchars($defaultTheme, ENT_QUOTES) ?>"<?= $a11y['on'] ? ' data-a11y="1" data-a11y-scheme="' . htmlspecialchars($a11y['scheme'], ENT_QUOTES) . '" data-a11y-size="' . htmlspecialchars($a11y['size'], ENT_QUOTES) . '" data-a11y-images="' . htmlspecialchars($a11y['images'], ENT_QUOTES) . '"' : '' ?>>
