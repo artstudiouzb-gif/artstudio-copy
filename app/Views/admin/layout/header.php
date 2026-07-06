@@ -31,6 +31,7 @@ if ($isSuper) {
         'languages' => ['/admin/languages', 'Языки'],
         'users' => ['/admin/users', 'Пользователи'],
         'social' => ['/admin/social', 'Соцсети'],
+        'webhooks' => ['/admin/webhooks', 'Вебхуки'],
         'settings' => ['/admin/settings', 'Настройки'],
     ];
 }

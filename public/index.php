@@ -196,6 +196,12 @@ $router->post('/admin/settings', [SettingsController::class, 'update']);
 $router->get('/admin/social', [\App\Controllers\Admin\SocialController::class, 'index']);
 $router->post('/admin/social', [\App\Controllers\Admin\SocialController::class, 'update']);
 
+// --- Admin: исходящие вебхуки (только супер-админ) ---
+$router->get('/admin/webhooks', [\App\Controllers\Admin\WebhookController::class, 'index']);
+$router->post('/admin/webhooks/create', [\App\Controllers\Admin\WebhookController::class, 'store']);
+$router->post('/admin/webhooks/{id}/edit', [\App\Controllers\Admin\WebhookController::class, 'update']);
+$router->post('/admin/webhooks/{id}/delete', [\App\Controllers\Admin\WebhookController::class, 'destroy']);
+
 // --- Admin: резервное копирование ---
 $router->post('/admin/backup', [\App\Controllers\Admin\BackupController::class, 'create']);
 

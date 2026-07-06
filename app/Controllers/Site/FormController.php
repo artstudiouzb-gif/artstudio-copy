@@ -77,6 +77,13 @@ final class FormController
             $this->notify($form, $data);
         }
 
+        // Событие для исходящих вебхуков (задача 136).
+        \App\Core\WebhookDispatcher::dispatch('form.submitted', [
+            'form' => (string) $form['slug'],
+            'form_name' => (string) ($form['name'] ?? ''),
+            'fields' => $data,
+        ]);
+
         $this->success($successMessage);
     }
 

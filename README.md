@@ -651,6 +651,13 @@ php tests/run.php
   шаблон (`block_snippets`, `BlockSnippet`) и вставить его на другую страницу
   одним кликом — при вставке блоки получают новые id (совместимо с изоляцией
   CSS по `#block-{id}`).
+- **16.2 — исходящие вебхуки** (задача 136): таблицы `webhooks` +
+  `webhook_deliveries` (очередь), `WebhookDispatcher` (постановка события в
+  очередь + доставка с HMAC-SHA256-подписью `X-ArtStudio-Signature` и
+  SSRF-защитой через `UrlGuard::isSafeRemote`), CLI-воркер
+  `app/Console/webhook_worker.php` (ретраи x3, фиксация HTTP-кода). События
+  `form.submitted` (отправка формы) и `news.published` (публикация новости).
+  Раздел «Вебхуки» в админке (супер-админ) с журналом доставок.
 
 ## Возможные дальнейшие шаги
 

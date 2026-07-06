@@ -399,6 +399,35 @@ CREATE TABLE IF NOT EXISTS social_posts (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
+-- Исходящие вебхуки (этап 16.2)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS webhooks (
+    id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_type  VARCHAR(60)  NOT NULL,
+    url         VARCHAR(500) NOT NULL,
+    secret      VARCHAR(190) NULL,
+    is_active   TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_webhooks_event (event_type, is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS webhook_deliveries (
+    id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    webhook_id    BIGINT UNSIGNED NOT NULL,
+    event_type    VARCHAR(60)  NOT NULL,
+    payload_json  LONGTEXT     NOT NULL,
+    status        ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+    attempts      INT UNSIGNED NOT NULL DEFAULT 0,
+    response_code INT          NULL,
+    last_error    VARCHAR(500) NULL,
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at       DATETIME     NULL,
+    KEY idx_webhook_deliveries_status (status, created_at),
+    KEY idx_webhook_deliveries_hook (webhook_id, created_at),
+    CONSTRAINT fk_webhook_deliveries_hook FOREIGN KEY (webhook_id) REFERENCES webhooks (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
 -- Библиотека шаблонов блоков (сниппеты, этап 16.1)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS block_snippets (
@@ -429,7 +458,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_05_security_block11.sql'),
     ('2026_07_05_news_media.sql'),
     ('2026_07_05_social_posts.sql'),
-    ('2026_07_06_block_snippets.sql')
+    ('2026_07_06_block_snippets.sql'),
+    ('2026_07_06_webhooks.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

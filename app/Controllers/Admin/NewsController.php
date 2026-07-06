@@ -66,9 +66,10 @@ final class NewsController
         $this->saveTranslations($id);
         $this->handleGallery($id);
 
-        // Авто-публикация в соцсети при создании сразу опубликованной новости.
+        // Авто-публикация в соцсети + вебхук при создании опубликованной новости.
         if ($data['status'] === 'published') {
             \App\Core\SocialSettings::enqueueForNews($id);
+            $this->dispatchNewsPublished($id, $data);
         }
 
         Flash::success('Новость создана.');
@@ -122,14 +123,27 @@ final class NewsController
         $this->saveTranslations($id);
         $this->handleGallery($id);
 
-        // Авто-публикация при переходе черновик -> опубликовано (без повторов).
+        // Авто-публикация + вебхук при переходе черновик -> опубликовано.
         if ($data['status'] === 'published' && !$wasPublished) {
             \App\Core\SocialSettings::enqueueForNews($id);
+            $this->dispatchNewsPublished($id, $data);
         }
 
         Flash::success('Новость обновлена.');
         header('Location: /admin/news');
         exit;
+    }
+
+    /** Отправляет событие news.published в исходящие вебхуки (задача 136). */
+    private function dispatchNewsPublished(int $id, array $data): void
+    {
+        $base = rtrim((string) \App\Core\Config::get('app.url', ''), '/');
+        \App\Core\WebhookDispatcher::dispatch('news.published', [
+            'id' => $id,
+            'title' => (string) ($data['title'] ?? ''),
+            'slug' => (string) ($data['slug'] ?? ''),
+            'url' => $base . '/news/' . rawurlencode((string) ($data['slug'] ?? '')),
+        ]);
     }
 
     /** Ручная постановка новости в очередь публикации во все готовые сети. */
