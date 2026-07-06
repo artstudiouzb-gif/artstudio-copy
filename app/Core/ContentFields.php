@@ -74,6 +74,47 @@ final class ContentFields
         return $html;
     }
 
+    /**
+     * Безопасный HTML значения поля для публичного фронтенда (списки/карточки
+     * пользовательских типов контента). Возвращает '' для пустых значений.
+     *
+     * @param array<string,mixed> $field
+     * @param mixed $value
+     */
+    public static function displayValue(array $field, mixed $value): string
+    {
+        if ($value === null || $value === '' || (is_array($value) && $value === [])) {
+            return '';
+        }
+        $type = (string) $field['field_type'];
+        $scalar = is_scalar($value) ? (string) $value : '';
+
+        switch ($type) {
+            case 'textarea':
+                return nl2br(htmlspecialchars($scalar, ENT_QUOTES));
+            case 'date':
+                $ts = strtotime($scalar);
+                return $ts ? htmlspecialchars(date('d.m.Y', $ts), ENT_QUOTES) : htmlspecialchars($scalar, ENT_QUOTES);
+            case 'image':
+                $src = htmlspecialchars($scalar, ENT_QUOTES);
+                return '<img src="' . $src . '" alt="' . htmlspecialchars((string) $field['label'], ENT_QUOTES) . '" loading="lazy">';
+            case 'file':
+                $href = htmlspecialchars($scalar, ENT_QUOTES);
+                return '<a href="' . $href . '" target="_blank" rel="noopener" download>' . htmlspecialchars((string) $field['label'], ENT_QUOTES) . '</a>';
+            case 'relation':
+                $target = ContentType::findBySlug((string) ($field['options']['relation_type'] ?? ''));
+                if ($target !== null && ctype_digit($scalar)) {
+                    $entry = ContentEntry::findById((int) $scalar);
+                    if ($entry !== null) {
+                        return htmlspecialchars((string) $entry['title'], ENT_QUOTES);
+                    }
+                }
+                return htmlspecialchars($scalar, ENT_QUOTES);
+            default: // text, number
+                return htmlspecialchars($scalar, ENT_QUOTES);
+        }
+    }
+
     private static function renderRelation(array $field, string $name, string $id, string $value, string $required): string
     {
         $targetSlug = (string) ($field['options']['relation_type'] ?? '');

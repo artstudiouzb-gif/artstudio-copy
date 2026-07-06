@@ -270,6 +270,8 @@ $router->get('/robots.txt', [\App\Controllers\Site\SitemapController::class, 'ro
 $router->get('/', [SitePageController::class, 'home']);
 $router->get('/news', [SiteNewsController::class, 'index']);
 $router->get('/news/{slug}', [SiteNewsController::class, 'show']);
+$router->get('/catalog/{type}', [\App\Controllers\Site\ContentController::class, 'index']);
+$router->get('/catalog/{type}/{slug}', [\App\Controllers\Site\ContentController::class, 'show']);
 $router->post('/forms/{slug}/submit', [SiteFormController::class, 'submit']);
 $router->get('/{slug}', [SitePageController::class, 'show']);
 

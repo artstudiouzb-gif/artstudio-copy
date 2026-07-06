@@ -19,9 +19,17 @@ $ftypes = ['text' => 'Текст', 'textarea' => 'Многострочный', '
             <label for="name">Название типа</label>
             <input type="text" id="name" name="name" value="<?= htmlspecialchars((string) $type['name'], ENT_QUOTES) ?>" required>
         </div>
+        <div class="form-field">
+            <label for="description">Описание раздела (для страницы списка на сайте)</label>
+            <input type="text" id="description" name="description" value="<?= htmlspecialchars((string) ($type['description'] ?? ''), ENT_QUOTES) ?>">
+        </div>
         <div class="form-field form-field--checkbox">
             <input type="checkbox" id="has_translations" name="has_translations" value="1" <?= (int) $type['has_translations'] === 1 ? 'checked' : '' ?>>
             <label for="has_translations">Мультиязычный</label>
+        </div>
+        <div class="form-field form-field--checkbox">
+            <input type="checkbox" id="is_public" name="is_public" value="1" <?= (int) ($type['is_public'] ?? 1) === 1 ? 'checked' : '' ?>>
+            <label for="is_public">Публичный раздел (доступен на сайте по адресу <code>/catalog/<?= htmlspecialchars((string) $type['slug'], ENT_QUOTES) ?></code>)</label>
         </div>
 
         <h3>Поля</h3>

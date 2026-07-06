@@ -30,13 +30,15 @@ final class ContentTypeController
         $name = trim((string) ($_POST['name'] ?? ''));
         $slug = Slug::make((string) ($_POST['slug'] ?? '') ?: $name);
         $hasTr = !empty($_POST['has_translations']);
+        $description = trim((string) ($_POST['description'] ?? ''));
+        $isPublic = !empty($_POST['is_public']);
 
         if ($name === '' || $slug === '') {
             Flash::error('Укажите название типа.');
         } elseif (ContentType::slugExists($slug)) {
             Flash::error('Тип с таким адресом уже существует.');
         } else {
-            $id = ContentType::create($slug, $name, $hasTr);
+            $id = ContentType::create($slug, $name, $hasTr, $description, $isPublic);
             Flash::success('Тип контента создан. Добавьте поля.');
             header('Location: /admin/content-types/' . $id . '/fields');
             exit;
@@ -73,7 +75,13 @@ final class ContentTypeController
             return;
         }
 
-        ContentType::update((int) $type['id'], trim((string) ($_POST['name'] ?? $type['name'])), !empty($_POST['has_translations']));
+        ContentType::update(
+            (int) $type['id'],
+            trim((string) ($_POST['name'] ?? $type['name'])),
+            !empty($_POST['has_translations']),
+            trim((string) ($_POST['description'] ?? ($type['description'] ?? ''))),
+            !empty($_POST['is_public'])
+        );
 
         $fields = [];
         foreach ((array) ($_POST['fields'] ?? []) as $f) {

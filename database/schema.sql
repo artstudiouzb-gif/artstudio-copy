@@ -465,7 +465,9 @@ CREATE TABLE IF NOT EXISTS content_types (
     id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     slug             VARCHAR(60)  NOT NULL,
     name             VARCHAR(190) NOT NULL,
+    description      VARCHAR(255) NOT NULL DEFAULT '',
     has_translations TINYINT(1)   NOT NULL DEFAULT 0,
+    is_public        TINYINT(1)   NOT NULL DEFAULT 1,
     created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_content_types_slug (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -475,7 +477,7 @@ CREATE TABLE IF NOT EXISTS content_type_fields (
     type_id     INT UNSIGNED NOT NULL,
     name        VARCHAR(60)  NOT NULL,
     label       VARCHAR(190) NOT NULL,
-    field_type  ENUM('text','textarea','number','date','file','relation') NOT NULL DEFAULT 'text',
+    field_type  ENUM('text','textarea','number','date','image','file','relation') NOT NULL DEFAULT 'text',
     required    TINYINT(1)   NOT NULL DEFAULT 0,
     sort_order  INT          NOT NULL DEFAULT 0,
     options     LONGTEXT     NULL,
@@ -509,6 +511,37 @@ CREATE TABLE IF NOT EXISTS content_entry_translations (
     UNIQUE KEY uq_content_entry_translations (entry_id, lang),
     CONSTRAINT fk_content_entry_translations_entry FOREIGN KEY (entry_id) REFERENCES content_entries (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
+-- Стартовые публичные типы контента государственного сайта (редактируемы)
+-- ---------------------------------------------------------------------------
+INSERT IGNORE INTO content_types (slug, name, description, has_translations, is_public, created_at) VALUES
+    ('documenty', 'Документы', 'Официальные документы, приказы и постановления', 1, 1, NOW()),
+    ('vakansii',  'Вакансии',  'Открытые вакансии организации', 1, 1, NOW()),
+    ('tendery',   'Тендеры',   'Актуальные тендеры и закупки', 1, 1, NOW());
+
+INSERT INTO content_type_fields (type_id, name, label, field_type, required, sort_order, created_at)
+SELECT t.id, f.name, f.label, f.field_type, f.required, f.sort_order, NOW()
+FROM content_types t
+JOIN (
+    SELECT 'documenty' AS slug, 'doc_number' AS name, 'Номер документа' AS label, 'text' AS field_type, 0 AS required, 0 AS sort_order
+    UNION ALL SELECT 'documenty', 'doc_date',  'Дата',              'date',     0, 1
+    UNION ALL SELECT 'documenty', 'category',  'Категория',         'text',     0, 2
+    UNION ALL SELECT 'documenty', 'summary',   'Краткое описание',  'textarea', 0, 3
+    UNION ALL SELECT 'documenty', 'file',      'Файл документа',    'file',     1, 4
+    UNION ALL SELECT 'vakansii',  'department','Отдел',             'text',     0, 0
+    UNION ALL SELECT 'vakansii',  'salary',    'Зарплата',          'text',     0, 1
+    UNION ALL SELECT 'vakansii',  'deadline',  'Приём заявок до',   'date',     0, 2
+    UNION ALL SELECT 'vakansii',  'requirements','Требования',      'textarea', 0, 3
+    UNION ALL SELECT 'vakansii',  'duties',    'Обязанности',       'textarea', 0, 4
+    UNION ALL SELECT 'tendery',   'tender_number','Номер тендера',  'text',     0, 0
+    UNION ALL SELECT 'tendery',   'budget',    'Бюджет',            'text',     0, 1
+    UNION ALL SELECT 'tendery',   'start_date','Дата публикации',   'date',     0, 2
+    UNION ALL SELECT 'tendery',   'deadline',  'Приём заявок до',   'date',     0, 3
+    UNION ALL SELECT 'tendery',   'summary',   'Описание',          'textarea', 0, 4
+    UNION ALL SELECT 'tendery',   'file',      'Тендерная документация', 'file', 0, 5
+) f ON f.slug = t.slug
+WHERE NOT EXISTS (SELECT 1 FROM content_type_fields x WHERE x.type_id = t.id);
 
 -- ---------------------------------------------------------------------------
 -- Защищённое файловое хранилище (репозиторий) с собственной авторизацией
@@ -573,7 +606,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_06_block_revisions.sql'),
     ('2026_07_06_block_columns.sql'),
     ('2026_07_06_page_landing.sql'),
-    ('2026_07_06_file_repository.sql')
+    ('2026_07_06_file_repository.sql'),
+    ('2026_07_06_content_frontend.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

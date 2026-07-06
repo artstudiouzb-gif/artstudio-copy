@@ -12,12 +12,18 @@ use App\Core\Database;
  */
 final class ContentType
 {
-    public const FIELD_TYPES = ['text', 'textarea', 'number', 'date', 'file', 'relation'];
+    public const FIELD_TYPES = ['text', 'textarea', 'number', 'date', 'image', 'file', 'relation'];
 
     /** @return array<int, array<string, mixed>> */
     public static function all(): array
     {
         return Database::pdo()->query('SELECT * FROM content_types ORDER BY name ASC')->fetchAll();
+    }
+
+    /** Публичные типы (показываются на сайте). @return array<int, array<string, mixed>> */
+    public static function allPublic(): array
+    {
+        return Database::pdo()->query('SELECT * FROM content_types WHERE is_public = 1 ORDER BY name ASC')->fetchAll();
     }
 
     public static function findById(int $id): ?array
@@ -50,20 +56,35 @@ final class ContentType
         return (int) $stmt->fetchColumn() > 0;
     }
 
-    public static function create(string $slug, string $name, bool $hasTranslations): int
+    public static function create(string $slug, string $name, bool $hasTranslations, string $description = '', bool $isPublic = true): int
     {
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO content_types (slug, name, has_translations, created_at) VALUES (:s, :n, :t, NOW())'
+            'INSERT INTO content_types (slug, name, description, has_translations, is_public, created_at)
+             VALUES (:s, :n, :d, :t, :p, NOW())'
         );
-        $stmt->execute([':s' => $slug, ':n' => $name, ':t' => $hasTranslations ? 1 : 0]);
+        $stmt->execute([
+            ':s' => $slug,
+            ':n' => $name,
+            ':d' => $description,
+            ':t' => $hasTranslations ? 1 : 0,
+            ':p' => $isPublic ? 1 : 0,
+        ]);
 
         return (int) Database::pdo()->lastInsertId();
     }
 
-    public static function update(int $id, string $name, bool $hasTranslations): void
+    public static function update(int $id, string $name, bool $hasTranslations, string $description = '', bool $isPublic = true): void
     {
-        $stmt = Database::pdo()->prepare('UPDATE content_types SET name = :n, has_translations = :t WHERE id = :id');
-        $stmt->execute([':n' => $name, ':t' => $hasTranslations ? 1 : 0, ':id' => $id]);
+        $stmt = Database::pdo()->prepare(
+            'UPDATE content_types SET name = :n, description = :d, has_translations = :t, is_public = :p WHERE id = :id'
+        );
+        $stmt->execute([
+            ':n' => $name,
+            ':d' => $description,
+            ':t' => $hasTranslations ? 1 : 0,
+            ':p' => $isPublic ? 1 : 0,
+            ':id' => $id,
+        ]);
     }
 
     public static function delete(int $id): void
