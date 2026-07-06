@@ -54,7 +54,7 @@ $fields = $form['fields'] ?? [];
                         <div class="form-field">
                             <label>Тип поля</label>
                             <select name="fields[<?= $i ?>][type]">
-                                <?php foreach (['text' => 'Текст', 'email' => 'Email', 'tel' => 'Телефон', 'textarea' => 'Многострочный текст'] as $val => $label): ?>
+                                <?php foreach (['text' => 'Текст', 'email' => 'Email', 'tel' => 'Телефон', 'textarea' => 'Многострочный текст', 'file' => 'Файл'] as $val => $label): ?>
                                     <option value="<?= $val ?>" <?= ($field['type'] ?? 'text') === $val ? 'selected' : '' ?>><?= $label ?></option>
                                 <?php endforeach; ?>
                             </select>
@@ -62,6 +62,14 @@ $fields = $form['fields'] ?? [];
                         <div class="form-field form-field--checkbox">
                             <input type="checkbox" name="fields[<?= $i ?>][required]" value="1" <?= !empty($field['required']) ? 'checked' : '' ?>>
                             <label>Обязательное поле</label>
+                        </div>
+                        <div class="form-field">
+                            <label>Условие показа (необязательно)</label>
+                            <div style="display:flex;gap:8px;">
+                                <input type="text" name="fields[<?= $i ?>][condition_field]" placeholder="имя другого поля" value="<?= htmlspecialchars($field['condition']['field'] ?? '', ENT_QUOTES) ?>">
+                                <input type="text" name="fields[<?= $i ?>][condition_value]" placeholder="= значение" value="<?= htmlspecialchars($field['condition']['value'] ?? '', ENT_QUOTES) ?>">
+                            </div>
+                            <span class="form-hint">Поле показывается только если указанное поле равно значению.</span>
                         </div>
                         <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить поле</button>
                     </div>
@@ -83,11 +91,19 @@ $fields = $form['fields'] ?? [];
                         <option value="email">Email</option>
                         <option value="tel">Телефон</option>
                         <option value="textarea">Многострочный текст</option>
+                        <option value="file">Файл</option>
                     </select>
                 </div>
                 <div class="form-field form-field--checkbox">
                     <input type="checkbox" name="fields[__INDEX__][required]" value="1">
                     <label>Обязательное поле</label>
+                </div>
+                <div class="form-field">
+                    <label>Условие показа (необязательно)</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" name="fields[__INDEX__][condition_field]" placeholder="имя другого поля">
+                        <input type="text" name="fields[__INDEX__][condition_value]" placeholder="= значение">
+                    </div>
                 </div>
                 <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить поле</button>
             </template>

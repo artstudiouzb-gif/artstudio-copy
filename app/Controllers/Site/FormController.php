@@ -48,8 +48,30 @@ final class FormController
 
         foreach ($form['fields'] as $field) {
             $name = $field['name'];
-            $value = trim((string) ($_POST[$name] ?? ''));
 
+            // Условная логика (задача 135): скрытое условием поле не валидируем.
+            if (!$this->fieldActive($field)) {
+                continue;
+            }
+
+            // Поле-файл: реальная проверка MIME и сохранение через Uploader.
+            if (($field['type'] ?? '') === 'file') {
+                $file = $_FILES[$name] ?? null;
+                $uploaded = $file && ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
+                if (!empty($field['required']) && !$uploaded) {
+                    $errors[$name] = 'Приложите файл к полю «' . $field['label'] . '».';
+                } elseif ($uploaded) {
+                    try {
+                        $stored = \App\Core\Uploader::store($file, 'public', null);
+                        $data[$name] = \App\Models\FileEntry::publicUrl($stored);
+                    } catch (\Throwable $e) {
+                        $errors[$name] = $e->getMessage();
+                    }
+                }
+                continue;
+            }
+
+            $value = trim((string) ($_POST[$name] ?? ''));
             if (!empty($field['required']) && $value === '') {
                 $errors[$name] = 'Поле «' . $field['label'] . '» обязательно.';
                 continue;
@@ -85,6 +107,21 @@ final class FormController
         ]);
 
         $this->success($successMessage);
+    }
+
+    /**
+     * Активно ли поле по условной логике (задача 135): без условия — всегда;
+     * с условием — только если поле-триггер равно заданному значению.
+     */
+    private function fieldActive(array $field): bool
+    {
+        $cond = $field['condition'] ?? null;
+        if (!is_array($cond) || empty($cond['field'])) {
+            return true;
+        }
+        $trigger = trim((string) ($_POST[(string) $cond['field']] ?? ''));
+
+        return $trigger === (string) ($cond['value'] ?? '');
     }
 
     /** AJAX-запрос ли это (fetch с X-Requested-With). */

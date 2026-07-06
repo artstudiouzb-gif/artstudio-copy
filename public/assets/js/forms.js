@@ -5,6 +5,28 @@
     if (!forms.length) { return; }
 
     forms.forEach(function (form) {
+        // --- Условная логика полей (задача 135) ---
+        var conditional = Array.prototype.slice.call(form.querySelectorAll('[data-cond-field]'));
+        if (conditional.length) {
+            var applyConditions = function () {
+                conditional.forEach(function (fieldEl) {
+                    var trigName = fieldEl.getAttribute('data-cond-field');
+                    var trigVal = fieldEl.getAttribute('data-cond-value');
+                    var trigger = form.querySelector('[name="' + trigName + '"]');
+                    var current = trigger ? String(trigger.value || '') : '';
+                    var show = current === trigVal;
+                    fieldEl.style.display = show ? '' : 'none';
+                    // Отключаем скрытые поля, чтобы браузер их не валидировал/не слал.
+                    fieldEl.querySelectorAll('input, textarea, select').forEach(function (inp) {
+                        inp.disabled = !show;
+                    });
+                });
+            };
+            form.addEventListener('change', applyConditions);
+            form.addEventListener('input', applyConditions);
+            applyConditions();
+        }
+
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 

@@ -11,7 +11,8 @@ $form = $data['form'] ?? null;
         <p class="block-form__missing">Форма не найдена или ещё не выбрана в настройках блока.</p>
     <?php else: ?>
         <?php if (!empty($form['name'])): ?><h2><?= htmlspecialchars($form['name'], ENT_QUOTES) ?></h2><?php endif; ?>
-        <form method="post" action="/forms/<?= htmlspecialchars($form['slug'], ENT_QUOTES) ?>/submit" class="block-form__form">
+        <?php $hasFile = false; foreach ($form['fields'] as $f) { if (($f['type'] ?? '') === 'file') { $hasFile = true; break; } } ?>
+        <form method="post" action="/forms/<?= htmlspecialchars($form['slug'], ENT_QUOTES) ?>/submit" class="block-form__form"<?= $hasFile ? ' enctype="multipart/form-data"' : '' ?>>
             <?= Csrf::field() ?>
             <?= Csrf::honeypotField() ?>
             <?php foreach ($form['fields'] as $field): ?>
@@ -21,11 +22,23 @@ $form = $data['form'] ?? null;
                 $fieldType = $field['type'] ?? 'text';
                 $required = !empty($field['required']) ? 'required' : '';
                 $inputId = 'field-' . $fieldName . '-' . (int) $blockId;
+                // Условная логика (задача 135): поле с условием стартует скрытым,
+                // JS показывает его при совпадении значения триггера.
+                $cond = $field['condition'] ?? null;
+                $condAttrs = '';
+                $hiddenStyle = '';
+                if (is_array($cond) && !empty($cond['field'])) {
+                    $condAttrs = ' data-cond-field="' . htmlspecialchars((string) $cond['field'], ENT_QUOTES)
+                        . '" data-cond-value="' . htmlspecialchars((string) ($cond['value'] ?? ''), ENT_QUOTES) . '"';
+                    $hiddenStyle = ' style="display:none"';
+                }
                 ?>
-                <div class="block-form__field">
+                <div class="block-form__field"<?= $condAttrs ?><?= $hiddenStyle ?>>
                     <label for="<?= $inputId ?>"><?= $fieldLabel ?></label>
                     <?php if ($fieldType === 'textarea'): ?>
                         <textarea id="<?= $inputId ?>" name="<?= $fieldName ?>" <?= $required ?>></textarea>
+                    <?php elseif ($fieldType === 'file'): ?>
+                        <input type="file" id="<?= $inputId ?>" name="<?= $fieldName ?>" <?= $required ?>>
                     <?php else: ?>
                         <input type="<?= htmlspecialchars($fieldType, ENT_QUOTES) ?>" id="<?= $inputId ?>" name="<?= $fieldName ?>" <?= $required ?>>
                     <?php endif; ?>
