@@ -21,6 +21,12 @@ require __DIR__ . '/../Core/bootstrap.php';
 
 \App\Core\Heartbeat::touch('social'); // группа 2.1
 
+$workerLock = \App\Core\ProcessLock::acquire('social_worker'); // группа 6
+if ($workerLock === null) {
+    fwrite(STDERR, 'social_worker уже выполняется — пропуск запуска.' . PHP_EOL);
+    exit(0);
+}
+
 use App\Core\Logger;
 use App\Core\SocialPublisher;
 use App\Core\SocialSettings;

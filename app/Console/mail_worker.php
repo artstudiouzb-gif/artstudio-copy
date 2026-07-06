@@ -21,6 +21,13 @@ require __DIR__ . '/../Core/bootstrap.php';
 
 \App\Core\Heartbeat::touch('mail'); // группа 2.1
 
+// Защита от наложения запусков (группа 6): не стартуем поверх незавершённого.
+$workerLock = \App\Core\ProcessLock::acquire('mail_worker');
+if ($workerLock === null) {
+    fwrite(STDERR, 'mail_worker уже выполняется — пропуск запуска.' . PHP_EOL);
+    exit(0);
+}
+
 use App\Core\Mailer;
 use App\Models\MailQueue;
 

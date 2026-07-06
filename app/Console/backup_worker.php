@@ -29,14 +29,13 @@ use App\Core\Backup;
 use App\Core\Config;
 use App\Core\Heartbeat;
 use App\Core\Logger;
+use App\Core\ProcessLock;
 
 Heartbeat::touch('backup'); // группа 2.1
 
 // Защита от наложения запусков: если предыдущий бэкап ещё идёт — выходим.
-$lockFile = APP_ROOT . '/storage/cache/backup_worker.lock';
-@mkdir(dirname($lockFile), 0750, true);
-$lock = fopen($lockFile, 'c');
-if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
+$lock = ProcessLock::acquire('backup_worker'); // группа 6 (единый хелпер)
+if ($lock === null) {
     fwrite(STDERR, 'Предыдущий бэкап ещё выполняется — пропуск запуска.' . PHP_EOL);
     exit(0);
 }
@@ -83,6 +82,5 @@ try {
     fwrite(STDERR, 'ОШИБКА бэкапа: ' . $e->getMessage() . PHP_EOL);
     exit(1);
 } finally {
-    flock($lock, LOCK_UN);
-    fclose($lock);
+    ProcessLock::release($lock);
 }

@@ -20,6 +20,12 @@ require __DIR__ . '/../Core/bootstrap.php';
 
 \App\Core\Heartbeat::touch('webhook'); // группа 2.1
 
+$workerLock = \App\Core\ProcessLock::acquire('webhook_worker'); // группа 6
+if ($workerLock === null) {
+    fwrite(STDERR, 'webhook_worker уже выполняется — пропуск запуска.' . PHP_EOL);
+    exit(0);
+}
+
 use App\Core\WebhookDispatcher;
 use App\Models\Webhook;
 use App\Models\WebhookDelivery;
