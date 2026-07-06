@@ -15,6 +15,15 @@ return [
         'url' => getenv('APP_URL') ?: 'https://example.com',
         'timezone' => getenv('APP_TIMEZONE') ?: 'Europe/Moscow',
     ],
+    // Критические ключи жизнеобеспечения — строго из файла/окружения, не из БД
+    // (задача 115). Падение БД не влияет на их чтение.
+    'crypto' => [
+        'app_env' => getenv('APP_ENV') ?: 'production',
+        'app_url' => getenv('APP_URL') ?: '',
+        // Ключ шифрования для будущего шифрования секретов at-rest
+        // (напр. TOTP-секретов). Сгенерируйте: bin2hex(random_bytes(32)).
+        'encryption_key' => getenv('APP_ENCRYPTION_KEY') ?: '',
+    ],
     'db' => [
         'host' => getenv('DB_HOST') ?: '127.0.0.1',
         'port' => getenv('DB_PORT') ?: '3306',

@@ -32,11 +32,21 @@ $fontFaceName = Setting::get('font_face_name', ''); // имя семейства
 $appUrl = rtrim((string) \App\Core\Config::get('app.url', ''), '/');
 $canonicalUrl = $appUrl . Locale::url(Locale::path());
 $ogType = $ogType ?? 'website';
-$ogImageRaw = $ogImage ?? ($logo !== '' ? $logo : '');
+// Приоритет OG-картинки: страница -> дефолтный OG:Image -> логотип (задача 116).
+$defaultOg = Setting::get('default_og_image', '');
+$ogImageRaw = ($ogImage ?? '') !== '' ? $ogImage : ($defaultOg !== '' ? $defaultOg : ($logo !== '' ? $logo : ''));
 // Абсолютный URL для og:image.
 if ($ogImageRaw !== '' && !preg_match('#^https?://#', $ogImageRaw)) {
     $ogImageRaw = $appUrl . '/' . ltrim($ogImageRaw, '/');
 }
+// Meta Description по умолчанию, если не задан на странице.
+if (empty($metaDescription)) {
+    $metaDescription = Setting::get('default_meta_description', '');
+}
+// Favicon / Theme Color / PWA (задача 116).
+$faviconUrl = Setting::get('favicon_url', '');
+$themeColor = Setting::get('theme_color', '');
+$pwaShortName = Setting::get('pwa_short_name', '');
 
 $hcfg = HeaderConfig::get();
 $currentLang = Locale::current();
@@ -152,6 +162,16 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
     font-display: swap;
 }
 </style>
+<?php endif; ?>
+<?php if ($faviconUrl !== ''): ?>
+<link rel="icon" href="<?= htmlspecialchars($faviconUrl, ENT_QUOTES) ?>">
+<?php endif; ?>
+<?php if ($themeColor !== ''): ?>
+<meta name="theme-color" content="<?= htmlspecialchars($themeColor, ENT_QUOTES) ?>">
+<?php endif; ?>
+<?php if ($pwaShortName !== ''): ?>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars($pwaShortName, ENT_QUOTES) ?>">
 <?php endif; ?>
 <link rel="stylesheet" href="/assets/css/frontend.css">
 <style>

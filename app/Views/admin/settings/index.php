@@ -77,11 +77,77 @@ require __DIR__ . '/../layout/header.php';
             <input type="text" id="contact_address" name="contact_address" value="<?= htmlspecialchars($settings['contact_address'] ?? '', ENT_QUOTES) ?>">
         </div>
 
-        <div class="form-field">
-            <label for="counter_codes">Коды счётчиков (Google Analytics, Яндекс.Метрика и т.п.)</label>
-            <textarea id="counter_codes" name="counter_codes" style="min-height:140px; font-family: monospace;"><?= htmlspecialchars($settings['counter_codes'] ?? '', ENT_QUOTES) ?></textarea>
-            <span class="form-hint">Вставляется в конец страницы как есть (доступно только администраторам).</span>
-        </div>
+        <fieldset class="settings-group">
+            <legend>Веб-аналитика и трекинг</legend>
+            <div class="form-field">
+                <label for="analytics_ga_id">Google Analytics ID</label>
+                <input type="text" id="analytics_ga_id" name="analytics_ga_id" value="<?= htmlspecialchars($settings['analytics_ga_id'] ?? '', ENT_QUOTES) ?>" placeholder="G-XXXXXXXXXX">
+                <span class="form-hint">Только идентификатор формата <code>G-XXXXXXXXXX</code>. Скрипт собирается автоматически (сырой JS не принимается).</span>
+            </div>
+            <div class="form-field">
+                <label for="analytics_ym_id">Яндекс.Метрика ID</label>
+                <input type="text" id="analytics_ym_id" name="analytics_ym_id" value="<?= htmlspecialchars($settings['analytics_ym_id'] ?? '', ENT_QUOTES) ?>" placeholder="12345678" inputmode="numeric">
+            </div>
+        </fieldset>
+
+        <fieldset class="settings-group">
+            <legend>Приватность и GDPR</legend>
+            <div class="form-field form-field--checkbox">
+                <input type="checkbox" id="cookie_consent_enabled" name="cookie_consent_enabled" value="1" <?= ($settings['cookie_consent_enabled'] ?? '0') === '1' ? 'checked' : '' ?>>
+                <label for="cookie_consent_enabled">Показывать Cookie-Consent баннер (счётчики грузятся только после согласия)</label>
+            </div>
+            <div class="form-field">
+                <label for="privacy_policy_page_id">Страница «Политика конфиденциальности»</label>
+                <select id="privacy_policy_page_id" name="privacy_policy_page_id">
+                    <option value="">— не выбрано —</option>
+                    <?php foreach (($pages ?? []) as $p): ?>
+                        <?php if (($p['status'] ?? '') !== 'published') { continue; } ?>
+                        <option value="<?= (int) $p['id'] ?>" <?= (string) ($settings['privacy_policy_page_id'] ?? '') === (string) $p['id'] ? 'selected' : '' ?>><?= htmlspecialchars((string) $p['title'], ENT_QUOTES) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="pii_retention_days">Срок хранения ПДн (дней, 0 — бессрочно)</label>
+                <input type="number" id="pii_retention_days" name="pii_retention_days" min="0" value="<?= htmlspecialchars($settings['pii_retention_days'] ?? '0', ENT_QUOTES) ?>">
+            </div>
+        </fieldset>
+
+        <fieldset class="settings-group">
+            <legend>Favicon и PWA</legend>
+            <div class="form-field">
+                <label for="favicon_file">Favicon (.svg/.png, файл)</label>
+                <input type="file" id="favicon_file" name="favicon_file" accept="image/png,image/svg+xml">
+            </div>
+            <div class="form-field">
+                <label for="favicon_url">...либо ссылка на favicon</label>
+                <input type="text" id="favicon_url" name="favicon_url" value="<?= htmlspecialchars($settings['favicon_url'] ?? '', ENT_QUOTES) ?>">
+            </div>
+            <div class="form-field">
+                <label for="pwa_short_name">Короткое имя приложения (до 12 символов)</label>
+                <input type="text" id="pwa_short_name" name="pwa_short_name" maxlength="12" value="<?= htmlspecialchars($settings['pwa_short_name'] ?? '', ENT_QUOTES) ?>">
+            </div>
+            <div class="form-field">
+                <label for="theme_color">Theme Color (HEX)</label>
+                <input type="text" id="theme_color" name="theme_color" value="<?= htmlspecialchars($settings['theme_color'] ?? '#1a1a1a', ENT_QUOTES) ?>" placeholder="#1a1a1a">
+            </div>
+        </fieldset>
+
+        <fieldset class="settings-group">
+            <legend>Глобальное SEO и соцсети</legend>
+            <div class="form-field">
+                <label for="default_meta_description">Meta Description по умолчанию</label>
+                <input type="text" id="default_meta_description" name="default_meta_description" value="<?= htmlspecialchars($settings['default_meta_description'] ?? '', ENT_QUOTES) ?>">
+            </div>
+            <div class="form-field">
+                <label for="default_og_image_file">OG:Image по умолчанию (файл)</label>
+                <input type="file" id="default_og_image_file" name="default_og_image_file" accept="image/*">
+            </div>
+            <div class="form-field">
+                <label for="default_og_image">...либо ссылка на OG:Image</label>
+                <input type="text" id="default_og_image" name="default_og_image" value="<?= htmlspecialchars($settings['default_og_image'] ?? '', ENT_QUOTES) ?>">
+            </div>
+            <span class="form-hint">Ссылки на соцсети (Telegram/YouTube/VK/Instagram) настраиваются в разделе «Шапка сайта».</span>
+        </fieldset>
 
         <div class="form-field form-field--checkbox">
             <input type="checkbox" id="maintenance_mode" name="maintenance_mode" value="1" <?= ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : '' ?>>

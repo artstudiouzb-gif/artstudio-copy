@@ -298,6 +298,21 @@ a { color: var(--color-accent, #e63946); }
     .news-single__content a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 11px; }
 }
 
+/* Cookie-Consent баннер (задача 116) */
+.cookie-banner {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 9998;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    padding: 14px 20px; background: var(--bg-surface); border-top: 1px solid var(--border-color);
+    box-shadow: 0 -6px 20px rgba(0,0,0,.08); font-size: 14px;
+}
+.cookie-banner__text { flex: 1; min-width: 220px; color: var(--text-main); }
+.cookie-banner__text a { color: var(--color-accent, #e63946); }
+.cookie-banner__accept, .cookie-banner__decline {
+    padding: 9px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; border: 1px solid var(--border-color);
+}
+.cookie-banner__accept { background: var(--color-accent, #e63946); color: #fff; border-color: transparent; }
+.cookie-banner__decline { background: transparent; color: var(--text-main); }
+
 /* Лайтбокс для блоков галереи */
 .cms-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
 .cms-lightbox.is-open { display: flex; }

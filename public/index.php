@@ -231,6 +231,9 @@ $router->post('/admin/files/{id}/regenerate-token', [AdminFileController::class,
 // --- Health-check (мониторинг) ---
 $router->get('/health', [\App\Controllers\Site\HealthController::class, 'index']);
 
+// --- PWA-манифест ---
+$router->get('/manifest.webmanifest', [\App\Controllers\Site\ManifestController::class, 'webmanifest']);
+
 // --- SEO ---
 $router->get('/sitemap.xml', [\App\Controllers\Site\SitemapController::class, 'xml']);
 $router->get('/robots.txt', [\App\Controllers\Site\SitemapController::class, 'robots']);

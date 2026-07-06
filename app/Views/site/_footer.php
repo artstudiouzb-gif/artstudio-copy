@@ -3,9 +3,20 @@
 use App\Models\Setting;
 
 $siteName = Setting::get('site_name', 'ArtStudio');
-$counterCodes = Setting::get('counter_codes', '');
 /** @var string $canonicalUrl — задаётся в _header.php (та же область видимости View) */
 $printUrl = $canonicalUrl ?? '';
+
+// --- Аналитика + Cookie-Consent (задача 116) ---
+$analyticsInit = \App\Core\Analytics::hasAny() ? \App\Core\Analytics::initScript() : '';
+$consentRequired = Setting::get('cookie_consent_enabled', '0') === '1';
+$privacyUrl = '';
+$privacyPageId = (int) Setting::get('privacy_policy_page_id', '');
+if ($privacyPageId > 0) {
+    $pp = \App\Models\Page::findById($privacyPageId);
+    if ($pp && ($pp['status'] ?? '') === 'published') {
+        $privacyUrl = \App\Core\Locale::url($pp['slug']);
+    }
+}
 ?>
 <div class="print-only print-footer">
     <?php if ($printUrl !== ''): ?>Источник: <?= htmlspecialchars($printUrl, ENT_QUOTES) ?> &nbsp;·&nbsp; <?php endif; ?>
@@ -18,6 +29,11 @@ $printUrl = $canonicalUrl ?? '';
 <script src="/assets/js/frontend.js"></script>
 <script src="/assets/js/forms.js" defer></script>
 <?= \App\Core\AssetCollector::renderScripts() /* JS блоков — по одному разу */ ?>
-<?= $counterCodes /* коды счётчиков вводятся администратором в настройках */ ?>
+<?php if ($analyticsInit !== ''): ?>
+<?php // Код счётчиков инертен (type text/plain); consent.js активирует его. ?>
+<script type="text/plain" id="analytics-init"><?= $analyticsInit ?></script>
+<script>window.__consent = {required: <?= $consentRequired ? 'true' : 'false' ?>, privacyUrl: <?= json_encode($privacyUrl, JSON_UNESCAPED_SLASHES) ?>};</script>
+<script src="/assets/js/consent.js" defer></script>
+<?php endif; ?>
 </body>
 </html>
