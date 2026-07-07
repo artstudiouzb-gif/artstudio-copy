@@ -38,6 +38,27 @@ test('DesignSettings::bodyClasses отражает макет каталога, 
     assert_contains('design-catalog-cards_sm', $off);
 });
 
+test('DesignSettings::bodyClasses включает тип поиска, шаблон детали и футер', function () {
+    $cls = DesignSettings::bodyClasses(DesignSettings::PRESETS['modern']['values']);
+    assert_contains('design-search-overlay', $cls);
+    assert_contains('design-detail-sidebar', $cls);
+    assert_contains('design-footer-columns', $cls);
+    assert_contains('design-cards-elevated', $cls);
+    assert_contains('design-sidebar-floating', $cls);
+
+    $min = DesignSettings::bodyClasses(DesignSettings::PRESETS['minimal']['values']);
+    assert_contains('design-search-overlay', $min);
+    assert_contains('design-detail-plain', $min);
+    assert_contains('design-footer-minimal', $min);
+});
+
+test('DesignSettings::cssVariables задаёт тень карточек по стилю', function () {
+    $flat = DesignSettings::cssVariables(DesignSettings::PRESETS['minimal']['values']);
+    assert_contains('--card-shadow:none', $flat);
+    $elevated = DesignSettings::cssVariables(DesignSettings::PRESETS['modern']['values']);
+    assert_contains('--card-shadow:0 10px 30px', $elevated);
+});
+
 test('DesignSettings пресеты покрывают все опции валидными значениями', function () {
     foreach (DesignSettings::PRESETS as $name => $preset) {
         foreach (DesignSettings::OPTIONS as $key => $opt) {

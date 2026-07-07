@@ -32,21 +32,44 @@ require __DIR__ . '/_header.php';
     <h1 class="content-detail__title"><?= htmlspecialchars((string) $entry['title'], ENT_QUOTES) ?></h1>
     <time class="content-detail__date"><?= htmlspecialchars(date('d.m.Y', strtotime((string) $entry['created_at'])), ENT_QUOTES) ?></time>
 
-    <dl class="content-detail__fields">
-        <?php foreach ($fields as $f): ?>
-            <?php $val = ContentFields::displayValue($f, $entry['data'][$f['name']] ?? null); ?>
-            <?php if ($val === '') { continue; } ?>
-            <div class="content-detail__row content-detail__row--<?= htmlspecialchars((string) $f['field_type'], ENT_QUOTES) ?>">
-                <dt><?= htmlspecialchars((string) $f['label'], ENT_QUOTES) ?></dt>
-                <dd>
-                    <?php if ($f['field_type'] === 'file'): ?>
-                        <a class="content-detail__download" href="<?= htmlspecialchars((string) $entry['data'][$f['name']], ENT_QUOTES) ?>" target="_blank" rel="noopener" download>📎 Скачать</a>
-                    <?php else: ?>
-                        <?= $val ?>
-                    <?php endif; ?>
-                </dd>
-            </div>
-        <?php endforeach; ?>
-    </dl>
+    <?php
+    // Раскладка «С боковой панелью»: длинный контент (текст/изображение) — в
+    // основную колонку, короткие поля и файлы — в мета-панель. Раскладка «В
+    // одну колонку» показывает всё подряд (CSS схлопывает грид). Драйвер —
+    // класс design-detail-* на <body>.
+    $mainTypes = ['textarea', 'image'];
+    $renderRow = static function (array $f, string $val, array $entry): string {
+        $out = '<div class="content-detail__row content-detail__row--' . htmlspecialchars((string) $f['field_type'], ENT_QUOTES) . '">';
+        $out .= '<dt>' . htmlspecialchars((string) $f['label'], ENT_QUOTES) . '</dt><dd>';
+        if ($f['field_type'] === 'file') {
+            $out .= '<a class="content-detail__download" href="' . htmlspecialchars((string) $entry['data'][$f['name']], ENT_QUOTES) . '" target="_blank" rel="noopener" download>📎 Скачать</a>';
+        } else {
+            $out .= $val;
+        }
+        return $out . '</dd></div>';
+    };
+    $mainHtml = '';
+    $asideHtml = '';
+    foreach ($fields as $f) {
+        $val = ContentFields::displayValue($f, $entry['data'][$f['name']] ?? null);
+        if ($val === '') {
+            continue;
+        }
+        if (in_array($f['field_type'], $mainTypes, true)) {
+            $mainHtml .= $renderRow($f, $val, $entry);
+        } else {
+            $asideHtml .= $renderRow($f, $val, $entry);
+        }
+    }
+    ?>
+    <div class="content-detail__grid">
+        <div class="content-detail__body">
+            <?php if ($mainHtml !== ''): ?><dl class="content-detail__fields"><?= $mainHtml ?></dl><?php endif; ?>
+            <?php if ($mainHtml === '' && $asideHtml === ''): ?><p class="content-detail__empty">Нет данных.</p><?php endif; ?>
+        </div>
+        <?php if ($asideHtml !== ''): ?>
+            <aside class="content-detail__aside"><dl class="content-detail__fields"><?= $asideHtml ?></dl></aside>
+        <?php endif; ?>
+    </div>
 </article>
 <?php require __DIR__ . '/_footer.php'; ?>

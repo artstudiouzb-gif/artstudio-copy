@@ -1,6 +1,36 @@
 (function () {
     'use strict';
 
+    // Выпадающий поиск (режим «Выпадающий» в настройках дизайна): кнопка-лупа
+    // открывает панель поиска сверху; закрытие по ×, Esc или клику вне формы.
+    var searchToggle = document.querySelector('[data-search-toggle]');
+    var searchOverlay = document.querySelector('[data-search-overlay]');
+    if (searchToggle && searchOverlay) {
+        var searchInput = searchOverlay.querySelector('[data-search-input]');
+        var openSearch = function () {
+            searchOverlay.hidden = false;
+            searchToggle.setAttribute('aria-expanded', 'true');
+            requestAnimationFrame(function () {
+                searchOverlay.classList.add('is-open');
+                if (searchInput) { searchInput.focus(); }
+            });
+        };
+        var closeSearch = function () {
+            searchOverlay.classList.remove('is-open');
+            searchToggle.setAttribute('aria-expanded', 'false');
+            setTimeout(function () { searchOverlay.hidden = true; }, 200);
+        };
+        searchToggle.addEventListener('click', openSearch);
+        searchOverlay.addEventListener('click', function (e) {
+            if (e.target === searchOverlay || e.target.hasAttribute('data-search-close')) {
+                closeSearch();
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !searchOverlay.hidden) { closeSearch(); }
+        });
+    }
+
     // Выпадающее подменю: клик по стрелке раскрывает (мобильные/клавиатура).
     // На desktop работает и hover/focus-within (CSS), клик — дополнительно.
     document.querySelectorAll('.site-menu__item--has-children .site-menu__toggle').forEach(function (toggle) {
