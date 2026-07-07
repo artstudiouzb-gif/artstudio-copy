@@ -164,6 +164,10 @@ $searchHtml = '<form class="site-search" method="get" action="' . htmlspecialcha
     . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>'
     . '</button></form>';
 
+// --- Тема-билдер: значения дизайна + классы для <body> ---
+$designVals = \App\Core\DesignSettings::current();
+$designBodyClass = \App\Core\DesignSettings::bodyClasses($designVals);
+
 // --- Раскладка по зонам ---
 $zones = ['left' => '', 'center' => '', 'right' => ''];
 $zones[$hcfg['logo_position']] .= $logoHtml;
@@ -229,6 +233,8 @@ $zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeTogg
     --color-accent: <?= htmlspecialchars($accentColor, ENT_QUOTES) ?>;
     --font-family: <?= htmlspecialchars($font, ENT_QUOTES) ?>;
 }
+<?php // Тема-билдер: переменные дизайна (ширина, скругления, отступы, кнопки). ?>
+<?= \App\Core\DesignSettings::cssVariables($designVals) ?>
 </style>
 <?php if ($extraHeadCss !== ''): ?>
 <style id="block-styles">
@@ -243,7 +249,7 @@ $zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeTogg
 </style>
 <?php endif; ?>
 </head>
-<body<?= !empty($previewNotice) ? ' class="is-preview"' : '' ?>>
+<body class="<?= htmlspecialchars(trim($designBodyClass . (!empty($previewNotice) ? ' is-preview' : '')), ENT_QUOTES) ?>">
 <a href="#main-content" class="skip-link">Перейти к содержимому</a>
 <?php if (!empty($previewNotice)): ?>
 <div class="preview-bar" role="status">

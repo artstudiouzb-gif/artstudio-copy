@@ -210,6 +210,11 @@ $router->get('/admin/content/{type}/{id}/edit', [\App\Controllers\Admin\ContentE
 $router->post('/admin/content/{type}/{id}/edit', [\App\Controllers\Admin\ContentEntryController::class, 'update']);
 $router->post('/admin/content/{type}/{id}/delete', [\App\Controllers\Admin\ContentEntryController::class, 'destroy']);
 
+// --- Admin: тема-билдер (дизайн сайта, супер-админ) ---
+$router->get('/admin/design', [\App\Controllers\Admin\DesignController::class, 'index']);
+$router->post('/admin/design', [\App\Controllers\Admin\DesignController::class, 'update']);
+$router->post('/admin/design/preset', [\App\Controllers\Admin\DesignController::class, 'applyPreset']);
+
 // --- Admin: настройки дизайна ---
 $router->get('/admin/settings', [SettingsController::class, 'index']);
 $router->post('/admin/settings', [SettingsController::class, 'update']);

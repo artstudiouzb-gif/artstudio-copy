@@ -10,9 +10,9 @@
     --border-color: #e1e3e8;
 
     /* Пресеты вертикальных отступов блоков (адаптивные через clamp). */
-    --space-small: clamp(16px, 3vw, 28px);
-    --space-premium: clamp(40px, 7vw, 96px);
-    --space-max: clamp(72px, 12vw, 180px);
+    --space-small: clamp(14px, 2.5vw, 24px);
+    --space-premium: clamp(28px, 4vw, 56px);
+    --space-max: clamp(40px, 5vw, 76px);
 }
 
 /* Тёмная тема: явное переключение через data-theme="dark". */
@@ -518,3 +518,93 @@ body.is-preview { outline: 3px solid #b45309; outline-offset: -3px; }
 .news-card__title { font-weight: 600; font-size: 1.08rem; color: var(--color-primary, #1a1a1a); line-height: 1.35; }
 .news-card:hover .news-card__title { color: var(--color-accent, #e63946); }
 .news-card__excerpt { color: var(--text-muted); font-size: .92rem; line-height: 1.5; }
+
+/* ============================================================================
+   Тема-билдер: применение переменных дизайна + современная отделка фронтенда.
+   Переменные --container-max/--radius/--card-gap/--section-pad/--btn-radius
+   задаются в <head> из настроек дизайна (DesignSettings). Значения ниже —
+   безопасные дефолты на случай отсутствия настроек.
+   ========================================================================== */
+:root {
+    --container-max: 1200px;
+    --radius: 14px;
+    --radius-sm: 9px;
+    --card-gap: 24px;
+    --section-pad: 68px;
+    --btn-radius: 10px;
+    --surface: #ffffff;
+    --shadow-sm: 0 1px 2px rgba(16,24,40,.05);
+    --shadow-md: 0 6px 22px rgba(16,24,40,.08);
+    --shadow-lg: 0 18px 48px rgba(16,24,40,.12);
+}
+:root[data-theme="dark"] { --surface: #1d212b; }
+
+/* Ширина контейнеров из настроек */
+.site-header__inner, .site-content, .layout { max-width: var(--container-max); }
+
+/* Скругления карточек/полей */
+.content-card, .news-card, .site-search-results__item,
+.block-cta, .block-form, .block-testimonials__item, .widget,
+.content-detail, .block-slider, .block-gallery__item img { border-radius: var(--radius); }
+
+/* Форма кнопок */
+.site-cta, .content-toolbar button, .site-search-page__form button,
+.content-detail__download, .block-cta a, .block-news__all { border-radius: var(--btn-radius); }
+
+/* Отступ между карточками в сетках */
+.block-news__grid, .block-projects__grid, .site-search-results { gap: var(--card-gap); }
+
+/* Вертикальный ритм секций по плотности: базовый паддинг блока = --section-pad
+   (блоки уже самоотбиваются паддингом; отдельные отступы не добавляем, чтобы
+   не удваивать зазоры). Per-block классы --space-* переопределяют. */
+.cms-block { padding-top: var(--section-pad); padding-bottom: var(--section-pad); }
+
+/* --- Каталог: макеты из настроек дизайна --- */
+body.design-catalog-cards_lg .content-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+body.design-catalog-cards_sm .content-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+body.design-catalog-cards_sm .content-card { padding: 16px 18px; }
+body.design-catalog-list .content-cards { display: flex; flex-direction: column; }
+
+/* --- Шапка: стиль и фиксация из настроек --- */
+body.design-header-sticky .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg-primary) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    box-shadow: var(--shadow-sm);
+}
+body.design-header-dark .site-header { background: #14161c; }
+body.design-header-dark .site-header .site-menu__link,
+body.design-header-dark .site-header .site-header__logo span,
+body.design-header-dark .site-header a { color: #f3f5f9; }
+body.design-header-accent .site-header { background: linear-gradient(90deg, var(--color-primary, #1a1a1a), color-mix(in srgb, var(--color-primary, #1a1a1a) 70%, var(--color-accent, #e63946))); }
+body.design-header-accent .site-header .site-menu__link,
+body.design-header-accent .site-header .site-header__logo span,
+body.design-header-accent .site-header a { color: #fff; }
+body.design-header-accent .site-search { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.3); }
+body.design-header-accent .site-search input { color: #fff; }
+body.design-header-accent .site-search input::placeholder { color: rgba(255,255,255,.75); }
+
+/* --- Современная отделка --- */
+.site-header { border-bottom: 1px solid var(--border-color); }
+.site-menu__link { font-weight: 500; letter-spacing: .01em; transition: color .15s; }
+.site-cta { font-weight: 600; box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s; }
+.site-cta:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* Hero (CTA-блок) — крупный современный вид */
+.block-cta { background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary,#1a1a1a) 6%, var(--surface)) , var(--surface)); border: 1px solid var(--border-color); padding: clamp(36px, 6vw, 72px); }
+.block-cta h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.1; letter-spacing: -.02em; margin-top: 0; }
+.block-cta a { display: inline-block; padding: 13px 30px; background: var(--color-accent, #e63946); color: #fff; text-decoration: none; font-weight: 600; margin-top: 8px; box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s; }
+.block-cta a:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+/* Колонки быстрых ссылок — компактные карточки с ховером */
+.cms-columns__col .cms-block--cta .block-cta {
+    height: 100%; text-align: left; padding: clamp(22px, 2.4vw, 34px);
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+    transition: transform .15s, box-shadow .15s;
+}
+.cms-columns__col .cms-block--cta .block-cta h2 { font-size: clamp(1.3rem, 2vw, 1.6rem); margin: 0; }
+.cms-columns__col .cms-block--cta .block-cta p { margin: 0; color: var(--text-muted); }
+.cms-columns__col .cms-block--cta .block-cta a { margin-top: auto; }
+.cms-columns__col .cms-block--cta .block-cta:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+
+h1, h2 { letter-spacing: -.015em; }

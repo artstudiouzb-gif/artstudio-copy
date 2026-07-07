@@ -32,6 +32,7 @@ $navIcon = static function (string $name): string {
         'settings' => '<circle cx="12" cy="12" r="3"/><path d="M4 12a8 8 0 0 1 .2-1.8L2 8.5l2 3.5M20 12a8 8 0 0 0-.2-1.8"/><path d="M12 2v3M12 19v3M4.2 6.2l2.1 2.1M17.7 15.7l2.1 2.1M2 12h3M19 12h3M6.3 17.7l-2.1 2.1M19.8 6.2l-2.1 2.1"/>',
         'profile' => '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
         'repository' => '<path d="M12 2 4 6v6c0 5 3.4 7.7 8 10 4.6-2.3 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/>',
+        'design' => '<circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17" cy="14" r="2.5"/><path d="M12 22a10 10 0 1 1 10-10c0 2-1.5 3-3 3h-2a2 2 0 0 0-1 3.7A2 2 0 0 1 12 22Z"/>',
     ];
     $body = $p[$name] ?? '<circle cx="12" cy="12" r="9"/>';
 
@@ -67,6 +68,7 @@ $navSettings = [];
 $navUsersGroup = [];
 if ($navIsSuper) {
     $navSettings = [
+        'design' => ['/admin/design', 'Дизайн'],
         'menu' => ['/admin/menu', 'Меню'],
         'widgets' => ['/admin/widgets', 'Виджеты'],
         'header' => ['/admin/header', 'Шапка сайта'],
