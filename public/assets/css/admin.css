@@ -472,7 +472,7 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .design-opt__label small { display: block; color: #8a929c; font-size: 12px; margin-top: 4px; line-height: 1.45; }
 .design-opt__choices { display: flex; flex-wrap: wrap; gap: 12px; }
 
-.design-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 128px; padding: 14px 12px; border: 2px solid var(--admin-border, #e6e8ec); border-radius: 12px; cursor: pointer; background: #fbfbfd; transition: border-color .15s, box-shadow .15s, background .15s; }
+.design-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1 1 108px; min-width: 96px; max-width: 168px; padding: 14px 12px; border: 2px solid var(--admin-border, #e6e8ec); border-radius: 12px; cursor: pointer; background: #fbfbfd; transition: border-color .15s, box-shadow .15s, background .15s; }
 .design-card:hover { border-color: #c7cbe8; }
 .design-card input { position: absolute; opacity: 0; pointer-events: none; }
 .design-card:has(input:checked) { border-color: var(--admin-accent, #5b52e5); background: var(--admin-accent-soft, #eef0fe); box-shadow: 0 0 0 3px rgba(91,82,229,.12); }
@@ -492,5 +492,23 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .design-card__preview--button-rounded::after { content:''; position:absolute; left:16px; top:18px; width:52px; height:16px; border-radius:6px; background: var(--admin-accent,#5b52e5); }
 .design-card__preview--button-square::after { content:''; position:absolute; left:16px; top:18px; width:52px; height:16px; border-radius:0; background: var(--admin-accent,#5b52e5); }
 
-.design-actions { position: sticky; bottom: 0; background: linear-gradient(transparent, #f6f7f9 40%); padding: 16px 0; }
-@media (max-width: 720px) { .design-opt { grid-template-columns: 1fr; gap: 10px; } }
+.design-actions { position: sticky; bottom: 0; background: linear-gradient(transparent, var(--admin-bg, #f6f7f9) 40%); padding: 16px 0; z-index: 5; }
+.design-fine { padding-bottom: 8px; }
+
+/* --- Мобильная версия панели дизайна --- */
+@media (max-width: 720px) {
+    .design-opt { grid-template-columns: 1fr; gap: 10px; }
+    .design-presets { grid-template-columns: 1fr; }
+    .design-section__title { font-size: 13px; }
+    /* Кнопка сохранения — сплошная нижняя панель во всю ширину. */
+    .design-actions {
+        position: sticky; bottom: 0; margin: 0 -16px; padding: 12px 16px;
+        background: var(--admin-sidebar-bg, #fff); border-top: 1px solid var(--admin-border, #e6e8ec);
+        box-shadow: 0 -4px 16px rgba(20,33,51,.06);
+    }
+    .design-actions .btn { width: 100%; justify-content: center; }
+}
+@media (max-width: 420px) {
+    .design-card { flex-basis: calc(50% - 6px); max-width: none; padding: 10px 8px; }
+    .design-card__preview { height: 44px; }
+}
