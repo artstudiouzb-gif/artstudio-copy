@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username        VARCHAR(60)  NOT NULL,
     email           VARCHAR(190) NOT NULL,
+    phone           VARCHAR(20)  NULL COMMENT 'телефон в формате E.164 (+998...) для кода входа через Telegram',
     password_hash   VARCHAR(255) NOT NULL,
     totp_secret     VARCHAR(64)  NULL,
     totp_enabled    TINYINT(1)   NOT NULL DEFAULT 0,
@@ -288,6 +289,7 @@ INSERT INTO settings (`key`, `value`) VALUES
     ('contact_email', ''),
     ('contact_address', ''),
     ('counter_codes', ''),
+    ('telegram_gateway_token', ''),
     ('header_config', '{"logo_position":"left","menu_position":"right","language_switcher":{"enabled":true,"format":"code"},"social_buttons":[],"cta":{"enabled":false,"text":"","url":"","style":"filled"}}')
 ON DUPLICATE KEY UPDATE `key` = `key`;
 
@@ -645,7 +647,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_06_file_repository.sql'),
     ('2026_07_06_content_frontend.sql'),
     ('2026_07_07_block_active.sql'),
-    ('2026_07_07_home_page.sql')
+    ('2026_07_07_home_page.sql'),
+    ('2026_07_08_telegram_gateway_2fa.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

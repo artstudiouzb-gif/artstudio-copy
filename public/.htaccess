@@ -25,16 +25,14 @@
 </IfModule>
 
 Options -Indexes
+DirectoryIndex index.php
 
 # Единственные .php с разрешённым прямым доступом — точки входа приложения.
 # Это отменяет унаследованный из корневого .htaccess deny-all на .php (задача
-# 1.1) для fallback-сценария (docroot = корень проекта): без этого правила
-# запрос, переписанный на public/index.php, получал бы 403.
+# 1.1) для fallback-сценария (docroot = корень проекта). Порядок важен:
+# сначала общий запрет, затем явные разрешения — последняя совпавшая секция
+# побеждает при слиянии, поэтому index/download.php гарантированно доступны.
 <IfModule mod_authz_core.c>
-    <FilesMatch "^(index|download)\.php$">
-        Require all granted
-    </FilesMatch>
-    # Любые прочие .php внутри public/ прямого доступа не имеют.
     <FilesMatch "\.php$">
         Require all denied
     </FilesMatch>

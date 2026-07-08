@@ -74,6 +74,15 @@ require __DIR__ . '/../layout/header.php';
         </div>
 
         <fieldset class="settings-group">
+            <legend>Вход в панель: код через Telegram</legend>
+            <div class="form-field">
+                <label for="telegram_gateway_token">Токен Telegram Gateway API</label>
+                <input type="text" id="telegram_gateway_token" name="telegram_gateway_token" value="<?= htmlspecialchars($settings['telegram_gateway_token'] ?? '', ENT_QUOTES) ?>" autocomplete="off" spellcheck="false">
+                <span class="form-hint">Получите токен в кабинете <code>gateway.telegram.org</code>. Когда токен указан и у администратора заполнен телефон, вход подтверждается 6-значным кодом, который приходит в Telegram от официального канала <strong>Verification&nbsp;Codes</strong> (t.me/VerificationCodes). Если поле пустое — вход только по паролю.</span>
+            </div>
+        </fieldset>
+
+        <fieldset class="settings-group">
             <legend>Веб-аналитика и трекинг</legend>
             <div class="form-field">
                 <label for="analytics_ga_id">Google Analytics ID</label>

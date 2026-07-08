@@ -71,8 +71,7 @@ $router->get('/admin/login', [AdminAuthController::class, 'showLogin']);
 $router->post('/admin/login', [AdminAuthController::class, 'login']);
 $router->get('/admin/login/2fa', [AdminAuthController::class, 'showTwoFactor']);
 $router->post('/admin/login/2fa', [AdminAuthController::class, 'verifyTwoFactor']);
-$router->get('/admin/login/2fa-setup', [AdminAuthController::class, 'showTwoFactorSetup']);
-$router->post('/admin/login/2fa-setup', [AdminAuthController::class, 'confirmTwoFactorSetup']);
+$router->post('/admin/login/2fa/resend', [AdminAuthController::class, 'resendCode']);
 $router->post('/admin/logout', [AdminAuthController::class, 'logout']);
 
 // --- Admin: восстановление пароля (без требования логина) ---
@@ -84,7 +83,7 @@ $router->post('/admin/reset', [\App\Controllers\Admin\PasswordResetController::c
 // --- Admin: профиль, сессии, backup-коды ---
 $router->get('/admin/profile', [\App\Controllers\Admin\ProfileController::class, 'index']);
 $router->post('/admin/profile/password', [\App\Controllers\Admin\ProfileController::class, 'changePassword']);
-$router->post('/admin/profile/backup-codes', [\App\Controllers\Admin\ProfileController::class, 'regenerateBackupCodes']);
+$router->post('/admin/profile/phone', [\App\Controllers\Admin\ProfileController::class, 'updatePhone']);
 $router->post('/admin/profile/sessions/revoke-others', [\App\Controllers\Admin\ProfileController::class, 'revokeOthers']);
 $router->post('/admin/profile/sessions/{id}/revoke', [\App\Controllers\Admin\ProfileController::class, 'revokeSession']);
 

@@ -30,6 +30,8 @@ final class UserController
         $email = trim((string) ($_POST['email'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
         $role = ($_POST['role'] ?? 'editor') === 'admin' ? 'admin' : 'editor';
+        $phoneRaw = trim((string) ($_POST['phone'] ?? ''));
+        $phone = null;
 
         $error = null;
         if ($username === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -40,6 +42,11 @@ final class UserController
             $error = 'Пользователь с таким логином уже существует.';
         } elseif (User::emailExists($email)) {
             $error = 'Пользователь с таким email уже существует.';
+        } elseif ($phoneRaw !== '') {
+            $phone = \App\Core\TelegramGateway::normalizePhone($phoneRaw);
+            if ($phone === null) {
+                $error = 'Некорректный телефон. Используйте международный формат, например +998901234567.';
+            }
         }
 
         if ($error !== null) {
@@ -47,8 +54,8 @@ final class UserController
             return;
         }
 
-        User::create($username, $email, $password, $role);
-        Flash::success('Пользователь создан. Двухфакторная аутентификация будет настроена при первом входе.');
+        User::create($username, $email, $password, $role, $phone);
+        Flash::success('Пользователь создан. Код входа будет приходить в Telegram, если указан телефон и настроен шлюз.');
         header('Location: /admin/users');
         exit;
     }

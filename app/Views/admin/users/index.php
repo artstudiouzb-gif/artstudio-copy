@@ -16,7 +16,7 @@ $roleLabels = ['admin' => 'Супер-администратор', 'super_admin'
 
 <table class="data-table" style="margin-bottom:30px;">
     <thead>
-        <tr><th>Логин</th><th>Email</th><th>Роль</th><th>2FA</th><th>Последний вход</th><th></th></tr>
+        <tr><th>Логин</th><th>Email</th><th>Роль</th><th>Телефон (код входа)</th><th>Последний вход</th><th></th></tr>
     </thead>
     <tbody>
         <?php foreach ($items as $item): ?>
@@ -24,7 +24,7 @@ $roleLabels = ['admin' => 'Супер-администратор', 'super_admin'
                 <td><?= htmlspecialchars($item['username'], ENT_QUOTES) ?></td>
                 <td><?= htmlspecialchars($item['email'], ENT_QUOTES) ?></td>
                 <td><?= htmlspecialchars($roleLabels[$item['role']] ?? $item['role'], ENT_QUOTES) ?></td>
-                <td><?= $item['totp_enabled'] ? '✓' : '—' ?></td>
+                <td><?= !empty($item['phone']) ? htmlspecialchars((string) $item['phone'], ENT_QUOTES) : '—' ?></td>
                 <td><?= htmlspecialchars((string) ($item['last_login_at'] ?? '—'), ENT_QUOTES) ?></td>
                 <td class="data-table__actions">
                     <?php if ((int) $item['id'] !== Auth::id()): ?>
@@ -53,6 +53,11 @@ $roleLabels = ['admin' => 'Супер-администратор', 'super_admin'
         <div class="form-field">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-field">
+            <label for="phone">Телефон для кода входа (необязательно)</label>
+            <input type="tel" id="phone" name="phone" placeholder="+998901234567" autocomplete="off">
+            <span class="form-hint">Код подтверждения входа придёт в Telegram от канала Verification Codes. Без телефона — вход только по паролю.</span>
         </div>
         <div class="form-field">
             <label for="password">Пароль (минимум 10 символов)</label>

@@ -4,13 +4,23 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Models\BackupCode;
 use App\Models\SessionRegistry;
 use App\Models\User;
 
 final class Auth
 {
+    /** Срок жизни кода подтверждения входа, секунд. */
+    private const CODE_TTL = 300;
+
     /**
+     * Вход по паролю с подтверждением одноразовым кодом через Telegram
+     * (официальный канал Verification Codes, Telegram Gateway API).
+     * Другие методы 2FA (TOTP, backup-коды) для админки отключены.
+     *
+     * Статусы: needs_code — код отправлен, ждём подтверждения;
+     * ok — вход выполнен (шлюз не настроен или у пользователя нет телефона);
+     * send_failed — шлюз не принял сообщение; invalid/locked — как раньше.
+     *
      * @return array{status: string, retry_after?: int}
      */
     public static function attemptLogin(string $username, string $password): array
@@ -32,26 +42,83 @@ final class Auth
         RateLimiter::clearAttempts($identifier);
 
         session_regenerate_id(true);
+
+        $phone = trim((string) ($user['phone'] ?? ''));
+        if (!TelegramGateway::isConfigured() || $phone === '') {
+            // Шлюз не настроен либо у пользователя не указан телефон — входим
+            // по паролю. Фиксируем в security-логе, чтобы это было видно.
+            Logger::security('Вход без кода подтверждения (Telegram-шлюз не настроен или нет телефона)', [
+                'user' => (string) $user['username'],
+                'ip' => $ip,
+            ]);
+            self::establishSession($user);
+
+            return ['status' => 'ok'];
+        }
+
         $_SESSION['pending_user_id'] = (int) $user['id'];
         $_SESSION['pending_since'] = time();
 
-        if ((int) $user['totp_enabled'] === 1) {
-            return ['status' => 'needs_2fa'];
+        if (!self::sendLoginCode($user)) {
+            self::clearPending();
+
+            return ['status' => 'send_failed'];
         }
 
-        return ['status' => 'needs_2fa_setup'];
+        return ['status' => 'needs_code'];
     }
 
+    /**
+     * Генерирует одноразовый код, сохраняет его хэш в сессии и отправляет в
+     * Telegram. Используется при входе и при повторной отправке.
+     */
+    private static function sendLoginCode(array $user): bool
+    {
+        $code = (string) random_int(100000, 999999);
+        $_SESSION['pending_code_hash'] = hash('sha256', $code);
+        $_SESSION['pending_code_expires'] = time() + self::CODE_TTL;
+
+        return TelegramGateway::sendCode((string) $user['phone'], $code);
+    }
+
+    /**
+     * Повторная отправка кода (по кнопке на странице подтверждения).
+     * Ограничена: не чаще 3 раз за 5 минут с одного IP.
+     */
+    public static function resendCode(): bool
+    {
+        $userId = $_SESSION['pending_user_id'] ?? null;
+        if (!$userId) {
+            return false;
+        }
+        if (!RateLimiter::throttle('2fa_resend', $_SERVER['REMOTE_ADDR'] ?? 'unknown', 3, 5)) {
+            return false;
+        }
+
+        $user = User::findById((int) $userId);
+        if (!$user || trim((string) ($user['phone'] ?? '')) === '') {
+            return false;
+        }
+
+        return self::sendLoginCode($user);
+    }
+
+    /**
+     * Проверка кода из Telegram: hash_equals с хэшем из сессии, срок жизни
+     * 5 минут, перебор ограничен RateLimiter.
+     */
     public static function completeTwoFactor(string $code): bool
     {
         $userId = $_SESSION['pending_user_id'] ?? null;
-        if (!$userId || (time() - (int) ($_SESSION['pending_since'] ?? 0)) > 300) {
+        if (!$userId || (time() - (int) ($_SESSION['pending_since'] ?? 0)) > self::CODE_TTL) {
             self::clearPending();
             return false;
         }
 
         $user = User::findById((int) $userId);
-        if (!$user || empty($user['totp_secret'])) {
+        $expectedHash = (string) ($_SESSION['pending_code_hash'] ?? '');
+        if (!$user || $expectedHash === '' || time() > (int) ($_SESSION['pending_code_expires'] ?? 0)) {
+            self::clearPending();
             return false;
         }
 
@@ -60,67 +127,13 @@ final class Auth
             return false;
         }
 
-        // Основной путь: код из приложения-аутентификатора (TOTP).
-        // Альтернатива: одноразовый backup-код (если введён не 6-значный код).
-        $ok = TOTP::verify($user['totp_secret'], $code)
-            || BackupCode::consume((int) $userId, $code);
-
-        if (!$ok) {
+        $code = preg_replace('/\s+/', '', $code) ?? '';
+        if (!hash_equals($expectedHash, hash('sha256', $code))) {
             RateLimiter::recordAttempt($identifier, false);
             return false;
         }
 
         RateLimiter::clearAttempts($identifier);
-        self::clearPending();
-        self::establishSession($user);
-
-        return true;
-    }
-
-    /**
-     * @return array{secret: string, uri: string}
-     */
-    public static function beginTwoFactorSetup(): array
-    {
-        $userId = $_SESSION['pending_user_id'] ?? null;
-        if (!$userId) {
-            throw new \RuntimeException('No pending login.');
-        }
-
-        $user = User::findById((int) $userId);
-
-        if (empty($_SESSION['pending_totp_secret'])) {
-            $_SESSION['pending_totp_secret'] = TOTP::generateSecret();
-        }
-        $secret = $_SESSION['pending_totp_secret'];
-
-        return [
-            'secret' => $secret,
-            'uri' => TOTP::provisioningUri($secret, $user['username'], 'ArtStudio CMS'),
-        ];
-    }
-
-    public static function confirmTwoFactorSetup(string $code): bool
-    {
-        $userId = $_SESSION['pending_user_id'] ?? null;
-        $secret = $_SESSION['pending_totp_secret'] ?? null;
-
-        if (!$userId || !$secret) {
-            return false;
-        }
-
-        if (!TOTP::verify($secret, $code)) {
-            return false;
-        }
-
-        $user = User::findById((int) $userId);
-        User::enableTotp((int) $userId, $secret);
-
-        // Генерируем пул backup-кодов и кладём в сессию для однократного показа
-        // сразу после установления сессии (страница /admin показывает баннер).
-        $_SESSION['fresh_backup_codes'] = BackupCode::regenerate((int) $userId);
-
-        unset($_SESSION['pending_totp_secret']);
         self::clearPending();
         self::establishSession($user);
 
@@ -185,7 +198,12 @@ final class Auth
 
     private static function clearPending(): void
     {
-        unset($_SESSION['pending_user_id'], $_SESSION['pending_since'], $_SESSION['pending_totp_secret']);
+        unset(
+            $_SESSION['pending_user_id'],
+            $_SESSION['pending_since'],
+            $_SESSION['pending_code_hash'],
+            $_SESSION['pending_code_expires']
+        );
     }
 
     public static function check(): bool

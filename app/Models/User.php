@@ -10,7 +10,7 @@ final class User
 {
     public static function all(): array
     {
-        $stmt = Database::pdo()->query('SELECT id, username, email, role, totp_enabled, last_login_at, created_at FROM users ORDER BY id ASC');
+        $stmt = Database::pdo()->query('SELECT id, username, email, phone, role, last_login_at, created_at FROM users ORDER BY id ASC');
 
         return $stmt->fetchAll();
     }
@@ -76,20 +76,29 @@ final class User
         $stmt->execute([':secret' => $secret, ':id' => $id]);
     }
 
+    /** Телефон (E.164) для кода входа через Telegram; null — вход без кода. */
+    public static function updatePhone(int $id, ?string $phone): void
+    {
+        $stmt = Database::pdo()->prepare('UPDATE users SET phone = :phone WHERE id = :id');
+        $stmt->execute([':phone' => $phone, ':id' => $id]);
+    }
+
     public static function touchLastLogin(int $id): void
     {
         $stmt = Database::pdo()->prepare('UPDATE users SET last_login_at = NOW() WHERE id = :id');
         $stmt->execute([':id' => $id]);
     }
 
-    public static function create(string $username, string $email, string $password, string $role = 'admin'): int
+    public static function create(string $username, string $email, string $password, string $role = 'admin', ?string $phone = null): int
     {
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO users (username, email, password_hash, role, created_at) VALUES (:username, :email, :password, :role, NOW())'
+            'INSERT INTO users (username, email, phone, password_hash, role, created_at)
+             VALUES (:username, :email, :phone, :password, :role, NOW())'
         );
         $stmt->execute([
             ':username' => $username,
             ':email' => $email,
+            ':phone' => $phone,
             ':password' => password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]),
             ':role' => $role,
         ]);

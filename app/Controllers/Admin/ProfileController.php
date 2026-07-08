@@ -9,13 +9,12 @@ use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\PasswordPolicy;
 use App\Core\View;
-use App\Models\BackupCode;
 use App\Models\SessionRegistry;
 use App\Models\User;
 
 /**
  * Профиль администратора: смена пароля, управление активными сессиями,
- * регенерация backup-кодов 2FA.
+ * телефон для кода входа через Telegram (Verification Codes).
  */
 final class ProfileController
 {
@@ -26,15 +25,10 @@ final class ProfileController
         $userId = (int) Auth::id();
         $currentHash = SessionRegistry::hash(session_id());
 
-        // Одноразовый показ свежесгенерированных backup-кодов (после setup/регена).
-        $freshCodes = $_SESSION['fresh_backup_codes'] ?? null;
-        unset($_SESSION['fresh_backup_codes']);
-
         View::render('admin/profile/index', [
             'sessions' => SessionRegistry::forUser($userId),
             'currentHash' => $currentHash,
-            'backupRemaining' => BackupCode::remainingCount($userId),
-            'freshCodes' => $freshCodes,
+            'profileUser' => User::findById($userId),
             'error' => null,
         ]);
     }
@@ -112,7 +106,11 @@ final class ProfileController
         exit;
     }
 
-    public function regenerateBackupCodes(): void
+    /**
+     * Телефон для кода входа через Telegram (E.164). Изменение подтверждается
+     * текущим паролем — иначе угнанная сессия могла бы перевесить 2FA на себя.
+     */
+    public function updatePhone(): void
     {
         Auth::requireLogin();
         Csrf::verifyRequest();
@@ -120,15 +118,27 @@ final class ProfileController
         $userId = (int) Auth::id();
         $user = User::findById($userId);
 
-        // Подтверждение паролем — как требует ТЗ (задача 47).
         if (!$user || !password_verify((string) ($_POST['password'] ?? ''), $user['password_hash'])) {
-            Flash::error('Неверный пароль. Коды не изменены.');
+            Flash::error('Неверный пароль. Телефон не изменён.');
             header('Location: /admin/profile');
             exit;
         }
 
-        $_SESSION['fresh_backup_codes'] = BackupCode::regenerate($userId);
-        Flash::success('Резервные коды перевыпущены. Старые коды больше не действуют.');
+        $raw = trim((string) ($_POST['phone'] ?? ''));
+        if ($raw === '') {
+            User::updatePhone($userId, null);
+            Flash::success('Телефон удалён — вход будет выполняться без кода подтверждения.');
+        } else {
+            $phone = \App\Core\TelegramGateway::normalizePhone($raw);
+            if ($phone === null) {
+                Flash::error('Некорректный номер. Укажите телефон в международном формате, например +998901234567.');
+                header('Location: /admin/profile');
+                exit;
+            }
+            User::updatePhone($userId, $phone);
+            Flash::success('Телефон сохранён. Коды входа будут приходить в Telegram (Verification Codes).');
+        }
+
         header('Location: /admin/profile');
         exit;
     }

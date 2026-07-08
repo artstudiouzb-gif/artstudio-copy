@@ -6,8 +6,13 @@ namespace App\Controllers\Admin;
 
 use App\Core\Auth;
 use App\Core\Csrf;
+use App\Core\Flash;
 use App\Core\View;
 
+/**
+ * Вход в админку: пароль + одноразовый код, который приходит в Telegram от
+ * официального канала Verification Codes (Telegram Gateway API).
+ */
 final class AuthController
 {
     public function showLogin(): void
@@ -35,12 +40,17 @@ final class AuthController
         $result = Auth::attemptLogin($username, $password);
 
         switch ($result['status']) {
-            case 'needs_2fa':
+            case 'ok':
+                header('Location: /admin');
+                exit;
+            case 'needs_code':
                 header('Location: /admin/login/2fa');
                 exit;
-            case 'needs_2fa_setup':
-                header('Location: /admin/login/2fa-setup');
-                exit;
+            case 'send_failed':
+                View::render('admin/auth/login', [
+                    'error' => 'Не удалось отправить код в Telegram. Проверьте токен шлюза в настройках и телефон пользователя, либо повторите позже.',
+                ]);
+                return;
             case 'locked':
                 $minutes = (int) ceil(($result['retry_after'] ?? 0) / 60);
                 View::render('admin/auth/login', [
@@ -78,25 +88,18 @@ final class AuthController
             exit;
         }
 
-        View::render('admin/auth/2fa', ['error' => 'Неверный код. Попробуйте снова.']);
-    }
-
-    public function showTwoFactorSetup(): void
-    {
+        // Просроченный/сброшенный pending уводит на логин, неверный код — ошибка.
         if (empty($_SESSION['pending_user_id'])) {
+            Flash::error('Код устарел. Войдите заново — мы отправим новый.');
             header('Location: /admin/login');
             exit;
         }
 
-        $setup = Auth::beginTwoFactorSetup();
-        View::render('admin/auth/2fa-setup', [
-            'error' => null,
-            'secret' => $setup['secret'],
-            'uri' => $setup['uri'],
-        ]);
+        View::render('admin/auth/2fa', ['error' => 'Неверный код. Попробуйте снова.']);
     }
 
-    public function confirmTwoFactorSetup(): void
+    /** Повторная отправка кода в Telegram (лимит: 3 раза за 5 минут). */
+    public function resendCode(): void
     {
         Csrf::verifyRequest();
 
@@ -105,19 +108,11 @@ final class AuthController
             exit;
         }
 
-        $code = trim((string) ($_POST['code'] ?? ''));
-
-        if (Auth::confirmTwoFactorSetup($code)) {
-            // Ведём на профиль: там сразу показываются свежие backup-коды.
-            header('Location: /admin/profile');
-            exit;
-        }
-
-        $setup = Auth::beginTwoFactorSetup();
-        View::render('admin/auth/2fa-setup', [
-            'error' => 'Неверный код подтверждения. Попробуйте снова.',
-            'secret' => $setup['secret'],
-            'uri' => $setup['uri'],
+        View::render('admin/auth/2fa', [
+            'error' => null,
+            'notice' => Auth::resendCode()
+                ? 'Новый код отправлен в Telegram.'
+                : 'Не удалось отправить код (превышен лимит или шлюз недоступен). Подождите и попробуйте снова.',
         ]);
     }
 

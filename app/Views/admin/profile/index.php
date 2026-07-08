@@ -9,8 +9,7 @@ require __DIR__ . '/../layout/header.php';
 
 /** @var array $sessions */
 /** @var string $currentHash */
-/** @var int $backupRemaining */
-/** @var array<int,string>|null $freshCodes */
+/** @var array|null $profileUser */
 
 function ua_short(?string $ua): string
 {
@@ -29,20 +28,6 @@ function ua_short(?string $ua): string
     return trim($browser . ($os !== '' ? ' · ' . $os : ''));
 }
 ?>
-
-<?php if (!empty($freshCodes)): ?>
-<div class="form-card" style="border:2px solid var(--color-accent,#e63946); margin-bottom:24px;">
-    <h2 style="margin-top:0;">Ваши резервные коды 2FA</h2>
-    <p class="form-hint">Сохраните эти коды в надёжном месте. Каждый код работает <strong>один раз</strong>
-       и заменяет код из приложения-аутентификатора, если вы потеряете доступ к нему.
-       Коды показываются <strong>только сейчас</strong>.</p>
-    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; font-family:monospace; font-size:16px; margin-top:12px;">
-        <?php foreach ($freshCodes as $c): ?>
-            <div style="padding:10px 14px; background:var(--bg-surface,#f4f5f7); border-radius:8px; text-align:center; letter-spacing:1px;"><?= htmlspecialchars($c, ENT_QUOTES) ?></div>
-        <?php endforeach; ?>
-    </div>
-</div>
-<?php endif; ?>
 
 <div class="form-card">
     <h2 style="margin-top:0;">Смена пароля</h2>
@@ -68,17 +53,23 @@ function ua_short(?string $ua): string
 </div>
 
 <div class="form-card" style="margin-top:24px;">
-    <h2 style="margin-top:0;">Резервные коды 2FA</h2>
-    <p class="form-hint">Осталось неиспользованных кодов: <strong><?= (int) $backupRemaining ?></strong>.
-       Перевыпуск полностью заменит старый набор — прежние коды перестанут работать.</p>
-    <form method="post" action="/admin/profile/backup-codes" class="form-grid" style="max-width:480px;">
+    <h2 style="margin-top:0;">Подтверждение входа через Telegram</h2>
+    <p class="form-hint">Код входа приходит в Telegram от официального канала
+       <strong>Verification&nbsp;Codes</strong> (t.me/VerificationCodes) на номер, привязанный к вашему
+       Telegram-аккаунту. Без телефона вход выполняется только по паролю.</p>
+    <form method="post" action="/admin/profile/phone" class="form-grid" style="max-width:480px;">
         <?= Csrf::field() ?>
         <div class="form-field">
-            <label for="bc_password">Подтвердите паролем</label>
-            <input type="password" id="bc_password" name="password" autocomplete="current-password" required>
+            <label for="phone">Телефон (международный формат)</label>
+            <input type="tel" id="phone" name="phone" placeholder="+998901234567" value="<?= htmlspecialchars((string) ($profileUser['phone'] ?? ''), ENT_QUOTES) ?>" autocomplete="tel">
+            <span class="form-hint">Оставьте пустым, чтобы отключить код подтверждения для своего аккаунта.</span>
+        </div>
+        <div class="form-field">
+            <label for="ph_password">Подтвердите паролем</label>
+            <input type="password" id="ph_password" name="password" autocomplete="current-password" required>
         </div>
         <div class="form-actions">
-            <button type="submit" class="btn">Перевыпустить коды</button>
+            <button type="submit" class="btn">Сохранить телефон</button>
         </div>
     </form>
 </div>
