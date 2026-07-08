@@ -81,11 +81,19 @@ final class FormNotifier
      */
     public static function notifySubmission(string $formName, array $fields): int
     {
+        return self::broadcast(self::formatSubmission($formName, $fields));
+    }
+
+    /**
+     * Произвольное служебное уведомление тем же получателям (сбой автобэкапа
+     * и т.п.). Возвращает число успешных доставок.
+     */
+    public static function broadcast(string $text): int
+    {
         if (!self::isEnabled()) {
             return 0;
         }
 
-        $text = self::formatSubmission($formName, $fields);
         $sent = 0;
         foreach (self::chatIds() as $chatId) {
             if (TelegramBot::sendMessage($chatId, $text)) {

@@ -42,6 +42,8 @@ if ($lock === null) {
 
 $maintenance = (bool) Config::get('backup.maintenance_during', true);
 $retention = (int) Config::get('backup.retention_days', 14);
+$keepDaily = (int) Config::get('backup.keep_daily', 7);
+$keepWeekly = (int) Config::get('backup.keep_weekly', 4);
 
 try {
     $started = microtime(true);
@@ -50,7 +52,9 @@ try {
     $sha = Backup::storedChecksum($path);
 
     $external = Backup::copyExternal($path);
-    $removed = Backup::rotate($retention);
+    // keep_daily > 0 — умная схема «дневные + недельные»; keep_daily = 0 —
+    // прежняя простая ротация по retention_days.
+    $removed = $keepDaily > 0 ? Backup::rotateSmart($keepDaily, $keepWeekly) : Backup::rotate($retention);
     $seconds = round(microtime(true) - $started, 1);
 
     Logger::info('Бэкап снят успешно', [
@@ -79,6 +83,9 @@ try {
         'file' => $e->getFile(),
         'line' => $e->getLine(),
     ]);
+    // Дублируем алерт через бота из настроек (канал заявок) — он настроен
+    // чаще, чем config[telegram] для алертов логов.
+    \App\Core\FormNotifier::broadcast("\u{1F534} Автобэкап НЕ снят: " . $e->getMessage());
     fwrite(STDERR, 'ОШИБКА бэкапа: ' . $e->getMessage() . PHP_EOL);
     exit(1);
 } finally {

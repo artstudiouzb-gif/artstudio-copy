@@ -154,6 +154,75 @@ final class Backup
     }
 
     /**
+     * Умная ротация «дневные + недельные»: последние $keepDaily дней хранятся
+     * все копии; старше — по одной (самой свежей) на ISO-неделю в пределах
+     * $keepWeekly недель; всё, что старше этого окна, удаляется.
+     * Возвращает число удалённых архивов.
+     */
+    public static function rotateSmart(int $keepDaily = 7, int $keepWeekly = 4): int
+    {
+        $dir = self::backupDir();
+        if (!is_dir($dir) || $keepDaily <= 0) {
+            return 0;
+        }
+
+        $files = [];
+        foreach (glob($dir . '/backup_*.zip') ?: [] as $file) {
+            $files[$file] = (int) filemtime($file);
+        }
+
+        $delete = self::selectForDeletion($files, time(), $keepDaily, $keepWeekly);
+        foreach ($delete as $file) {
+            @unlink($file);
+            @unlink(self::checksumPath($file));
+        }
+        if ($delete !== []) {
+            Logger::info('Ротация бэкапов (дневные+недельные): удалены старые копии', [
+                'removed' => count($delete),
+                'keep_daily' => $keepDaily,
+                'keep_weekly' => $keepWeekly,
+            ]);
+        }
+
+        return count($delete);
+    }
+
+    /**
+     * Чистая логика выбора архивов на удаление (тестируемо без ФС).
+     *
+     * @param array<string, int> $files путь => mtime
+     * @return array<int, string> пути на удаление
+     */
+    public static function selectForDeletion(array $files, int $now, int $keepDaily, int $keepWeekly): array
+    {
+        $dailyCutoff = $now - $keepDaily * 86400;
+        $weeklyCutoff = $dailyCutoff - $keepWeekly * 7 * 86400;
+
+        $delete = [];
+        $bestPerWeek = []; // ISO-неделя => [путь, mtime самой свежей копии]
+        foreach ($files as $path => $mtime) {
+            if ($mtime >= $dailyCutoff) {
+                continue; // свежие копии храним все
+            }
+            if ($mtime < $weeklyCutoff) {
+                $delete[] = $path;
+                continue;
+            }
+            $week = date('o-W', $mtime);
+            if (!isset($bestPerWeek[$week])) {
+                $bestPerWeek[$week] = [$path, $mtime];
+            } elseif ($mtime > $bestPerWeek[$week][1]) {
+                $delete[] = $bestPerWeek[$week][0];
+                $bestPerWeek[$week] = [$path, $mtime];
+            } else {
+                $delete[] = $path;
+            }
+        }
+
+        return $delete;
+    }
+
+    /**
      * Дублирует архив (и его .sha256) во внешний каталог, если он задан в
      * config('backup.external_dir'). Возвращает путь копии или null.
      */
