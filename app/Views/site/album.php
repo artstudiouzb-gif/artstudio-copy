@@ -1,0 +1,45 @@
+<?php
+
+use App\Core\Locale;
+
+/** @var array $album */
+/** @var array $images */
+
+$metaTitle = (string) $album['title'];
+$metaDescription = mb_substr(trim((string) ($album['description'] ?? '')), 0, 160);
+require __DIR__ . '/_header.php';
+?>
+<div class="content-list">
+    <nav class="content-crumbs" aria-label="Хлебные крошки">
+        <a href="<?= htmlspecialchars(Locale::url('/'), ENT_QUOTES) ?>">Главная</a>
+        <span>/</span>
+        <a href="<?= htmlspecialchars(Locale::url('albums'), ENT_QUOTES) ?>">Фотоальбомы</a>
+        <span>/</span>
+        <span><?= htmlspecialchars((string) $album['title'], ENT_QUOTES) ?></span>
+    </nav>
+
+    <header class="content-list__head">
+        <h1><?= htmlspecialchars((string) $album['title'], ENT_QUOTES) ?></h1>
+        <?php if (!empty($album['description'])): ?>
+            <p class="content-list__lead"><?= nl2br(htmlspecialchars((string) $album['description'], ENT_QUOTES)) ?></p>
+        <?php endif; ?>
+    </header>
+
+    <?php if (empty($images)): ?>
+        <p class="content-list__empty">В альбоме пока нет фотографий.</p>
+    <?php else: ?>
+        <div class="album-photos">
+            <?php foreach ($images as $img): ?>
+                <figure class="album-photo">
+                    <a href="<?= htmlspecialchars((string) $img['image_url'], ENT_QUOTES) ?>" target="_blank" rel="noopener">
+                        <img src="<?= htmlspecialchars((string) $img['image_url'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) ($img['caption'] ?: $album['title']), ENT_QUOTES) ?>" loading="lazy">
+                    </a>
+                    <?php if ($img['caption'] !== ''): ?>
+                        <figcaption><?= htmlspecialchars((string) $img['caption'], ENT_QUOTES) ?></figcaption>
+                    <?php endif; ?>
+                </figure>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
+<?php require __DIR__ . '/_footer.php'; ?>

@@ -495,6 +495,31 @@ CREATE TABLE IF NOT EXISTS redirects (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
+-- Фотоальбомы: галереи изображений с обложкой (/albums)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS photo_albums (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title        VARCHAR(255) NOT NULL,
+    slug         VARCHAR(255) NOT NULL,
+    description  TEXT NULL,
+    cover_url    VARCHAR(500) NOT NULL DEFAULT '',
+    is_published TINYINT(1) NOT NULL DEFAULT 1,
+    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_albums_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS photo_album_images (
+    id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    album_id   INT UNSIGNED NOT NULL,
+    image_url  VARCHAR(500) NOT NULL,
+    caption    VARCHAR(255) NOT NULL DEFAULT '',
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_album_images (album_id, sort_order, id),
+    CONSTRAINT fk_album_images FOREIGN KEY (album_id) REFERENCES photo_albums (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
 -- Конструктор произвольных типов контента (этап 16.4)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS content_types (
@@ -700,7 +725,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_08_telegram_bot_login.sql'),
     ('2026_07_08_audit_log.sql'),
     ('2026_07_08_redirects.sql'),
-    ('2026_07_08_events_calendar.sql')
+    ('2026_07_08_events_calendar.sql'),
+    ('2026_07_08_photo_albums.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

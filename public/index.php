@@ -194,6 +194,13 @@ $router->post('/admin/trash/{type}/{id}/force-delete', [\App\Controllers\Admin\T
 
 // --- Admin: пользователи (только супер-администратор) ---
 $router->get('/admin/audit', [\App\Controllers\Admin\AuditController::class, 'index']);
+$router->get('/admin/albums', [\App\Controllers\Admin\AlbumController::class, 'index']);
+$router->post('/admin/albums/create', [\App\Controllers\Admin\AlbumController::class, 'store']);
+$router->get('/admin/albums/{id}/edit', [\App\Controllers\Admin\AlbumController::class, 'edit']);
+$router->post('/admin/albums/{id}/update', [\App\Controllers\Admin\AlbumController::class, 'update']);
+$router->post('/admin/albums/{id}/delete', [\App\Controllers\Admin\AlbumController::class, 'destroy']);
+$router->post('/admin/albums/{id}/images/add', [\App\Controllers\Admin\AlbumController::class, 'addImage']);
+$router->post('/admin/albums/{id}/images/{imageId}/delete', [\App\Controllers\Admin\AlbumController::class, 'deleteImage']);
 $router->get('/admin/redirects', [\App\Controllers\Admin\RedirectController::class, 'index']);
 $router->post('/admin/redirects/create', [\App\Controllers\Admin\RedirectController::class, 'store']);
 $router->post('/admin/redirects/import', [\App\Controllers\Admin\RedirectController::class, 'import']);
@@ -290,6 +297,8 @@ $router->get('/news/rss.xml', [SiteNewsController::class, 'feed']);
 $router->get('/news/{slug}', [SiteNewsController::class, 'show']);
 $router->get('/search', [\App\Controllers\Site\SearchController::class, 'index']);
 $router->get('/calendar', [\App\Controllers\Site\CalendarController::class, 'index']);
+$router->get('/albums', [\App\Controllers\Site\AlbumController::class, 'index']);
+$router->get('/albums/{slug}', [\App\Controllers\Site\AlbumController::class, 'show']);
 $router->get('/catalog/{type}', [\App\Controllers\Site\ContentController::class, 'index']);
 $router->get('/catalog/{type}/{slug}', [\App\Controllers\Site\ContentController::class, 'show']);
 $router->post('/forms/{slug}/submit', [SiteFormController::class, 'submit']);
