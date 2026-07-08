@@ -184,10 +184,12 @@
         if (!modal) { return; }
         var grid = modal.querySelector('[data-media-grid]');
         var currentTarget = null;
+        var currentCallback = null; // режим выбора для WYSIWYG (вставка URL в контент)
         var loaded = false;
 
-        function open(targetSelector) {
-            currentTarget = document.querySelector(targetSelector);
+        function open(targetSelector, callback) {
+            currentTarget = targetSelector ? document.querySelector(targetSelector) : null;
+            currentCallback = callback || null;
             modal.hidden = false;
             if (loaded) { return; }
             grid.innerHTML = '<div class="media-modal__empty">Загрузка…</div>';
@@ -208,7 +210,9 @@
                         img.src = it.url; img.alt = it.name; img.loading = 'lazy';
                         fig.appendChild(img);
                         fig.addEventListener('click', function () {
-                            if (currentTarget) {
+                            if (currentCallback) {
+                                currentCallback(it.url);
+                            } else if (currentTarget) {
                                 currentTarget.value = it.url;
                                 currentTarget.dispatchEvent(new Event('change', { bubbles: true }));
                             }
@@ -219,7 +223,10 @@
                 })
                 .catch(function () { grid.innerHTML = '<div class="media-modal__empty">Ошибка загрузки.</div>'; });
         }
-        function close() { modal.hidden = true; }
+        function close() { modal.hidden = true; currentCallback = null; }
+
+        // Публичный API для редактора: выбор изображения с колбэком.
+        window.MediaPicker = { pick: function (cb) { open(null, cb); } };
 
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('[data-media-pick]');

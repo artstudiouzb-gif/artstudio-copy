@@ -512,3 +512,17 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
     .design-card { flex-basis: calc(50% - 6px); max-width: none; padding: 10px 8px; }
     .design-card__preview { height: 44px; }
 }
+
+/* ArtEditor: расширенный тулбар, HTML-режим, полноэкранный режим */
+.art-editor__sep { width: 1px; align-self: stretch; margin: 2px 4px; background: var(--admin-border, #e6e8ec); }
+.art-editor__btn:disabled { opacity: .35; cursor: default; }
+.art-editor__btn.is-active { background: var(--admin-accent-soft, #eef0fe); border-color: var(--admin-accent, #5b52e5); color: var(--admin-accent, #5b52e5); }
+.art-editor__source { display: block; width: 100%; min-height: 240px; border: 0; padding: 12px 14px; font-family: ui-monospace, monospace; font-size: 13px; line-height: 1.5; resize: vertical; outline: none; }
+.art-editor--full { position: fixed; inset: 12px; z-index: 300; display: flex; flex-direction: column; box-shadow: 0 24px 80px rgba(0,0,0,.35); }
+.art-editor--full .art-editor__area, .art-editor--full .art-editor__source { flex: 1; overflow: auto; }
+.art-editor__area blockquote { margin: 10px 0; padding: 8px 14px; border-left: 3px solid var(--admin-accent, #5b52e5); background: #f8f9fb; color: #444; }
+.art-editor__area pre { background: #16161d; color: #e8e8ef; padding: 12px 14px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+.art-editor__area table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+.art-editor__area th, .art-editor__area td { border: 1px solid var(--admin-border-strong, #d5d9e0); padding: 6px 10px; min-width: 40px; }
+.art-editor__area th { background: #f2f4f8; }
+.art-editor__area img { max-width: 100%; height: auto; }
