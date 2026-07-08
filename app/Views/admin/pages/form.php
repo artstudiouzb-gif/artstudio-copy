@@ -246,16 +246,17 @@ foreach ($blocks as $b) {
 
     <?php $snippets = \App\Models\BlockSnippet::all(); ?>
     <div class="form-card" style="margin-top:16px;">
-        <h3 style="margin-top:0;">Шаблоны блоков</h3>
+        <h3 style="margin-top:0;">Шаблоны страницы</h3>
+        <p class="form-hint">Шаблон сохраняет все блоки этого языка, включая содержимое колонок. Его можно применить к любой странице: добавить к текущим блокам или полностью заменить их.</p>
         <div class="snippet-tools">
             <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/snippets/save" class="snippet-tools__row">
                 <?= Csrf::field() ?>
                 <input type="hidden" name="block_lang" value="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>">
                 <input type="text" name="snippet_name" placeholder="Название шаблона" required>
-                <button type="submit" class="btn btn--small">Сохранить блоки как шаблон</button>
+                <button type="submit" class="btn btn--small">Сохранить страницу как шаблон</button>
             </form>
             <?php if (!empty($snippets)): ?>
-                <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/snippets/insert" class="snippet-tools__row">
+                <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/snippets/insert" class="snippet-tools__row" data-snippet-insert>
                     <?= Csrf::field() ?>
                     <input type="hidden" name="block_lang" value="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>">
                     <select name="snippet_id" required>
@@ -264,7 +265,11 @@ foreach ($blocks as $b) {
                             <option value="<?= (int) $s['id'] ?>"><?= htmlspecialchars((string) $s['name'], ENT_QUOTES) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <button type="submit" class="btn btn--small">Вставить шаблон</button>
+                    <select name="mode">
+                        <option value="append">Добавить к текущим</option>
+                        <option value="replace">Заменить текущие блоки</option>
+                    </select>
+                    <button type="submit" class="btn btn--small">Применить шаблон</button>
                 </form>
             <?php else: ?>
                 <p class="form-hint">Пока нет сохранённых шаблонов.</p>

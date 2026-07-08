@@ -38,6 +38,17 @@
         });
     });
 
+    // Применение шаблона страницы: режим «заменить» требует подтверждения.
+    document.querySelectorAll('[data-snippet-insert]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            var mode = form.querySelector('select[name=mode]');
+            if (mode && mode.value === 'replace'
+                && !window.confirm('Заменить все текущие блоки этого языка блоками из шаблона? Действие необратимо.')) {
+                event.preventDefault();
+            }
+        });
+    });
+
     // Чанковая загрузка больших файлов через File API.
     var chunkBtn = document.getElementById('chunk_upload_btn');
     if (chunkBtn) {

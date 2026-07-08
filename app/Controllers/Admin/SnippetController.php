@@ -9,15 +9,15 @@ use App\Core\Cache;
 use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\View;
-use App\Models\Block;
 use App\Models\BlockSnippet;
 use App\Models\Language;
 use App\Models\Page;
 
 /**
- * Сохранение набора блоков страницы как шаблона и вставка шаблона в страницу
- * (задача 133). При вставке блоки получают новые id (custom_css скоупится по
- * #block-{id} на рендере — конфликтов не возникает).
+ * Шаблоны целых страниц: снимок всех блоков языкового стека (включая дочерние
+ * блоки колонок и активность) и применение к любой странице — добавлением к
+ * текущим блокам или полной заменой. При вставке блоки получают новые id
+ * (custom_css скоупится по #block-{id} — конфликтов не возникает).
  */
 final class SnippetController
 {
@@ -47,15 +47,8 @@ final class SnippetController
             $this->back($pageId, $lang);
         }
 
-        $blocks = [];
-        foreach (Block::forPage($pageId, $lang) as $block) {
-            $blocks[] = [
-                'type' => (string) $block['type'],
-                'title' => $block['title'] !== null ? (string) $block['title'] : null,
-                'data' => json_decode((string) $block['data'], true) ?: [],
-                'custom_css' => (string) ($block['custom_css'] ?? ''),
-            ];
-        }
+        // Снимок целой страницы: верхний уровень + дочерние блоки колонок.
+        $blocks = BlockSnippet::captureFromPage($pageId, $lang);
 
         if ($blocks === []) {
             Flash::error('На этом языке нет блоков для сохранения.');
@@ -93,27 +86,11 @@ final class SnippetController
             $this->back($pageId, $lang);
         }
 
-        $count = 0;
-        foreach ($blocks as $b) {
-            $type = (string) ($b['type'] ?? '');
-            if ($type === '') {
-                continue;
-            }
-            // Новые id присваиваются автоматически (Block::create) — важно для
-            // изоляции CSS по #block-{id}.
-            Block::create(
-                $pageId,
-                $lang,
-                $type,
-                isset($b['title']) && $b['title'] !== '' ? (string) $b['title'] : null,
-                is_array($b['data'] ?? null) ? $b['data'] : [],
-                (string) ($b['custom_css'] ?? '')
-            );
-            $count++;
-        }
+        $replace = ($_POST['mode'] ?? 'append') === 'replace';
+        $count = BlockSnippet::applyToPage($blocks, $pageId, $lang, $replace);
 
         Cache::forgetPrefix('page:' . $pageId);
-        Flash::success('Вставлено блоков: ' . $count . '.');
+        Flash::success(($replace ? 'Страница заменена шаблоном. ' : '') . 'Вставлено блоков: ' . $count . '.');
         $this->back($pageId, $lang);
     }
 
