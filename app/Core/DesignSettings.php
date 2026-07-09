@@ -23,7 +23,7 @@ final class DesignSettings
      * 'custom' сохраняет цвета, заданные вручную в «Настройках».
      */
     public const PALETTES = [
-        'gov_blue' => ['Гос-синий', '#223d79', '#2f6fed'],
+        'gov_blue' => ['Гос-синий', '#173a63', '#17999b'],
         'classic_red' => ['Классика', '#1a1a1a', '#e63946'],
         'emerald' => ['Изумруд', '#14532d', '#059669'],
         'graphite' => ['Графит', '#111827', '#374151'],
@@ -33,6 +33,7 @@ final class DesignSettings
 
     /** Шрифтовые пресеты: значение опции font_style => [подпись, CSS-стек]. */
     public const FONTS = [
+        'pt' => ['PT Serif / PT Sans (гос)', "'PT Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"],
         'inter' => ['Inter', "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"],
         'system' => ['Системный', "system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"],
         'serif' => ['С засечками', "Georgia, 'Times New Roman', serif"],

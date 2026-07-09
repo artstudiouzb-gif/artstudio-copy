@@ -24,3 +24,8 @@ curl -A '<современный UA>' \
   'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap' -o mn.css
 # затем скачать woff2 из блоков /* cyrillic */ и /* latin */ и обновить fonts.css.
 ```
+
+## Гос-тема
+
+- **PT Serif** — заголовки, **PT Sans** — текст (веса 400/700, cyrillic+latin, OFL).
+  Подключаются через `public/assets/css/gov-fonts.css` (см. `gov-theme.css`).

@@ -15,12 +15,12 @@ use App\Models\Setting;
 
 $siteName = Setting::get('site_name', 'ArtStudio');
 $logo = Setting::get('logo_url', '');
-// Дефолтная палитра — корпоративный «navy» (основной #223D79, акцент —
-// живой синий) и типографика Montserrat/Manrope (см. fonts.css).
-$primaryColor = Setting::get('color_primary', '#223D79');
-$accentColor = Setting::get('color_accent', '#2f6fed');
-$font = Setting::get('font_family', "'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif");
-$fontHeading = Setting::get('font_heading', "'Montserrat', 'Manrope', system-ui, sans-serif");
+// Гос-тема (по утверждённым эскизам): navy #173a63 + бирюзовый #17999b,
+// типографика PT Serif (заголовки) / PT Sans (текст) — см. gov-theme.css.
+$primaryColor = Setting::get('color_primary', '#173a63');
+$accentColor = Setting::get('color_accent', '#17999b');
+$font = Setting::get('font_family', "'PT Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif");
+$fontHeading = Setting::get('font_heading', "'PT Serif', Georgia, 'Times New Roman', serif");
 $extraHeadCss = $extraHeadCss ?? '';
 
 // --- Дизайн-система: тема и локальный шрифт ---
@@ -328,8 +328,12 @@ if ($inlineMenu !== '') {
 <?php endif; ?>
 <link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/manrope-400-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/montserrat-700-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/ptserif-700-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/ptsans-400-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/fonts.css'), ENT_QUOTES) ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/gov-fonts.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/frontend.css'), ENT_QUOTES) ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/gov-theme.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/a11y.css'), ENT_QUOTES) ?>">
 <style>
 :root {
