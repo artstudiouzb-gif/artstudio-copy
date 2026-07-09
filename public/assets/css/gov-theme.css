@@ -584,3 +584,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 760px) { .newsdetail-body--no-left { grid-template-columns: 1fr; } }
 .newsdetail-share--inline { margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--gov-border); display: flex; align-items: center; gap: 18px; }
 .newsdetail-share--inline .newsdetail-share__title { margin: 0; }
+
+/* Типы отображения новости (выбор в админке). */
+.newsdetail-head--side { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+.newsdetail-head--side .newsdetail-gallery__main { aspect-ratio: 4/3; }
+.newsdetail-media { min-width: 0; }
+.newsdetail-video { margin-bottom: 0; border-radius: 14px; }

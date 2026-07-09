@@ -78,9 +78,18 @@ $docIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wi
 $dlIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 19h14"/></svg>';
 ?>
 <?php
+// Тип отображения (выбирается в админке): standard — только обложка,
+// gallery — слайдер с миниатюрами, video — модуль YouTube с play,
+// side_image — компактное фото сбоку от заголовка.
+$layout = News::normalizeLayout($news['layout_type'] ?? 'standard');
+$videoId = \App\Core\Video::youtubeId($news['video_url'] ?? null);
+if ($layout === 'video' && $videoId === null) {
+    $layout = 'standard'; // без валидного YouTube-URL показываем обложку
+}
 // Адаптация макета к наполнению: без медиа hero занимает всю ширину,
 // без тезисов левая колонка убирается, «Поделиться» уходит под статью.
-$hasMedia = !empty($slides);
+$heroSlides = $layout === 'gallery' ? $slides : array_slice($slides, 0, 1);
+$hasMedia = $layout === 'video' || !empty($heroSlides);
 $hasLeft = !empty($keyPoints);
 
 $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, $pageUrl): void { ?>
@@ -97,7 +106,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
 <?php };
 ?>
 <article class="newsdetail">
-    <div class="newsdetail-head<?= $hasMedia ? '' : ' newsdetail-head--full' ?>">
+    <div class="newsdetail-head<?= $hasMedia ? '' : ' newsdetail-head--full' ?><?= $hasMedia && $layout === 'side_image' ? ' newsdetail-head--side' : '' ?>">
         <div class="newsdetail-head__info">
             <?php if (!empty($news['badge'])): ?>
                 <span class="newsdetail__badge"><?= htmlspecialchars((string) $news['badge'], ENT_QUOTES) ?></span>
@@ -134,21 +143,34 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                 </div>
             <?php endif; ?>
         </div>
-        <?php if (!empty($slides)): ?>
+        <?php if ($layout === 'video'): ?>
+            <?php
+            // Модуль видео: обложка YouTube, плеер грузится только по клику (news.js).
+            $thumb = \App\Core\Video::youtubeThumbnail($videoId);
+            $fallback = 'https://i.ytimg.com/vi/' . $videoId . '/hqdefault.jpg';
+            $embed = \App\Core\Video::youtubeEmbed($videoId) . '&autoplay=1';
+            ?>
+            <div class="newsdetail-media">
+                <div class="news-video newsdetail-video skeleton" data-youtube="<?= htmlspecialchars($videoId, ENT_QUOTES) ?>" data-embed="<?= htmlspecialchars($embed, ENT_QUOTES) ?>">
+                    <img class="news-video__thumb" src="<?= htmlspecialchars($cover !== '' ? $cover : $thumb, ENT_QUOTES) ?>" data-fallback="<?= htmlspecialchars($fallback, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $news['title'], ENT_QUOTES) ?>" loading="eager" decoding="async">
+                    <button type="button" class="news-video__play" aria-label="Смотреть видео"></button>
+                </div>
+            </div>
+        <?php elseif (!empty($heroSlides)): ?>
             <div class="newsdetail-gallery" data-ndgallery>
                 <div class="newsdetail-gallery__main">
-                    <?php foreach ($slides as $i => $s): ?>
+                    <?php foreach ($heroSlides as $i => $s): ?>
                         <img class="newsdetail-gallery__slide<?= $i === 0 ? ' is-active' : '' ?>" src="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($s['alt'], ENT_QUOTES) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>">
                     <?php endforeach; ?>
-                    <?php if (count($slides) > 1): ?>
+                    <?php if (count($heroSlides) > 1): ?>
                         <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--prev" data-ndg-prev aria-label="Предыдущее фото">‹</button>
                         <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--next" data-ndg-next aria-label="Следующее фото">›</button>
-                        <span class="newsdetail-gallery__counter"><span data-ndg-current>1</span> из <?= count($slides) ?></span>
+                        <span class="newsdetail-gallery__counter"><span data-ndg-current>1</span> из <?= count($heroSlides) ?></span>
                     <?php endif; ?>
                 </div>
-                <?php if (count($slides) > 1): ?>
+                <?php if (count($heroSlides) > 1): ?>
                     <div class="newsdetail-gallery__thumbs">
-                        <?php foreach ($slides as $i => $s): ?>
+                        <?php foreach ($heroSlides as $i => $s): ?>
                             <button type="button" class="newsdetail-gallery__thumb<?= $i === 0 ? ' is-active' : '' ?>" data-ndg-thumb="<?= $i ?>" aria-label="Фото <?= $i + 1 ?>" style="background-image:url('<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>')"></button>
                         <?php endforeach; ?>
                     </div>
@@ -230,7 +252,12 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
         </aside>
     </div>
 
-    <?php if (count($slides) > 1): ?>
+    <?php
+    // Фотогалерея-лента: для видео — все фото (герой занят плеером),
+    // для остальных типов — когда фотографий больше одной.
+    $showPhotoStrip = $layout === 'video' ? !empty($slides) : count($slides) > 1;
+    ?>
+    <?php if ($showPhotoStrip): ?>
         <section class="newsdetail-photos">
             <div class="section-head">
                 <h2 class="section-head__title">Фотогалерея</h2>
