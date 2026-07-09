@@ -14,7 +14,11 @@ use App\Models\Setting;
  */
 final class HeaderConfig
 {
+    /** Доступные макеты шапки (десктоп + мобильный). */
+    public const LAYOUTS = ['stacked', 'inline', 'centered', 'drawer'];
+
     public const DEFAULTS = [
+        'layout' => 'stacked',                // stacked | inline | centered | drawer
         'logo_position' => 'left',            // left | center
         'menu_position' => 'right',           // left | center | right
         'language_switcher' => [
@@ -47,9 +51,18 @@ final class HeaderConfig
         Setting::set('header_config', json_encode($clean, JSON_UNESCAPED_UNICODE));
     }
 
+    /** Публичная нормализация конфигурации (валидация значений) без записи в БД. */
+    public static function normalize(array $config): array
+    {
+        return self::mergeDefaults($config);
+    }
+
     private static function mergeDefaults(array $config): array
     {
         $result = self::DEFAULTS;
+
+        $result['layout'] = in_array($config['layout'] ?? '', self::LAYOUTS, true)
+            ? $config['layout'] : self::DEFAULTS['layout'];
 
         $result['logo_position'] = in_array($config['logo_position'] ?? '', ['left', 'center'], true)
             ? $config['logo_position'] : self::DEFAULTS['logo_position'];

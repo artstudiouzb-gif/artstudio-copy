@@ -32,6 +32,7 @@ final class HeaderController
         }
 
         HeaderConfig::save([
+            'layout' => $_POST['layout'] ?? 'stacked',
             'logo_position' => $_POST['logo_position'] ?? 'left',
             'menu_position' => $_POST['menu_position'] ?? 'right',
             'language_switcher' => [

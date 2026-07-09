@@ -64,34 +64,50 @@ if ($logo !== '') {
 $logoHtml .= '</a>';
 
 // --- Меню ---
+// Инлайновая SVG-иконка пункта: очищается санитайзером при сохранении, здесь
+// выводится как есть внутри отдельного span (для стилизации размера/цвета).
+$renderMenuIcon = static function (mixed $svg): string {
+    $svg = trim((string) $svg);
+    return $svg !== '' ? '<span class="site-menu__icon" aria-hidden="true">' . $svg . '</span>' : '';
+};
 $menuHtml = '';
 $menuItems = MenuItem::activeForLang($currentLang);
 if (!empty($menuItems)) {
-    $menuHtml = '<nav class="site-menu">';
+    $menuHtml = '<nav class="site-menu" aria-label="Основное меню">';
     foreach ($menuItems as $mi) {
+        // Пункт-разделитель: визуальная черта/зазор без ссылки.
+        if (!empty($mi['is_divider'])) {
+            $menuHtml .= '<span class="site-menu__divider" role="separator" aria-hidden="true"></span>';
+            continue;
+        }
+
         $url = MenuItem::resolveUrl($mi, $currentLang);
-        // Показываем только активные дочерние пункты.
+        $icon = $renderMenuIcon($mi['icon_svg'] ?? '');
+        $label = $icon . '<span class="site-menu__text">' . htmlspecialchars($mi['title'], ENT_QUOTES) . '</span>';
+
+        // Показываем только активные дочерние пункты (разделители в подменю не поддерживаем).
         $children = array_values(array_filter(
             $mi['children'] ?? [],
-            static fn ($c) => (int) $c['is_active'] === 1
+            static fn ($c) => (int) $c['is_active'] === 1 && empty($c['is_divider'])
         ));
 
         if ($children === []) {
             $menuHtml .= '<a class="site-menu__link" href="' . htmlspecialchars($url, ENT_QUOTES) . '">'
-                . htmlspecialchars($mi['title'], ENT_QUOTES) . '</a>';
+                . $label . '</a>';
             continue;
         }
 
         // Пункт с выпадающим подменю (dropdown на desktop hover/focus, tap на мобильных).
         $menuHtml .= '<div class="site-menu__item site-menu__item--has-children">';
         $menuHtml .= '<a class="site-menu__link" href="' . htmlspecialchars($url, ENT_QUOTES) . '">'
-            . htmlspecialchars($mi['title'], ENT_QUOTES) . '</a>';
+            . $label . '</a>';
         $menuHtml .= '<button type="button" class="site-menu__toggle" aria-expanded="false" aria-label="Открыть подменю">▾</button>';
         $menuHtml .= '<div class="site-submenu">';
         foreach ($children as $child) {
             $childUrl = MenuItem::resolveUrl($child, $currentLang);
+            $childIcon = $renderMenuIcon($child['icon_svg'] ?? '');
             $menuHtml .= '<a class="site-submenu__link" href="' . htmlspecialchars($childUrl, ENT_QUOTES) . '">'
-                . htmlspecialchars($child['title'], ENT_QUOTES) . '</a>';
+                . $childIcon . '<span class="site-menu__text">' . htmlspecialchars($child['title'], ENT_QUOTES) . '</span></a>';
         }
         $menuHtml .= '</div></div>';
     }
@@ -177,16 +193,50 @@ $burgerHtml = $menuHtml !== ''
     ? '<button type="button" class="site-burger" data-mobile-menu-toggle aria-label="Меню" aria-expanded="false"><span></span><span></span><span></span></button>'
     : '';
 
-// --- Раскладка по зонам ---
-// Меню выводится отдельной навигационной полосой под верхним рядом (паттерн
-// официального портала): верх — логотип + утилиты, ниже — полноширинная
-// навигация. menu_position задаёт горизонтальное выравнивание этой полосы.
+// --- Макет шапки: 4 варианта ---
+// stacked  — верхний ряд + полноширинная навигационная полоса под ним;
+// centered — логотип по центру, меню центрировано полосой ниже;
+// inline   — логотип, меню и утилиты в одном ряду;
+// drawer   — меню скрыто за кнопкой, выезжает off-canvas сбоку (все экраны).
+$layout = in_array($hcfg['layout'] ?? 'stacked', HeaderConfig::LAYOUTS, true) ? $hcfg['layout'] : 'stacked';
+// Центрированный макет всегда ставит логотип по центру.
+$logoPos = $layout === 'centered' ? 'center' : $hcfg['logo_position'];
+$navAlign = $layout === 'centered' ? 'center'
+    : (in_array($hcfg['menu_position'], ['left', 'center', 'right'], true) ? $hcfg['menu_position'] : 'left');
+
+// --- Раскладка по зонам верхнего ряда ---
 $zones = ['left' => '', 'center' => '', 'right' => ''];
 $zones['left'] .= $burgerHtml;
-$zones[$hcfg['logo_position']] .= $logoHtml;
+$zones[$logoPos] .= $logoHtml;
 // Утилиты (поиск, язык, соцсети, CTA, тема, версия для слабовидящих) — справа.
 $zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeToggle . $a11yToggle;
-$navAlign = in_array($hcfg['menu_position'], ['left', 'center', 'right'], true) ? $hcfg['menu_position'] : 'left';
+
+// Размещение меню зависит от макета:
+//  - inline: внутрь центральной зоны верхнего ряда;
+//  - stacked/centered: отдельной полосой под верхним рядом;
+//  - drawer: в off-canvas панель (рендерится ниже), в шапке — кнопка.
+$inlineMenu = '';
+$navBarHtml = '';
+$drawerMenu = '';
+if ($menuHtml !== '') {
+    if ($layout === 'inline') {
+        $inlineMenu = $menuHtml;
+    } elseif ($layout === 'drawer') {
+        $drawerMenu = $menuHtml;
+    } else {
+        $navBarHtml = $menuHtml;
+    }
+}
+// В inline-макете меню занимает центральную зону; но если логотип по центру,
+// он уже там — тогда меню уходит в полосу под рядом.
+if ($inlineMenu !== '') {
+    if ($logoPos === 'center') {
+        $navBarHtml = $inlineMenu;
+        $inlineMenu = '';
+    } else {
+        $zones['center'] .= $inlineMenu;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES) ?>" data-theme="<?= htmlspecialchars($defaultTheme, ENT_QUOTES) ?>"<?= $a11y['on'] ? ' data-a11y="1" data-a11y-scheme="' . htmlspecialchars($a11y['scheme'], ENT_QUOTES) . '" data-a11y-size="' . htmlspecialchars($a11y['size'], ENT_QUOTES) . '" data-a11y-images="' . htmlspecialchars($a11y['images'], ENT_QUOTES) . '"' : '' ?>>
@@ -301,18 +351,29 @@ $navAlign = in_array($hcfg['menu_position'], ['left', 'center', 'right'], true) 
     </div>
     <a href="#" class="a11y-panel__off">Обычная версия</a>
 </div>
-<header class="site-header site-header--logo-<?= htmlspecialchars($hcfg['logo_position'], ENT_QUOTES) ?><?= $menuHtml !== '' ? ' site-header--has-nav' : '' ?>">
+<header class="site-header site-header--layout-<?= htmlspecialchars($layout, ENT_QUOTES) ?> site-header--logo-<?= htmlspecialchars($logoPos, ENT_QUOTES) ?><?= $navBarHtml !== '' ? ' site-header--has-nav' : '' ?><?= $drawerMenu !== '' ? ' site-header--has-drawer' : '' ?>">
     <div class="site-header__inner">
         <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>
         <div class="site-header__zone site-header__zone--center"><?= $zones['center'] ?></div>
         <div class="site-header__zone site-header__zone--right"><?= $zones['right'] ?></div>
     </div>
-    <?php if ($menuHtml !== ''): ?>
+    <?php if ($navBarHtml !== ''): ?>
     <div class="site-nav site-nav--align-<?= htmlspecialchars($navAlign, ENT_QUOTES) ?>">
-        <div class="site-nav__inner"><?= $menuHtml ?></div>
+        <div class="site-nav__inner"><?= $navBarHtml ?></div>
     </div>
     <?php endif; ?>
 </header>
+<?php if ($drawerMenu !== ''): ?>
+<?php // Off-canvas меню вынесено за пределы <header>, чтобы position:fixed не
+      // зависел от containing block шапки (sticky/трансформации). ?>
+<div class="site-drawer" data-drawer>
+    <div class="site-drawer__backdrop" data-mobile-menu-toggle aria-hidden="true"></div>
+    <div class="site-drawer__panel" role="dialog" aria-label="Меню" aria-modal="true">
+        <button type="button" class="site-drawer__close" data-mobile-menu-toggle aria-label="Закрыть меню">&times;</button>
+        <?= $drawerMenu ?>
+    </div>
+</div>
+<?php endif; ?>
 <div class="site-search-overlay" data-search-overlay hidden>
     <form class="site-search-overlay__form" method="get" action="<?= $searchAction ?>" role="search">
         <input type="search" name="q" placeholder="Введите запрос…" aria-label="Поиск по сайту" data-search-input>

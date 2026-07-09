@@ -1119,3 +1119,97 @@ body.design-header-dark .site-nav { border-top-color: rgba(255, 255, 255, .14); 
         color: var(--text-main);
     }
 }
+
+/* ==========================================================================
+   МЕНЮ: SVG-иконки и разделители пунктов
+   ========================================================================== */
+.site-menu__link, .site-submenu__link { display: inline-flex; align-items: center; gap: 8px; }
+.site-menu__icon { display: inline-flex; align-items: center; }
+.site-menu__icon svg { width: 18px; height: 18px; display: block; }
+.site-menu__text { display: inline-block; }
+/* Разделитель в горизонтальном меню — тонкая вертикальная черта. */
+.site-menu__divider {
+    align-self: center; width: 1px; height: 18px; margin: 0 4px;
+    background: color-mix(in srgb, currentColor 35%, transparent);
+}
+
+/* ==========================================================================
+   4 МАКЕТА ШАПКИ (десктоп + мобильный)
+   ========================================================================== */
+/* Бургер по умолчанию скрыт на десктопе (показывается только в мобильном
+   бургер-режиме, см. media-блок ниже, либо в макете «боковая панель»). */
+.site-burger { display: none; }
+
+/* --- Макет «В одну строку»: меню в центральной зоне верхнего ряда --- */
+.site-header--layout-inline .site-header__zone--center .site-menu {
+    display: flex; flex-wrap: wrap; gap: 4px 22px; justify-content: center;
+}
+.site-header--layout-inline .site-header__zone--center { flex: 1 1 auto; }
+
+/* --- Макет «Центрированный»: логотип по центру, меню центрировано ниже --- */
+.site-header--layout-centered .site-header__inner { position: relative; }
+.site-header--layout-centered .site-header__zone--left,
+.site-header--layout-centered .site-header__zone--right { flex: 1; }
+.site-header--layout-centered .site-nav__inner { justify-content: center; }
+
+/* --- Макет «Боковая панель» (drawer): меню off-canvas, кнопка на всех экранах --- */
+.site-header--layout-drawer .site-burger { display: inline-flex; }
+.site-drawer {
+    position: fixed; inset: 0; z-index: 120;
+    visibility: hidden; opacity: 0; transition: opacity .25s ease, visibility .25s ease;
+}
+body.mobile-menu-open .site-drawer { visibility: visible; opacity: 1; }
+.site-drawer__backdrop { position: absolute; inset: 0; background: rgba(8, 12, 34, .5); backdrop-filter: blur(2px); }
+.site-drawer__panel {
+    position: absolute; top: 0; right: 0; height: 100%; width: min(340px, 86vw);
+    background: var(--bg-primary); box-shadow: -12px 0 40px rgba(8, 12, 34, .3);
+    padding: 64px 20px 24px; overflow-y: auto;
+    transform: translateX(100%); transition: transform .28s ease;
+}
+body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
+.site-drawer__close {
+    position: absolute; top: 12px; right: 14px; width: 40px; height: 40px;
+    border: 0; background: transparent; font-size: 30px; line-height: 1; cursor: pointer;
+    color: var(--text-main); border-radius: 8px;
+}
+.site-drawer__close:hover { background: var(--bg-surface); }
+.site-drawer .site-menu { flex-direction: column; align-items: stretch; gap: 0; }
+.site-drawer .site-menu__link { padding: 13px 8px; border-bottom: 1px solid var(--border-color); }
+.site-drawer .site-menu__item { width: 100%; }
+.site-drawer .site-menu__item--has-children { display: flex; flex-wrap: wrap; align-items: center; }
+.site-drawer .site-submenu { position: static; display: flex; flex-direction: column; box-shadow: none; padding-left: 14px; width: 100%; }
+/* Разделитель в вертикальном (drawer/мобильном) меню — горизонтальная черта. */
+.site-drawer .site-menu__divider {
+    width: 100%; height: 1px; margin: 6px 0;
+    background: color-mix(in srgb, var(--text-main) 18%, transparent);
+}
+
+/* --- Мобильные (≤720): все макеты кроме drawer сворачиваются в бургер --- */
+@media (max-width: 720px) {
+    .site-header:not(.site-header--layout-drawer) .site-burger { display: inline-flex; }
+    /* В выпадающем мобильном меню пункты — блочные, но с отступом под иконку. */
+    body.design-mmenu-burger .site-menu__link { display: flex; align-items: center; gap: 8px; }
+    /* Разделитель в любом вертикальном мобильном меню — горизонтальная черта. */
+    body.design-mmenu-burger .site-menu__divider {
+        width: 100%; height: 1px; margin: 6px 0;
+        background: color-mix(in srgb, var(--text-main) 18%, transparent);
+    }
+    /* Инлайновое меню (центр. зона) на мобильном — выпадающая панель под шапкой. */
+    body.design-mmenu-burger .site-header--layout-inline .site-header__zone--center .site-menu,
+    body.design-mmenu-burger .site-header--layout-centered .site-nav .site-menu {
+        position: absolute; left: 0; right: 0; top: 100%; z-index: 55;
+        flex-direction: column; align-items: stretch; gap: 0; padding: 8px 12px 14px;
+        background: var(--bg-primary); border-bottom: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg); display: none;
+    }
+    body.design-mmenu-burger.mobile-menu-open .site-header--layout-inline .site-header__zone--center .site-menu,
+    body.design-mmenu-burger.mobile-menu-open .site-header--layout-centered .site-nav .site-menu { display: flex; }
+    body.design-mmenu-burger .site-header--layout-inline .site-menu__divider,
+    body.design-mmenu-burger .site-header--layout-centered .site-menu__divider {
+        width: 100%; height: 1px; margin: 6px 0;
+        background: color-mix(in srgb, var(--text-main) 18%, transparent);
+    }
+    /* Центрированный макет на мобильном — логотип слева для компактности. */
+    .site-header--layout-centered .site-header__zone--left,
+    .site-header--layout-centered .site-header__zone--right { flex: 0 0 auto; }
+}

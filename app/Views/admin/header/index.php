@@ -14,6 +14,31 @@ $networks = ['telegram' => 'Telegram', 'instagram' => 'Instagram', 'facebook' =>
         <?= Csrf::field() ?>
 
         <div class="header-builder__group">
+            <h3>Дизайн шапки</h3>
+            <?php
+            $layouts = [
+                'stacked' => ['Двухрядный', 'Логотип и утилиты сверху, меню — отдельной полосой во всю ширину.'],
+                'inline' => ['В одну строку', 'Логотип, меню и утилиты в одном компактном ряду.'],
+                'centered' => ['Центрированный', 'Логотип по центру сверху, меню центрировано под ним.'],
+                'drawer' => ['Боковая панель', 'Меню скрыто за кнопкой и выезжает сбоку (на всех экранах).'],
+            ];
+            $currentLayout = $config['layout'] ?? 'stacked';
+            ?>
+            <div class="header-layout-picker">
+                <?php foreach ($layouts as $val => [$label, $desc]): ?>
+                    <label class="header-layout-picker__option<?= $currentLayout === $val ? ' is-selected' : '' ?>">
+                        <input type="radio" name="layout" value="<?= $val ?>" <?= $currentLayout === $val ? 'checked' : '' ?>>
+                        <span class="header-layout-picker__preview header-layout-picker__preview--<?= $val ?>" aria-hidden="true">
+                            <span class="hlp-logo"></span><span class="hlp-nav"></span>
+                        </span>
+                        <span class="header-layout-picker__label"><?= htmlspecialchars($label, ENT_QUOTES) ?></span>
+                        <span class="header-layout-picker__desc"><?= htmlspecialchars($desc, ENT_QUOTES) ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <div class="header-builder__group">
             <h3>Расположение</h3>
             <div class="form-field">
                 <label for="logo_position">Логотип</label>
@@ -21,6 +46,7 @@ $networks = ['telegram' => 'Telegram', 'instagram' => 'Instagram', 'facebook' =>
                     <option value="left" <?= $config['logo_position'] === 'left' ? 'selected' : '' ?>>Слева</option>
                     <option value="center" <?= $config['logo_position'] === 'center' ? 'selected' : '' ?>>По центру</option>
                 </select>
+                <span class="form-hint">Для «Центрированного» макета логотип всегда по центру.</span>
             </div>
             <div class="form-field">
                 <label for="menu_position">Меню</label>

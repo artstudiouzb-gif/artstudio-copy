@@ -149,8 +149,24 @@ final class MenuController
         if ($lang !== '' && !Language::isActive($lang)) {
             $lang = '';
         }
+        $isDivider = !empty($_POST['is_divider']);
+        $iconSvg = (string) ($_POST['icon_svg'] ?? '');
         $urlType = in_array($_POST['url_type'] ?? '', ['page', 'news_index', 'custom'], true) ? $_POST['url_type'] : 'custom';
         $urlValue = trim((string) ($_POST['url_value'] ?? ''));
+
+        // Разделитель — визуальный элемент без ссылки и, как правило, без названия.
+        if ($isDivider) {
+            return [[
+                'title' => $title !== '' ? $title : '—',
+                'lang' => $lang,
+                'icon_svg' => null,
+                'is_divider' => true,
+                'url_type' => 'custom',
+                'url_value' => null,
+                'parent_id' => null,
+                'is_active' => !empty($_POST['is_active']),
+            ], null];
+        }
 
         if ($title === '') {
             return [[], 'Укажите название пункта меню.'];
@@ -174,6 +190,8 @@ final class MenuController
         return [[
             'title' => $title,
             'lang' => $lang,
+            'icon_svg' => $iconSvg,
+            'is_divider' => false,
             'url_type' => $urlType,
             'url_value' => $urlValue !== '' ? $urlValue : null,
             'parent_id' => $parentId,

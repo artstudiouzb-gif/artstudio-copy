@@ -1,19 +1,33 @@
 (function () {
     'use strict';
 
-    // Бургер-меню (режим «Бургер-меню» в настройках дизайна): открывает и
-    // закрывает главное меню на мобильных; Esc закрывает.
-    var burger = document.querySelector('[data-mobile-menu-toggle]');
-    if (burger) {
-        burger.addEventListener('click', function () {
-            var open = document.body.classList.toggle('mobile-menu-open');
-            burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    // Переключатели главного меню: бургер (мобильные / макет «боковая панель»),
+    // а также фон и кнопка закрытия off-canvas панели. Любой из них
+    // открывает/закрывает меню через класс body; Esc закрывает.
+    var menuToggles = document.querySelectorAll('[data-mobile-menu-toggle]');
+    var burger = document.querySelector('.site-burger[data-mobile-menu-toggle]');
+    var setBurgerState = function (open) {
+        if (burger) { burger.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+    };
+    if (menuToggles.length) {
+        menuToggles.forEach(function (el) {
+            el.addEventListener('click', function () {
+                var open = document.body.classList.toggle('mobile-menu-open');
+                setBurgerState(open);
+            });
         });
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && document.body.classList.contains('mobile-menu-open')) {
                 document.body.classList.remove('mobile-menu-open');
-                burger.setAttribute('aria-expanded', 'false');
+                setBurgerState(false);
             }
+        });
+        // Клик по пункту внутри off-canvas панели закрывает её.
+        document.querySelectorAll('.site-drawer__panel .site-menu__link').forEach(function (link) {
+            link.addEventListener('click', function () {
+                document.body.classList.remove('mobile-menu-open');
+                setBurgerState(false);
+            });
         });
     }
 

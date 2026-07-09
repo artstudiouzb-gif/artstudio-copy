@@ -321,6 +321,8 @@ CREATE TABLE IF NOT EXISTS menu_items (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     lang            VARCHAR(8) NOT NULL DEFAULT '' COMMENT 'код языка или пусто для всех',
     title           VARCHAR(190) NOT NULL,
+    icon_svg        TEXT NULL COMMENT 'инлайновая SVG-иконка пункта',
+    is_divider      TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'пункт-разделитель меню',
     url_type        ENUM('page', 'news_index', 'custom') NOT NULL DEFAULT 'custom',
     url_value       VARCHAR(500) NULL COMMENT 'slug страницы или произвольный URL',
     parent_id       INT UNSIGNED NULL,
@@ -758,7 +760,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_08_photo_albums.sql'),
     ('2026_07_08_subscribers.sql'),
     ('2026_07_08_queue_locks.sql'),
-    ('2026_07_08_not_found_log.sql')
+    ('2026_07_08_not_found_log.sql'),
+    ('2026_07_09_menu_icons_dividers.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;
