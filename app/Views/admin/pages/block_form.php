@@ -25,7 +25,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <input type="text" id="title" name="title" value="<?= htmlspecialchars($block['title'] ?? '', ENT_QUOTES) ?>">
         </div>
 
-        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature'], true)): ?>
+        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature', 'person_cards', 'timeline', 'cta_band', 'feature_band'], true)): ?>
             <div class="form-field">
                 <label for="title_field">Заголовок, показываемый на сайте</label>
                 <input type="text" id="title_field" name="title_field" value="<?= htmlspecialchars($data['title'] ?? '', ENT_QUOTES) ?>">
@@ -503,6 +503,185 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                 </template>
                 <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="items">+ Добавить</button></div>
             </div>
+        <?php endif; ?>
+
+        <?php if ($type === 'person_cards'): ?>
+            <div class="form-field"><label for="all_text">Ссылка «Все …» — текст</label><input type="text" id="all_text" name="all_text" value="<?= htmlspecialchars($data['all_text'] ?? '', ENT_QUOTES) ?>" placeholder="Все руководство"></div>
+            <div class="form-field"><label for="all_url">Ссылка «Все …» — URL</label><input type="text" id="all_url" name="all_url" value="<?= htmlspecialchars($data['all_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <div>
+                <label>Персоны (без фото и имени — карточка «Вакантно»)</label>
+                <div data-repeater="items">
+                    <?php foreach (($data['items'] ?? []) as $i => $item): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>Фото (URL)</label><input type="text" name="items[<?= $i ?>][photo]" value="<?= htmlspecialchars($item['photo'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/..."></div>
+                            <div class="form-field"><label>Имя</label><input type="text" name="items[<?= $i ?>][name]" value="<?= htmlspecialchars($item['name'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Должность</label><input type="text" name="items[<?= $i ?>][role]" value="<?= htmlspecialchars($item['role'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Ссылка «Подробнее»</label><input type="text" name="items[<?= $i ?>][url]" value="<?= htmlspecialchars($item['url'] ?? '', ENT_QUOTES) ?>"></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="items">
+                    <div class="form-field"><label>Фото (URL)</label><input type="text" name="items[__INDEX__][photo]" placeholder="/uploads/public/..."></div>
+                    <div class="form-field"><label>Имя</label><input type="text" name="items[__INDEX__][name]"></div>
+                    <div class="form-field"><label>Должность</label><input type="text" name="items[__INDEX__][role]"></div>
+                    <div class="form-field"><label>Ссылка «Подробнее»</label><input type="text" name="items[__INDEX__][url]"></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="items">+ Добавить персону</button></div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($type === 'timeline'): ?>
+            <div>
+                <label>События (год + описание)</label>
+                <div data-repeater="items">
+                    <?php foreach (($data['items'] ?? []) as $i => $item): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>Год</label><input type="text" name="items[<?= $i ?>][year]" value="<?= htmlspecialchars($item['year'] ?? '', ENT_QUOTES) ?>" placeholder="2023+"></div>
+                            <div class="form-field"><label>Текст</label><textarea name="items[<?= $i ?>][text]"><?= htmlspecialchars($item['text'] ?? '', ENT_QUOTES) ?></textarea></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="items">
+                    <div class="form-field"><label>Год</label><input type="text" name="items[__INDEX__][year]"></div>
+                    <div class="form-field"><label>Текст</label><textarea name="items[__INDEX__][text]"></textarea></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="items">+ Добавить событие</button></div>
+            </div>
+            <div class="form-field"><label for="button_text">Кнопка под таймлайном — текст</label><input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>" placeholder="Вся история"></div>
+            <div class="form-field"><label for="button_url">Кнопка под таймлайном — ссылка</label><input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <hr>
+            <div class="form-field"><label for="cta_title">CTA-карточка справа — заголовок (пусто = без карточки)</label><input type="text" id="cta_title" name="cta_title" value="<?= htmlspecialchars($data['cta_title'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="cta_text">CTA — текст</label><textarea id="cta_text" name="cta_text" rows="2"><?= htmlspecialchars($data['cta_text'] ?? '', ENT_QUOTES) ?></textarea></div>
+            <div class="form-field"><label for="cta_button_text">CTA — текст кнопки</label><input type="text" id="cta_button_text" name="cta_button_text" value="<?= htmlspecialchars($data['cta_button_text'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="cta_button_url">CTA — ссылка кнопки</label><input type="text" id="cta_button_url" name="cta_button_url" value="<?= htmlspecialchars($data['cta_button_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="cta_image">CTA — фоновое фото (URL)</label><input type="text" id="cta_image" name="cta_image" value="<?= htmlspecialchars($data['cta_image'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/..."></div>
+        <?php endif; ?>
+
+        <?php if ($type === 'news_docs'): ?>
+            <div class="form-field"><label for="news_title">Колонка новостей — заголовок</label><input type="text" id="news_title" name="news_title" value="<?= htmlspecialchars($data['news_title'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="limit">Сколько новостей (1–6)</label><input type="number" id="limit" name="limit" min="1" max="6" value="<?= (int) ($data['limit'] ?? 3) ?>"><span class="form-hint">Берутся последние опубликованные новости.</span></div>
+            <div class="form-field"><label for="news_all_text">Новости: «Все …» — текст</label><input type="text" id="news_all_text" name="news_all_text" value="<?= htmlspecialchars($data['news_all_text'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="news_all_url">Новости: «Все …» — URL (пусто = /news)</label><input type="text" id="news_all_url" name="news_all_url" value="<?= htmlspecialchars($data['news_all_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <hr>
+            <div class="form-field"><label for="docs_title">Колонка документов — заголовок</label><input type="text" id="docs_title" name="docs_title" value="<?= htmlspecialchars($data['docs_title'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="docs_all_text">Документы: «Все …» — текст</label><input type="text" id="docs_all_text" name="docs_all_text" value="<?= htmlspecialchars($data['docs_all_text'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="docs_all_url">Документы: «Все …» — URL</label><input type="text" id="docs_all_url" name="docs_all_url" value="<?= htmlspecialchars($data['docs_all_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <div>
+                <label>Документы</label>
+                <div data-repeater="docs">
+                    <?php foreach (($data['docs'] ?? []) as $i => $doc): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>Название</label><input type="text" name="docs[<?= $i ?>][title]" value="<?= htmlspecialchars($doc['title'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Мета (напр. PDF · 2.4 МБ)</label><input type="text" name="docs[<?= $i ?>][meta]" value="<?= htmlspecialchars($doc['meta'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Ссылка на файл</label><input type="text" name="docs[<?= $i ?>][url]" value="<?= htmlspecialchars($doc['url'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/....pdf"></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="docs">
+                    <div class="form-field"><label>Название</label><input type="text" name="docs[__INDEX__][title]"></div>
+                    <div class="form-field"><label>Мета (напр. PDF · 2.4 МБ)</label><input type="text" name="docs[__INDEX__][meta]"></div>
+                    <div class="form-field"><label>Ссылка на файл</label><input type="text" name="docs[__INDEX__][url]"></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="docs">+ Добавить документ</button></div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($type === 'cta_band'): ?>
+            <div class="form-field"><label for="text">Текст</label><textarea id="text" name="text" rows="2"><?= htmlspecialchars($data['text'] ?? '', ENT_QUOTES) ?></textarea></div>
+            <div class="form-field"><label for="icon_svg">SVG-иконка (необязательно)</label><textarea id="icon_svg" name="icon_svg" placeholder="<svg ...>...</svg>"><?= htmlspecialchars($data['icon_svg'] ?? '', ENT_QUOTES) ?></textarea></div>
+            <div class="form-field"><label for="button_text">Кнопка — текст</label><input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>" placeholder="Связаться с нами"></div>
+            <div class="form-field"><label for="button_url">Кнопка — ссылка</label><input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="/kontakty"></div>
+        <?php endif; ?>
+
+        <?php if ($type === 'person_profile'): ?>
+            <div class="form-field"><label for="photo">Фото (URL)</label><input type="text" id="photo" name="photo" value="<?= htmlspecialchars($data['photo'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/..."></div>
+            <div class="form-field"><label for="name">Имя</label><input type="text" id="name" name="name" value="<?= htmlspecialchars($data['name'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="position">Должность</label><input type="text" id="position" name="position" value="<?= htmlspecialchars($data['position'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="text">Описание</label><textarea id="text" name="text" rows="4"><?= htmlspecialchars($data['text'] ?? '', ENT_QUOTES) ?></textarea></div>
+            <div class="form-field"><label for="phone_label">Подпись телефона</label><input type="text" id="phone_label" name="phone_label" value="<?= htmlspecialchars($data['phone_label'] ?? 'Приёмная:', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="phone">Телефон</label><input type="text" id="phone" name="phone" value="<?= htmlspecialchars($data['phone'] ?? '', ENT_QUOTES) ?>" placeholder="+998 71 203 10 00"></div>
+            <div class="form-field"><label for="email_label">Подпись e-mail</label><input type="text" id="email_label" name="email_label" value="<?= htmlspecialchars($data['email_label'] ?? 'E-mail:', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="email">E-mail</label><input type="text" id="email" name="email" value="<?= htmlspecialchars($data['email'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="button_text">Кнопка — текст</label><input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>" placeholder="Обратиться к руководителю"></div>
+            <div class="form-field"><label for="button_url">Кнопка — ссылка</label><input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>"></div>
+        <?php endif; ?>
+
+        <?php if ($type === 'feature_band'): ?>
+            <div>
+                <label>Элементы полосы (иконка + название + текст)</label>
+                <div data-repeater="items">
+                    <?php foreach (($data['items'] ?? []) as $i => $item): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>SVG-иконка</label><textarea name="items[<?= $i ?>][icon_svg]" placeholder="<svg ...>...</svg>"><?= htmlspecialchars($item['icon_svg'] ?? '', ENT_QUOTES) ?></textarea></div>
+                            <div class="form-field"><label>Название</label><input type="text" name="items[<?= $i ?>][title]" value="<?= htmlspecialchars($item['title'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Текст</label><textarea name="items[<?= $i ?>][text]"><?= htmlspecialchars($item['text'] ?? '', ENT_QUOTES) ?></textarea></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="items">
+                    <div class="form-field"><label>SVG-иконка</label><textarea name="items[__INDEX__][icon_svg]" placeholder="<svg ...>...</svg>"></textarea></div>
+                    <div class="form-field"><label>Название</label><input type="text" name="items[__INDEX__][title]"></div>
+                    <div class="form-field"><label>Текст</label><textarea name="items[__INDEX__][text]"></textarea></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="items">+ Добавить элемент</button></div>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($type === 'bio_education'): ?>
+            <div class="form-field"><label for="bio_title">Левая колонка — заголовок</label><input type="text" id="bio_title" name="bio_title" value="<?= htmlspecialchars($data['bio_title'] ?? 'Биография', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="bio_text">Вступительный текст</label><textarea id="bio_text" name="bio_text" rows="4"><?= htmlspecialchars($data['bio_text'] ?? '', ENT_QUOTES) ?></textarea></div>
+            <div>
+                <label>Карьера (годы + позиция)</label>
+                <div data-repeater="career">
+                    <?php foreach (($data['career'] ?? []) as $i => $row): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>Годы</label><input type="text" name="career[<?= $i ?>][years]" value="<?= htmlspecialchars($row['years'] ?? '', ENT_QUOTES) ?>" placeholder="2023 – н.в."></div>
+                            <div class="form-field"><label>Позиция</label><textarea name="career[<?= $i ?>][text]"><?= htmlspecialchars($row['text'] ?? '', ENT_QUOTES) ?></textarea></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="career">
+                    <div class="form-field"><label>Годы</label><input type="text" name="career[__INDEX__][years]"></div>
+                    <div class="form-field"><label>Позиция</label><textarea name="career[__INDEX__][text]"></textarea></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="career">+ Добавить период</button></div>
+            </div>
+            <hr>
+            <div class="form-field"><label for="edu_title">Правая колонка — заголовок</label><input type="text" id="edu_title" name="edu_title" value="<?= htmlspecialchars($data['edu_title'] ?? 'Образование', ENT_QUOTES) ?>"></div>
+            <div>
+                <label>Образование (годы + степень + вуз)</label>
+                <div data-repeater="edu_items">
+                    <?php foreach (($data['edu_items'] ?? []) as $i => $row): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>Годы</label><input type="text" name="edu_items[<?= $i ?>][years]" value="<?= htmlspecialchars($row['years'] ?? '', ENT_QUOTES) ?>" placeholder="2011 – 2013"></div>
+                            <div class="form-field"><label>Степень</label><input type="text" name="edu_items[<?= $i ?>][title]" value="<?= htmlspecialchars($row['title'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Учебное заведение</label><input type="text" name="edu_items[<?= $i ?>][org]" value="<?= htmlspecialchars($row['org'] ?? '', ENT_QUOTES) ?>"></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="edu_items">
+                    <div class="form-field"><label>Годы</label><input type="text" name="edu_items[__INDEX__][years]"></div>
+                    <div class="form-field"><label>Степень</label><input type="text" name="edu_items[__INDEX__][title]"></div>
+                    <div class="form-field"><label>Учебное заведение</label><input type="text" name="edu_items[__INDEX__][org]"></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="edu_items">+ Добавить</button></div>
+            </div>
+            <div class="form-field"><label for="extra_title">Доп. образование — заголовок</label><input type="text" id="extra_title" name="extra_title" value="<?= htmlspecialchars($data['extra_title'] ?? '', ENT_QUOTES) ?>" placeholder="Дополнительное образование"></div>
+            <div class="form-field"><label for="extra_text">Доп. образование — пункты (по одному на строку)</label><textarea id="extra_text" name="extra_text" rows="3"><?= htmlspecialchars($data['extra_text'] ?? '', ENT_QUOTES) ?></textarea></div>
+            <div class="form-field"><label for="quote_text">Цитата</label><textarea id="quote_text" name="quote_text" rows="2"><?= htmlspecialchars($data['quote_text'] ?? '', ENT_QUOTES) ?></textarea></div>
+            <div class="form-field"><label for="quote_author">Автор цитаты</label><input type="text" id="quote_author" name="quote_author" value="<?= htmlspecialchars($data['quote_author'] ?? '', ENT_QUOTES) ?>"></div>
         <?php endif; ?>
 
         <?php $spacing = $data['_spacing'] ?? 'premium'; ?>

@@ -40,6 +40,13 @@ final class BlockRenderer
         'image_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
         'media_gallery' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
         'news_feature' => ['title' => 'Новости и аналитика', 'all_text' => 'Все новости', 'all_url' => '', 'limit' => 6],
+        'person_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
+        'timeline' => ['title' => '', 'items' => [], 'button_text' => '', 'button_url' => '', 'cta_title' => '', 'cta_text' => '', 'cta_button_text' => '', 'cta_button_url' => '', 'cta_image' => ''],
+        'news_docs' => ['news_title' => 'Актуальные новости', 'news_all_text' => 'Все новости', 'news_all_url' => '', 'limit' => 3, 'docs_title' => 'Документы', 'docs_all_text' => 'Все документы', 'docs_all_url' => '', 'docs' => []],
+        'cta_band' => ['title' => '', 'text' => '', 'icon_svg' => '', 'button_text' => '', 'button_url' => ''],
+        'person_profile' => ['photo' => '', 'name' => '', 'position' => '', 'text' => '', 'phone' => '', 'phone_label' => 'Приёмная:', 'email' => '', 'email_label' => 'E-mail:', 'button_text' => '', 'button_url' => ''],
+        'feature_band' => ['title' => '', 'items' => []],
+        'bio_education' => ['bio_title' => 'Биография', 'bio_text' => '', 'career' => [], 'edu_title' => 'Образование', 'edu_items' => [], 'extra_title' => '', 'extra_text' => '', 'quote_text' => '', 'quote_author' => ''],
     ];
 
     public static function defaultsFor(string $type): array
@@ -307,6 +314,29 @@ final class BlockRenderer
             $data['news'] = $items;
             if (($data['all_url'] ?? '') === '') {
                 $data['all_url'] = Locale::url('news', $lang);
+            }
+        }
+
+        // Блок «Новости + документы» (две колонки): лента подтягивается из БД,
+        // документы — ручной список. limit 0 -> 3.
+        if ($type === 'news_docs') {
+            $limit = (int) ($data['limit'] ?? 3);
+            if ($limit <= 0) {
+                $limit = 3;
+            }
+            $lang = Locale::current();
+            $items = [];
+            foreach (\App\Models\News::published($limit, 0, $lang) as $row) {
+                $items[] = [
+                    'title' => (string) $row['title'],
+                    'published_at' => (string) ($row['published_at'] ?? ''),
+                    'cover' => \App\Models\News::getCoverImage($row),
+                    'url' => Locale::url('news/' . $row['slug'], $lang),
+                ];
+            }
+            $data['news'] = $items;
+            if (($data['news_all_url'] ?? '') === '') {
+                $data['news_all_url'] = Locale::url('news', $lang);
             }
         }
 

@@ -39,23 +39,31 @@ $fmt = static fn (string $d): string => DateFormatter::long($d, $lang);
         </a>
 
         <div class="newsfeat-side">
-            <?php foreach ($withThumb as $item): ?>
-                <a class="newsfeat-mini" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
-                    <span class="newsfeat-mini__media<?= empty($item['cover']) ? ' newsfeat-mini__media--empty' : '' ?>"<?= !empty($item['cover']) ? ' style="background-image:url(\'' . htmlspecialchars((string) $item['cover'], ENT_QUOTES) . '\')"' : '' ?>></span>
-                    <span class="newsfeat-mini__body">
-                        <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
-                        <span class="newsfeat-mini__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
-                        <span class="newsfeat__more">Читать →</span>
-                    </span>
-                </a>
-            <?php endforeach; ?>
-            <?php foreach ($textOnly as $item): ?>
-                <a class="newsfeat-text" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
-                    <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
-                    <span class="newsfeat-text__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
-                    <span class="newsfeat__more">Читать →</span>
-                </a>
-            <?php endforeach; ?>
+            <?php if (!empty($withThumb)): ?>
+                <div class="newsfeat-side__thumbs">
+                    <?php foreach ($withThumb as $item): ?>
+                        <a class="newsfeat-mini" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
+                            <span class="newsfeat-mini__media<?= empty($item['cover']) ? ' newsfeat-mini__media--empty' : '' ?>"<?= !empty($item['cover']) ? ' style="background-image:url(\'' . htmlspecialchars((string) $item['cover'], ENT_QUOTES) . '\')"' : '' ?>></span>
+                            <span class="newsfeat-mini__body">
+                                <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
+                                <span class="newsfeat-mini__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
+                                <span class="newsfeat__more">Читать далее →</span>
+                            </span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($textOnly)): ?>
+                <div class="newsfeat-side__texts">
+                    <?php foreach ($textOnly as $item): ?>
+                        <a class="newsfeat-text" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
+                            <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
+                            <span class="newsfeat-text__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
+                            <span class="newsfeat__more">Читать далее →</span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
     <?php endif; ?>

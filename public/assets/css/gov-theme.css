@@ -237,24 +237,30 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .mediacard__date { display: block; color: var(--gov-muted); font-size: .85rem; margin-top: 4px; }
 
 /* --- Блок «Новости и аналитика»: крупная + список (по эскизу) --- */
-.newsfeat-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 30px; }
+.newsfeat-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 34px; }
 @media (max-width: 900px) { .newsfeat-grid { grid-template-columns: 1fr; } }
-.newsfeat-lead { display: flex; flex-direction: column; text-decoration: none; color: var(--gov-ink); background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); overflow: hidden; }
-.newsfeat-lead__media { display: block; aspect-ratio: 16/9; background: #24425f center/cover no-repeat; }
+.newsfeat-lead { display: grid; grid-template-columns: minmax(0, 46%) 1fr; gap: 22px; text-decoration: none; color: var(--gov-ink); align-items: start; }
+@media (max-width: 560px) { .newsfeat-lead { grid-template-columns: 1fr; } }
+.newsfeat-lead__media { display: block; aspect-ratio: 4/3; height: 100%; min-height: 210px; border-radius: var(--radius); background: #24425f center/cover no-repeat; }
 .newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
-.newsfeat-lead__body { display: flex; flex-direction: column; gap: 10px; padding: 22px; }
-.newsfeat-lead__title { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.35rem; color: var(--gov-navy); line-height: 1.25; }
-.newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.55; }
-.newsfeat-side { display: flex; flex-direction: column; gap: 18px; }
+.newsfeat-lead__body { display: flex; flex-direction: column; gap: 12px; }
+.newsfeat-lead__title { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.3rem; color: var(--gov-navy); line-height: 1.3; }
+.newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.55; font-size: .95rem; }
+.newsfeat-side { display: flex; flex-direction: column; gap: 24px; }
+@media (min-width: 901px) { .newsfeat-side { border-left: 1px solid var(--gov-border); padding-left: 34px; } }
+.newsfeat-side__thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+@media (max-width: 560px) { .newsfeat-side__thumbs { grid-template-columns: 1fr; } }
+.newsfeat-side__texts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid var(--gov-border); padding-top: 20px; }
+@media (max-width: 560px) { .newsfeat-side__texts { grid-template-columns: 1fr; } }
 .newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
 .newsfeat__more { color: var(--gov-teal); text-transform: uppercase; font-size: 12px; letter-spacing: .05em; font-weight: 700; }
-.newsfeat-mini { display: grid; grid-template-columns: 116px 1fr; gap: 14px; text-decoration: none; color: var(--gov-ink); align-items: center; }
+.newsfeat-mini { display: grid; grid-template-columns: 96px 1fr; gap: 14px; text-decoration: none; color: var(--gov-ink); align-items: start; }
 .newsfeat-mini__media { display: block; aspect-ratio: 4/3; border-radius: 8px; background: #24425f center/cover no-repeat; }
 .newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
-.newsfeat-mini__body { display: flex; flex-direction: column; gap: 5px; }
-.newsfeat-mini__title { font-weight: 700; color: var(--gov-navy); line-height: 1.3; font-size: .98rem; }
-.newsfeat-text { display: flex; flex-direction: column; gap: 5px; text-decoration: none; color: var(--gov-ink); padding-top: 16px; border-top: 1px solid var(--gov-border); }
-.newsfeat-text__title { font-weight: 700; color: var(--gov-navy); line-height: 1.3; font-size: .98rem; }
+.newsfeat-mini__body { display: flex; flex-direction: column; gap: 6px; }
+.newsfeat-mini__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .95rem; }
+.newsfeat-text { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--gov-ink); }
+.newsfeat-text__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .95rem; }
 .newsfeat-lead:hover .newsfeat-lead__title, .newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
 
 /* --- Медиа-галерея: переключатели --- */
@@ -295,3 +301,149 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .cms-block--fullwidth.cms-block--bg-light::before { background: var(--gov-surface); }
 .cms-block--fullwidth.cms-block--bg-tint::before { background: color-mix(in srgb, var(--gov-navy) 5%, var(--gov-bg)); }
 .cms-block--fullwidth.cms-block--bg-navy::before { background: var(--gov-navy); }
+
+/* Руководство — карточки персон (вакантные с плейсхолдером). */
+.persons-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+@media (max-width: 1000px) { .persons-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .persons-grid { grid-template-columns: 1fr; } }
+.person-card { display: flex; flex-direction: column; background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); overflow: hidden; }
+.person-card__photo { display: block; aspect-ratio: 4/4.4; background: #24425f center/cover no-repeat; }
+.person-card__placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; aspect-ratio: 4/4.4; background: color-mix(in srgb, var(--gov-navy) 5%, var(--gov-surface)); color: var(--gov-muted); }
+.person-card__placeholder svg { opacity: .55; }
+.person-card__vacant { text-transform: uppercase; font-size: 12px; letter-spacing: .08em; font-weight: 700; color: var(--gov-muted); }
+.person-card__body { display: flex; flex-direction: column; gap: 6px; padding: 18px; text-align: center; flex: 1; }
+.person-card__name { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.05rem; color: var(--gov-navy); }
+.person-card__role { color: var(--gov-muted); font-size: .9rem; line-height: 1.4; flex: 1; }
+.person-card__more { color: var(--gov-teal); text-transform: uppercase; font-size: 12px; letter-spacing: .05em; font-weight: 700; text-decoration: none; margin-top: 8px; }
+.person-card--vacant .person-card__role { color: var(--gov-ink); font-weight: 700; }
+
+/* История — таймлайн + CTA-карточка с фоном. */
+.block-timeline--with-cta { display: grid; grid-template-columns: 1fr 1.1fr; gap: 28px; align-items: stretch; }
+@media (max-width: 900px) { .block-timeline--with-cta { grid-template-columns: 1fr; } }
+.timeline-card { background: color-mix(in srgb, var(--gov-navy) 5%, var(--gov-bg)); border-radius: var(--radius); padding: 30px; }
+.timeline-card__title { font-size: 1.4rem; margin: 0 0 22px; }
+.timeline-list { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline-list::before { content: ''; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 2px; background: color-mix(in srgb, var(--gov-navy) 18%, transparent); }
+.timeline-item { position: relative; display: grid; grid-template-columns: 84px 1fr; gap: 12px; padding: 0 0 22px 28px; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--gov-navy); }
+.timeline-item__year { font-family: 'PT Serif', serif; font-weight: 700; color: var(--gov-navy); }
+.timeline-item__text { color: var(--gov-muted); font-size: .93rem; line-height: 1.5; }
+.timeline-card__button { display: inline-block; margin-top: 24px; padding: 11px 22px; border: 1px solid var(--gov-navy); border-radius: 8px; color: var(--gov-navy); font-weight: 700; font-size: .9rem; text-decoration: none; transition: background .15s ease, color .15s ease; }
+.timeline-card__button:hover { background: var(--gov-navy); color: #fff; }
+.timeline-cta { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--gov-navy) center/cover no-repeat; display: flex; align-items: flex-start; min-height: 320px; }
+.timeline-cta__overlay { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(15,33,60,.92) 25%, rgba(15,33,60,.55) 100%); }
+.timeline-cta__body { position: relative; padding: 36px; color: #fff; display: flex; flex-direction: column; gap: 14px; max-width: 480px; }
+.timeline-cta__title { font-size: clamp(1.3rem, 2vw, 1.7rem); margin: 0; color: #fff; }
+.timeline-cta__text { margin: 0; color: rgba(255,255,255,.85); line-height: 1.55; }
+.timeline-cta__button { display: inline-block; align-self: flex-start; margin-top: 8px; padding: 12px 22px; border: 1px solid rgba(255,255,255,.7); border-radius: 8px; color: #fff; font-weight: 700; font-size: .9rem; text-decoration: none; transition: background .15s ease; }
+.timeline-cta__button:hover { background: rgba(255,255,255,.14); }
+
+/* Новости + документы (две колонки). */
+.block-newsdocs { display: grid; grid-template-columns: 1.15fr 1fr; gap: 34px; align-items: start; }
+@media (max-width: 900px) { .block-newsdocs { grid-template-columns: 1fr; } }
+.newsdocs-news { display: flex; flex-direction: column; }
+.newsdocs-item { display: grid; grid-template-columns: 96px 1fr auto; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--gov-border); text-decoration: none; color: var(--gov-ink); }
+.newsdocs-item:first-child { padding-top: 0; }
+.newsdocs-item__media { display: block; aspect-ratio: 4/3; border-radius: 8px; background: #24425f center/cover no-repeat; }
+.newsdocs-item__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
+.newsdocs-item__body { display: flex; flex-direction: column; gap: 5px; }
+.newsdocs-item__date { color: var(--gov-muted); font-size: .82rem; }
+.newsdocs-item__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .95rem; }
+.newsdocs-item__arrow { color: var(--gov-teal); font-size: 1.15rem; }
+.newsdocs-item:hover .newsdocs-item__title { color: var(--gov-teal); }
+.newsdocs-docs { display: flex; flex-direction: column; gap: 14px; }
+.doc-card { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 18px 20px; background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); text-decoration: none; color: var(--gov-ink); transition: box-shadow .15s ease; }
+.doc-card:hover { box-shadow: 0 10px 26px rgba(19,42,92,.1); }
+.doc-card__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: color-mix(in srgb, var(--gov-teal) 12%, var(--gov-surface)); color: var(--gov-teal); }
+.doc-card__body { display: flex; flex-direction: column; gap: 4px; }
+.doc-card__title { font-weight: 700; color: var(--gov-navy); font-size: .95rem; line-height: 1.35; }
+.doc-card__meta { color: var(--gov-muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
+.doc-card__dl { color: var(--gov-navy); }
+
+/* CTA-полоса (navy) «Есть вопросы или предложения?». */
+.block-ctaband { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; background: var(--gov-navy); border-radius: var(--radius); padding: 34px 38px; color: #fff; }
+.ctaband__lead { display: flex; align-items: center; gap: 22px; }
+.ctaband__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); color: #fff; flex: 0 0 auto; }
+.ctaband__icon svg { width: 30px; height: 30px; }
+.ctaband__body { display: flex; flex-direction: column; gap: 6px; }
+.ctaband__title { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.3rem; }
+.ctaband__text { color: rgba(255,255,255,.82); line-height: 1.5; }
+.ctaband__button { display: inline-block; padding: 13px 26px; background: #fff; color: var(--gov-navy); border-radius: 8px; font-weight: 700; font-size: .92rem; text-decoration: none; transition: opacity .15s ease; }
+.ctaband__button:hover { opacity: .9; }
+
+/* Профиль руководителя. */
+.block-profile { display: grid; grid-template-columns: minmax(0, 420px) 1fr; gap: 44px; align-items: start; }
+@media (max-width: 900px) { .block-profile { grid-template-columns: 1fr; } }
+.profile__photo { display: block; width: 100%; aspect-ratio: 4/4.3; object-fit: cover; border-radius: var(--radius); }
+.profile__photo--empty { display: grid; place-items: center; background: color-mix(in srgb, var(--gov-navy) 6%, var(--gov-surface)); color: var(--gov-muted); }
+.profile__name { font-size: clamp(1.8rem, 3.4vw, 2.5rem); margin: 0 0 12px; }
+.profile__position { font-family: 'PT Serif', serif; font-weight: 700; color: var(--gov-teal); font-size: 1.15rem; line-height: 1.4; margin-bottom: 18px; }
+.profile__text { color: var(--gov-muted); line-height: 1.65; max-width: 60ch; margin: 0 0 22px; }
+.profile__contacts { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
+.profile__contact { display: flex; align-items: center; gap: 10px; color: var(--gov-ink); font-size: .95rem; }
+.profile__contact svg { color: var(--gov-teal); flex: 0 0 auto; }
+.profile__contact-label { color: var(--gov-muted); }
+.profile__contact a { color: var(--gov-navy); font-weight: 700; text-decoration: none; }
+.profile__contact a:hover { color: var(--gov-teal); }
+.profile__button { display: inline-block; padding: 13px 26px; background: var(--gov-navy); color: #fff; border-radius: 8px; font-weight: 700; font-size: .92rem; text-decoration: none; transition: opacity .15s ease; }
+.profile__button:hover { opacity: .92; }
+
+/* Полоса компетенций (navy, 4 колонки с разделителями). */
+.featband { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--gov-navy); border-radius: var(--radius); overflow: hidden; }
+@media (max-width: 1000px) { .featband { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .featband { grid-template-columns: 1fr; } }
+.featband__item { display: flex; flex-direction: column; gap: 10px; padding: 30px 26px; color: #fff; border-left: 1px solid rgba(255,255,255,.14); }
+.featband__item:first-child { border-left: 0; }
+@media (max-width: 1000px) { .featband__item:nth-child(odd) { border-left: 0; } .featband__item:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,.14); } }
+.featband__icon { color: rgba(255,255,255,.9); }
+.featband__icon svg { width: 30px; height: 30px; }
+.featband__name { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.05rem; }
+.featband__text { color: rgba(255,255,255,.75); font-size: .88rem; line-height: 1.5; }
+.block-featband__title { font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 0 0 26px; }
+
+/* Биография + образование (две колонки). */
+.block-bio { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: start; }
+@media (max-width: 900px) { .block-bio { grid-template-columns: 1fr; } }
+.bio__title { font-size: 1.5rem; margin: 0 0 18px; }
+.bio__text { color: var(--gov-muted); line-height: 1.65; margin-bottom: 26px; }
+.bio-career { list-style: none; margin: 0; padding: 0; position: relative; }
+.bio-career::before { content: ''; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 2px; background: color-mix(in srgb, var(--gov-navy) 15%, transparent); }
+.bio-career__item { position: relative; display: grid; grid-template-columns: 110px 1fr; gap: 14px; padding: 0 0 20px 26px; }
+.bio-career__item:last-child { padding-bottom: 0; }
+.bio-career__item::before { content: ''; position: absolute; left: 0; top: 7px; width: 10px; height: 10px; border-radius: 50%; background: var(--gov-navy); }
+.bio-career__years { font-weight: 700; color: var(--gov-navy); font-size: .93rem; white-space: nowrap; }
+.bio-career__text { color: var(--gov-muted); font-size: .93rem; line-height: 1.5; }
+.bio-side { display: flex; flex-direction: column; gap: 26px; }
+.bio-edu { background: color-mix(in srgb, var(--gov-navy) 5%, var(--gov-bg)); border-radius: var(--radius); padding: 28px; }
+.bio-edu__list { list-style: none; margin: 0; padding: 0; }
+.bio-edu__item { position: relative; padding: 0 0 18px 24px; display: flex; flex-direction: column; gap: 3px; }
+.bio-edu__item::before { content: ''; position: absolute; left: 0; top: 6px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--gov-teal); }
+.bio-edu__years { color: var(--gov-muted); font-size: .85rem; }
+.bio-edu__degree { font-weight: 700; color: var(--gov-navy); font-size: .95rem; }
+.bio-edu__org { color: var(--gov-muted); font-size: .88rem; }
+.bio-extra { margin-top: 8px; }
+.bio-extra__title { font-family: 'PT Sans', sans-serif; font-weight: 700; color: var(--gov-navy); font-size: 1rem; margin: 0 0 10px; }
+.bio-extra__list { margin: 0; padding-left: 18px; color: var(--gov-muted); font-size: .9rem; line-height: 1.55; display: flex; flex-direction: column; gap: 6px; }
+.bio-quote { position: relative; margin: 0; background: var(--gov-navy); border-radius: var(--radius); padding: 30px 30px 26px; color: #fff; }
+.bio-quote__mark { font-family: 'PT Serif', serif; font-size: 2.6rem; line-height: 1; color: var(--gov-teal); display: block; margin-bottom: 8px; }
+.bio-quote__text { margin: 0 0 12px; font-size: 1.02rem; line-height: 1.6; border: 0; padding: 0; }
+.bio-quote__author { color: rgba(255,255,255,.75); font-size: .9rem; }
+
+/* --- Доступность (WCAG, гос-требования): фокус-кольца, контраст, touch-цели --- */
+:root { --gov-teal-text: #12807f; } /* teal для мелкого текста: контраст ≥4.5:1 на светлом фоне */
+:root[data-theme="dark"] { --gov-teal-text: #3fc1c0; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--gov-teal); outline-offset: 2px; border-radius: 4px;
+}
+.cms-block--bg-navy a:focus-visible, .block-ctaband a:focus-visible, .featband a:focus-visible, .timeline-cta a:focus-visible { outline-color: #fff; }
+.section-head__all, .newsfeat__more, .person-card__more, .imgcard__more { color: var(--gov-teal-text); }
+.imgcard__more { color: rgba(255,255,255,.92); } /* на тёмном фото остаётся белым */
+.carousel-nav__btn { width: 44px; height: 44px; } /* touch-цель ≥44px */
+.media-tabs button, .media-tabs a { min-height: 44px; }
+@media (prefers-reduced-motion: reduce) {
+    .imgcards-grid--carousel { scroll-behavior: auto; }
+    .imgcard__media, .feature-card, .news-card, .doc-card { transition: none; }
+    .imgcard:hover .imgcard__media { transform: none; }
+    .feature-card:hover { transform: none; }
+}

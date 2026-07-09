@@ -17,7 +17,7 @@ use App\Models\Page;
 
 final class BlockController
 {
-    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature'];
+    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature', 'person_cards', 'timeline', 'news_docs', 'cta_band', 'person_profile', 'feature_band', 'bio_education'];
 
     public function store(array $params): void
     {
@@ -669,8 +669,168 @@ final class BlockController
                     'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
                     'items' => $items,
                 ];
+            case 'person_cards':
+                $items = [];
+                foreach ((array) ($_POST['items'] ?? []) as $item) {
+                    $name = trim((string) ($item['name'] ?? ''));
+                    $role = trim((string) ($item['role'] ?? ''));
+                    if ($name === '' && $role === '') {
+                        continue;
+                    }
+                    $url = trim((string) ($item['url'] ?? ''));
+                    if ($url !== '' && !\App\Core\UrlGuard::isSafeLink($url)) {
+                        $url = '';
+                    }
+                    $items[] = [
+                        'photo' => trim((string) ($item['photo'] ?? '')),
+                        'name' => TextProcessor::typographPlain($name, $locale),
+                        'role' => TextProcessor::typographPlain($role, $locale),
+                        'url' => $url,
+                    ];
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'all_text' => trim((string) ($_POST['all_text'] ?? '')),
+                    'all_url' => $this->safeUrlField('all_url'),
+                    'items' => $items,
+                ];
+            case 'timeline':
+                $items = [];
+                foreach ((array) ($_POST['items'] ?? []) as $item) {
+                    $year = trim((string) ($item['year'] ?? ''));
+                    $text = trim((string) ($item['text'] ?? ''));
+                    if ($year === '' && $text === '') {
+                        continue;
+                    }
+                    $items[] = [
+                        'year' => $year,
+                        'text' => TextProcessor::typographPlain($text, $locale),
+                    ];
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'items' => $items,
+                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
+                    'button_url' => $this->safeUrlField('button_url'),
+                    'cta_title' => TextProcessor::typographPlain(trim((string) ($_POST['cta_title'] ?? '')), $locale),
+                    'cta_text' => TextProcessor::typographPlain(trim((string) ($_POST['cta_text'] ?? '')), $locale),
+                    'cta_button_text' => trim((string) ($_POST['cta_button_text'] ?? '')),
+                    'cta_button_url' => $this->safeUrlField('cta_button_url'),
+                    'cta_image' => trim((string) ($_POST['cta_image'] ?? '')),
+                ];
+            case 'news_docs':
+                $docs = [];
+                foreach ((array) ($_POST['docs'] ?? []) as $doc) {
+                    $docTitle = trim((string) ($doc['title'] ?? ''));
+                    if ($docTitle === '') {
+                        continue;
+                    }
+                    $url = trim((string) ($doc['url'] ?? ''));
+                    if ($url !== '' && !\App\Core\UrlGuard::isSafeLink($url)) {
+                        $url = '';
+                    }
+                    $docs[] = [
+                        'title' => TextProcessor::typographPlain($docTitle, $locale),
+                        'meta' => trim((string) ($doc['meta'] ?? '')),
+                        'url' => $url,
+                    ];
+                }
+                return [
+                    'news_title' => TextProcessor::typographPlain(trim((string) ($_POST['news_title'] ?? '')), $locale),
+                    'news_all_text' => trim((string) ($_POST['news_all_text'] ?? '')),
+                    'news_all_url' => $this->safeUrlField('news_all_url'),
+                    'limit' => max(1, min(6, (int) ($_POST['limit'] ?? 3))),
+                    'docs_title' => TextProcessor::typographPlain(trim((string) ($_POST['docs_title'] ?? '')), $locale),
+                    'docs_all_text' => trim((string) ($_POST['docs_all_text'] ?? '')),
+                    'docs_all_url' => $this->safeUrlField('docs_all_url'),
+                    'docs' => $docs,
+                ];
+            case 'cta_band':
+                $iconSvg = trim((string) ($_POST['icon_svg'] ?? ''));
+                if ($iconSvg !== '') {
+                    $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'text' => TextProcessor::typographPlain(trim((string) ($_POST['text'] ?? '')), $locale),
+                    'icon_svg' => $iconSvg,
+                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
+                    'button_url' => $this->safeUrlField('button_url'),
+                ];
+            case 'person_profile':
+                return [
+                    'photo' => trim((string) ($_POST['photo'] ?? '')),
+                    'name' => TextProcessor::typographPlain(trim((string) ($_POST['name'] ?? '')), $locale),
+                    'position' => TextProcessor::typographPlain(trim((string) ($_POST['position'] ?? '')), $locale),
+                    'text' => TextProcessor::typographPlain(trim((string) ($_POST['text'] ?? '')), $locale),
+                    'phone' => trim((string) ($_POST['phone'] ?? '')),
+                    'phone_label' => trim((string) ($_POST['phone_label'] ?? 'Приёмная:')),
+                    'email' => trim((string) ($_POST['email'] ?? '')),
+                    'email_label' => trim((string) ($_POST['email_label'] ?? 'E-mail:')),
+                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
+                    'button_url' => $this->safeUrlField('button_url'),
+                ];
+            case 'feature_band':
+                $items = [];
+                foreach ((array) ($_POST['items'] ?? []) as $item) {
+                    $itemTitle = trim((string) ($item['title'] ?? ''));
+                    if ($itemTitle === '') {
+                        continue;
+                    }
+                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
+                    if ($iconSvg !== '') {
+                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
+                    }
+                    $items[] = [
+                        'icon_svg' => $iconSvg,
+                        'title' => TextProcessor::typographPlain($itemTitle, $locale),
+                        'text' => TextProcessor::typographPlain(trim((string) ($item['text'] ?? '')), $locale),
+                    ];
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'items' => $items,
+                ];
+            case 'bio_education':
+                $collect = static function (string $key, array $fields) use ($locale): array {
+                    $rows = [];
+                    foreach ((array) ($_POST[$key] ?? []) as $row) {
+                        $vals = [];
+                        $empty = true;
+                        foreach ($fields as $f) {
+                            $v = trim((string) ($row[$f] ?? ''));
+                            if ($v !== '') {
+                                $empty = false;
+                            }
+                            $vals[$f] = $f === 'years' ? $v : TextProcessor::typographPlain($v, $locale);
+                        }
+                        if (!$empty) {
+                            $rows[] = $vals;
+                        }
+                    }
+                    return $rows;
+                };
+                return [
+                    'bio_title' => TextProcessor::typographPlain(trim((string) ($_POST['bio_title'] ?? 'Биография')), $locale),
+                    'bio_text' => TextProcessor::typographPlain(trim((string) ($_POST['bio_text'] ?? '')), $locale),
+                    'career' => $collect('career', ['years', 'text']),
+                    'edu_title' => TextProcessor::typographPlain(trim((string) ($_POST['edu_title'] ?? 'Образование')), $locale),
+                    'edu_items' => $collect('edu_items', ['years', 'title', 'org']),
+                    'extra_title' => TextProcessor::typographPlain(trim((string) ($_POST['extra_title'] ?? '')), $locale),
+                    'extra_text' => TextProcessor::typographPlain(trim((string) ($_POST['extra_text'] ?? '')), $locale),
+                    'quote_text' => TextProcessor::typographPlain(trim((string) ($_POST['quote_text'] ?? '')), $locale),
+                    'quote_author' => TextProcessor::typographPlain(trim((string) ($_POST['quote_author'] ?? '')), $locale),
+                ];
             default:
                 return [];
         }
+    }
+
+    /** Читает URL-поле из POST и отбрасывает небезопасные схемы (javascript: и т.п.). */
+    private function safeUrlField(string $field): string
+    {
+        $url = trim((string) ($_POST[$field] ?? ''));
+
+        return ($url !== '' && \App\Core\UrlGuard::isSafeLink($url)) ? $url : '';
     }
 }
