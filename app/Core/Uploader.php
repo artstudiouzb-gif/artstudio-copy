@@ -339,12 +339,20 @@ final class Uploader
         // Быстрая грубая очистка на случай, если DOM не сможет разобрать документ.
         $svg = preg_replace('#<\?php.*?\?>#is', '', $svg) ?? $svg;
 
+        // DOCTYPE вырезаем целиком: объявления <!ENTITY ... SYSTEM "file://...">
+        // — это XXE (чтение локальных файлов сервера), а рекурсивные внутренние
+        // сущности — DoS («billion laughs»). Легитимному SVG DOCTYPE не нужен.
+        // Сущности не разворачиваем (LIBXML_NOENT недопустим — он включает
+        // подстановку внешних сущностей); осиротевшие &ref; после удаления
+        // DOCTYPE валят loadXML, и документ заменяется безопасной заглушкой.
+        $svg = preg_replace('/<!DOCTYPE\s[^>[]*(\[[^\]]*\])?[^>]*>/is', '', $svg) ?? $svg;
+
         $dangerousTags = ['script', 'foreignObject', 'iframe', 'embed', 'object', 'audio', 'video', 'animate', 'set', 'handler', 'listener'];
 
         $previous = libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
-        // LIBXML_NONET запрещает сетевые обращения при разборе (защита от SSRF/XXE).
-        $loaded = $dom->loadXML($svg, LIBXML_NONET | LIBXML_NOENT);
+        // LIBXML_NONET запрещает сетевые обращения при разборе.
+        $loaded = $dom->loadXML($svg, LIBXML_NONET);
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
 
