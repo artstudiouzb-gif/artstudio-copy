@@ -634,3 +634,10 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .hdr-chip__grip { color: var(--admin-muted, #99a); font-size: 12px; line-height: 1; }
 .hdr-chip__remove { border: 0; background: transparent; color: var(--admin-muted, #99a); font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; }
 .hdr-chip__remove:hover { color: #d33; }
+
+/* Вкладки конструктора шапки (Десктоп / Мобильный). */
+.hdr-tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 10px; margin-bottom: 14px; }
+.hdr-tabs__tab { border: 0; background: transparent; padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--admin-muted, #667); }
+.hdr-tabs__tab.is-active { background: #fff; color: var(--admin-accent, #5b52e5); box-shadow: 0 1px 3px rgba(16,24,40,.1); }
+.hdr-tabs__panel { display: none; }
+.hdr-tabs__panel.is-active { display: block; }

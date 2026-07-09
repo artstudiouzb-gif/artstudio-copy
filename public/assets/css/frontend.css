@@ -1123,6 +1123,14 @@ body.design-header-dark .site-nav { border-top-color: rgba(255, 255, 255, .14); 
 /* ==========================================================================
    МЕНЮ: SVG-иконки и разделители пунктов
    ========================================================================== */
+/* Наборы утилит для десктопа и мобильного (конструктор — раздельные раскладки). */
+.hdr-util { display: inline-flex; align-items: center; gap: 18px; }
+.hdr-util--mobile { display: none; }
+@media (max-width: 720px) {
+    .hdr-util--desktop { display: none; }
+    .hdr-util--mobile { display: inline-flex; }
+}
+
 /* Разделитель-спейсер между элементами верхнего ряда шапки. */
 .site-header__divider { display: inline-block; width: 1px; height: 22px; align-self: center; background: color-mix(in srgb, currentColor 28%, transparent); }
 .site-header__zone .site-header__divider { margin: 0 2px; }

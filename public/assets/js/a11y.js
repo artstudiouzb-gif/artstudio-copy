@@ -58,11 +58,13 @@
     }
 
     function onReady() {
-        var toggle = document.querySelector('.a11y-toggle');
+        var toggles = document.querySelectorAll('.a11y-toggle');
         var panel = document.querySelector('.a11y-panel');
-        if (toggle && panel) {
-            toggle.addEventListener('click', function () {
-                panel.classList.toggle('is-open');
+        if (toggles.length && panel) {
+            toggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    panel.classList.toggle('is-open');
+                });
             });
         }
 

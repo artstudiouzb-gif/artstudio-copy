@@ -216,10 +216,24 @@ $fragments = [
     'a11y' => $a11yToggle,
     'divider' => '<span class="site-header__divider" aria-hidden="true"></span>',
 ];
+// Собираем зоны отдельно для десктопа и мобильного (разные наборы элементов);
+// на фронте нужный вариант показывается по media-запросу.
+$composeZone = static function (string $zone, string $variant) use ($hcfg, $fragments): string {
+    $html = '';
+    foreach ($hcfg[$variant][$zone] ?? [] as $el) {
+        $html .= $fragments[$el] ?? '';
+    }
+    return $html;
+};
 $composed = ['left' => '', 'center' => '', 'right' => ''];
 foreach (['left', 'center', 'right'] as $zone) {
-    foreach ($hcfg['elements'][$zone] ?? [] as $el) {
-        $composed[$zone] .= $fragments[$el] ?? '';
+    $desktop = $composeZone($zone, 'elements');
+    $mobile = $composeZone($zone, 'elements_mobile');
+    if ($desktop !== '') {
+        $composed[$zone] .= '<span class="hdr-util hdr-util--desktop">' . $desktop . '</span>';
+    }
+    if ($mobile !== '') {
+        $composed[$zone] .= '<span class="hdr-util hdr-util--mobile">' . $mobile . '</span>';
     }
 }
 

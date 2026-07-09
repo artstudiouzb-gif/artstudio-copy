@@ -33,13 +33,13 @@
 
     // Выпадающий поиск (режим «Выпадающий» в настройках дизайна): кнопка-лупа
     // открывает панель поиска сверху; закрытие по ×, Esc или клику вне формы.
-    var searchToggle = document.querySelector('[data-search-toggle]');
+    var searchToggles = document.querySelectorAll('[data-search-toggle]');
     var searchOverlay = document.querySelector('[data-search-overlay]');
-    if (searchToggle && searchOverlay) {
+    if (searchToggles.length && searchOverlay) {
         var searchInput = searchOverlay.querySelector('[data-search-input]');
         var openSearch = function () {
             searchOverlay.hidden = false;
-            searchToggle.setAttribute('aria-expanded', 'true');
+            searchToggles.forEach(function (t) { t.setAttribute('aria-expanded', 'true'); });
             requestAnimationFrame(function () {
                 searchOverlay.classList.add('is-open');
                 if (searchInput) { searchInput.focus(); }
@@ -47,10 +47,10 @@
         };
         var closeSearch = function () {
             searchOverlay.classList.remove('is-open');
-            searchToggle.setAttribute('aria-expanded', 'false');
+            searchToggles.forEach(function (t) { t.setAttribute('aria-expanded', 'false'); });
             setTimeout(function () { searchOverlay.hidden = true; }, 200);
         };
-        searchToggle.addEventListener('click', openSearch);
+        searchToggles.forEach(function (t) { t.addEventListener('click', openSearch); });
         searchOverlay.addEventListener('click', function (e) {
             if (e.target === searchOverlay || e.target.hasAttribute('data-search-close')) {
                 closeSearch();

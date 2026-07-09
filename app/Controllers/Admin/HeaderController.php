@@ -32,18 +32,22 @@ final class HeaderController
         }
 
         // Конструктор: порядок элементов по зонам (скрытые поля с CSV,
-        // заполняемые drag-and-drop в админке).
-        $elements = [];
-        foreach (['left', 'center', 'right'] as $zone) {
-            $raw = (string) ($_POST['elements'][$zone] ?? '');
-            $elements[$zone] = array_values(array_filter(array_map('trim', explode(',', $raw))));
-        }
+        // заполняемые drag-and-drop в админке) — отдельно для десктопа и мобильного.
+        $parseZones = static function (string $key): array {
+            $out = [];
+            foreach (['left', 'center', 'right'] as $zone) {
+                $raw = (string) ($_POST[$key][$zone] ?? '');
+                $out[$zone] = array_values(array_filter(array_map('trim', explode(',', $raw))));
+            }
+            return $out;
+        };
 
         HeaderConfig::save([
             'layout' => $_POST['layout'] ?? 'stacked',
             'logo_position' => $_POST['logo_position'] ?? 'left',
             'menu_position' => $_POST['menu_position'] ?? 'right',
-            'elements' => $elements,
+            'elements' => $parseZones('elements'),
+            'elements_mobile' => $parseZones('elements_mobile'),
             'language_switcher' => [
                 'enabled' => !empty($_POST['ls_enabled']),
                 'format' => $_POST['ls_format'] ?? 'code',

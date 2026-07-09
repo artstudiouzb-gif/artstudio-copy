@@ -575,3 +575,22 @@
         serialize();
     });
 })();
+
+/* Вкладки конструктора (Десктоп / Мобильный). */
+(function () {
+    'use strict';
+    document.querySelectorAll('[data-hdr-tabs]').forEach(function (tabs) {
+        var group = tabs.parentElement;
+        tabs.querySelectorAll('[data-hdr-tab]').forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                var name = tab.getAttribute('data-hdr-tab');
+                tabs.querySelectorAll('[data-hdr-tab]').forEach(function (t) {
+                    t.classList.toggle('is-active', t === tab);
+                });
+                group.querySelectorAll('[data-hdr-panel]').forEach(function (p) {
+                    p.classList.toggle('is-active', p.getAttribute('data-hdr-panel') === name);
+                });
+            });
+        });
+    });
+})();

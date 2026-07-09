@@ -43,47 +43,61 @@ $networks = ['telegram' => 'Telegram', 'instagram' => 'Instagram', 'facebook' =>
             <p class="form-hint" style="margin-top:0;">
                 Перетаскивайте элементы между палитрой и зонами (Слева / Центр / Справа).
                 Логотип и меню размещаются отдельно (ниже). «Разделитель» можно добавлять
-                несколько раз. Порядок в зоне задаётся перетаскиванием.
+                несколько раз. Порядок в зоне задаётся перетаскиванием. Вкладки
+                «Десктоп» и «Мобильный» задают разные наборы для больших и малых экранов.
             </p>
             <?php
             $elements = \App\Core\HeaderConfig::ELEMENTS;
-            $placed = $config['elements'];
-            // Иконки-подсказки для чипов (мелкие эмодзи-нейтральные метки не нужны — текст).
             $renderChip = function (string $type) use ($elements): string {
                 $label = $elements[$type] ?? $type;
                 return '<span class="hdr-chip" draggable="true" data-el="' . htmlspecialchars($type, ENT_QUOTES) . '">'
                     . '<span class="hdr-chip__grip" aria-hidden="true">⠿</span>'
-                    . htmlspecialchars($label, ENT_QUOTES)
+                    . '<span class="hdr-chip__label">' . htmlspecialchars($label, ENT_QUOTES) . '</span>'
                     . '<button type="button" class="hdr-chip__remove" aria-label="Убрать" title="Убрать">&times;</button>'
                     . '</span>';
             };
-            // В палитре — неиспользованные (неповторяемые) типы + разделитель (источник).
-            $used = array_merge($placed['left'], $placed['center'], $placed['right']);
-            ?>
-            <div class="hdr-builder" data-hdr-builder data-labels="<?= htmlspecialchars(json_encode($elements, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
-                <div class="hdr-builder__palette">
-                    <div class="hdr-builder__palette-label">Доступные элементы</div>
-                    <div class="hdr-builder__dropzone hdr-builder__dropzone--palette" data-hdr-zone="palette">
-                        <?php foreach ($elements as $type => $label): ?>
-                            <?php if ($type === 'divider' || !in_array($type, $used, true)): ?>
-                                <?= $renderChip($type) ?>
-                            <?php endif; ?>
+            // Рендер одного конструктора (десктоп или мобильный), $inputName —
+            // префикс имени скрытых полей (elements | elements_mobile).
+            $renderBuilder = function (array $placed, string $inputName) use ($elements, $renderChip): string {
+                $used = array_merge($placed['left'], $placed['center'], $placed['right']);
+                ob_start(); ?>
+                <div class="hdr-builder" data-hdr-builder data-labels="<?= htmlspecialchars(json_encode($elements, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
+                    <div class="hdr-builder__palette">
+                        <div class="hdr-builder__palette-label">Доступные элементы</div>
+                        <div class="hdr-builder__dropzone hdr-builder__dropzone--palette" data-hdr-zone="palette">
+                            <?php foreach ($elements as $type => $label): ?>
+                                <?php if ($type === 'divider' || !in_array($type, $used, true)): ?>
+                                    <?= $renderChip($type) ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="hdr-builder__zones">
+                        <?php foreach (['left' => 'Слева', 'center' => 'Центр', 'right' => 'Справа'] as $zone => $zoneLabel): ?>
+                            <div class="hdr-builder__zone">
+                                <div class="hdr-builder__zone-label"><?= $zoneLabel ?></div>
+                                <div class="hdr-builder__dropzone" data-hdr-zone="<?= $zone ?>">
+                                    <?php foreach ($placed[$zone] as $type): ?>
+                                        <?= $renderChip($type) ?>
+                                    <?php endforeach; ?>
+                                </div>
+                                <input type="hidden" name="<?= $inputName ?>[<?= $zone ?>]" data-hdr-input="<?= $zone ?>" value="<?= htmlspecialchars(implode(',', $placed[$zone]), ENT_QUOTES) ?>">
+                            </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
-                <div class="hdr-builder__zones">
-                    <?php foreach (['left' => 'Слева', 'center' => 'Центр', 'right' => 'Справа'] as $zone => $zoneLabel): ?>
-                        <div class="hdr-builder__zone">
-                            <div class="hdr-builder__zone-label"><?= $zoneLabel ?></div>
-                            <div class="hdr-builder__dropzone" data-hdr-zone="<?= $zone ?>">
-                                <?php foreach ($placed[$zone] as $type): ?>
-                                    <?= $renderChip($type) ?>
-                                <?php endforeach; ?>
-                            </div>
-                            <input type="hidden" name="elements[<?= $zone ?>]" data-hdr-input="<?= $zone ?>" value="<?= htmlspecialchars(implode(',', $placed[$zone]), ENT_QUOTES) ?>">
-                        </div>
-                    <?php endforeach; ?>
-                </div>
+                <?php return (string) ob_get_clean();
+            };
+            ?>
+            <div class="hdr-tabs" data-hdr-tabs>
+                <button type="button" class="hdr-tabs__tab is-active" data-hdr-tab="desktop">🖥 Десктоп</button>
+                <button type="button" class="hdr-tabs__tab" data-hdr-tab="mobile">📱 Мобильный</button>
+            </div>
+            <div class="hdr-tabs__panel is-active" data-hdr-panel="desktop">
+                <?= $renderBuilder($config['elements'], 'elements') ?>
+            </div>
+            <div class="hdr-tabs__panel" data-hdr-panel="mobile">
+                <?= $renderBuilder($config['elements_mobile'], 'elements_mobile') ?>
             </div>
         </div>
 

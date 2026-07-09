@@ -39,11 +39,17 @@ final class HeaderConfig
         'layout' => 'stacked',                // stacked | inline | centered | drawer
         'logo_position' => 'left',            // left | center
         'menu_position' => 'right',           // left | center | right
-        // Конструктор: раскладка элементов по зонам верхнего ряда.
+        // Конструктор: раскладка элементов по зонам верхнего ряда (десктоп).
         'elements' => [
             'left' => [],
             'center' => [],
             'right' => ['search', 'language', 'theme', 'a11y'],
+        ],
+        // Отдельная раскладка для мобильной версии (компактнее по умолчанию).
+        'elements_mobile' => [
+            'left' => [],
+            'center' => [],
+            'right' => ['search', 'language'],
         ],
         'language_switcher' => [
             'enabled' => true,
@@ -81,6 +87,37 @@ final class HeaderConfig
         return self::mergeDefaults($config);
     }
 
+    /**
+     * Нормализует раскладку элементов по зонам: только известные типы;
+     * неповторяемые (поиск, языки и т.п.) — по одному на всю шапку (первое
+     * вхождение выигрывает), разделители можно повторять.
+     *
+     * @param array<string, mixed> $raw
+     * @return array{left: list<string>, center: list<string>, right: list<string>}
+     */
+    private static function normalizeZones(array $raw): array
+    {
+        $seen = [];
+        $zones = ['left' => [], 'center' => [], 'right' => []];
+        foreach (array_keys($zones) as $zone) {
+            foreach ((array) ($raw[$zone] ?? []) as $el) {
+                $el = (string) $el;
+                if (!isset(self::ELEMENTS[$el])) {
+                    continue;
+                }
+                if (!in_array($el, self::REPEATABLE, true)) {
+                    if (isset($seen[$el])) {
+                        continue;
+                    }
+                    $seen[$el] = true;
+                }
+                $zones[$zone][] = $el;
+            }
+        }
+
+        return $zones;
+    }
+
     private static function mergeDefaults(array $config): array
     {
         $result = self::DEFAULTS;
@@ -94,31 +131,13 @@ final class HeaderConfig
         $result['menu_position'] = in_array($config['menu_position'] ?? '', ['left', 'center', 'right'], true)
             ? $config['menu_position'] : self::DEFAULTS['menu_position'];
 
-        // Конструктор: раскладка элементов по зонам. Оставляем только известные
-        // типы; неповторяемые элементы (поиск, языки и т.п.) — по одному на всю
-        // шапку (первое вхождение выигрывает), разделители можно повторять.
-        if (isset($config['elements']) && is_array($config['elements'])) {
-            $seen = [];
-            $zones = ['left' => [], 'center' => [], 'right' => []];
-            foreach (array_keys($zones) as $zone) {
-                foreach ((array) ($config['elements'][$zone] ?? []) as $el) {
-                    $el = (string) $el;
-                    if (!isset(self::ELEMENTS[$el])) {
-                        continue;
-                    }
-                    if (!in_array($el, self::REPEATABLE, true)) {
-                        if (isset($seen[$el])) {
-                            continue;
-                        }
-                        $seen[$el] = true;
-                    }
-                    $zones[$zone][] = $el;
-                }
-            }
-            $result['elements'] = $zones;
-        } else {
-            $result['elements'] = self::DEFAULTS['elements'];
-        }
+        // Конструктор: раскладки элементов по зонам для десктопа и мобильного.
+        $result['elements'] = isset($config['elements']) && is_array($config['elements'])
+            ? self::normalizeZones($config['elements'])
+            : self::DEFAULTS['elements'];
+        $result['elements_mobile'] = isset($config['elements_mobile']) && is_array($config['elements_mobile'])
+            ? self::normalizeZones($config['elements_mobile'])
+            : self::DEFAULTS['elements_mobile'];
 
         $ls = (array) ($config['language_switcher'] ?? []);
         $result['language_switcher'] = [
