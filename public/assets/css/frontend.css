@@ -778,8 +778,15 @@ body.design-header-dark .site-burger, body.design-header-accent .site-burger { c
 }
 html { scroll-behavior: smooth; }
 ::selection { background: color-mix(in srgb, var(--color-primary, #1f4b8e) 82%, #000); color: #fff; }
-h1, h2, h3 { letter-spacing: -.022em; line-height: 1.18; }
-p { line-height: 1.65; }
+/* Заголовочная гарнитура (Montserrat) — крупный корпоративный характер. */
+h1, h2, h3, h4, h5, h6,
+.site-header__logo, .block-cta h2, .news-index__title,
+.block-news__title, .content-list__head h1, .site-footer__name {
+    font-family: var(--font-heading, var(--font-family));
+    letter-spacing: -.022em; line-height: 1.16; font-weight: 700;
+}
+h1, .news-index__title, .content-list__head h1 { font-weight: 800; }
+p { line-height: 1.7; }
 
 /* --- Шапка: глубина, аккуратные ссылки меню --- */
 .site-header { position: relative; z-index: 40; }
@@ -968,4 +975,147 @@ body.design-header-dark .site-header { box-shadow: 0 1px 0 rgba(255,255,255,.06)
 :root[data-theme="dark"] {
     --tint-2: color-mix(in srgb, var(--color-primary, #1f4b8e) 10%, var(--bg-primary));
     --tint-6: color-mix(in srgb, var(--color-primary, #1f4b8e) 16%, var(--bg-primary));
+}
+
+/* ==========================================================================
+   ФИНАЛЬНАЯ ПОЛИРОВКА ФРОНТА
+   ========================================================================== */
+
+/* --- Навигационная полоса под шапкой (паттерн официального портала) --- */
+/* Верхний ряд остаётся под логотип + утилиты; меню — отдельной строкой во всю
+   ширину, поэтому оно не теснится и не переносится вперемешку с поиском. */
+.site-header--has-nav .site-header__inner { padding-bottom: 14px; }
+.site-nav { border-top: 1px solid var(--border-color); }
+.site-nav__inner {
+    max-width: var(--container-max, 1140px);
+    margin: 0 auto; padding: 0 20px;
+    display: flex;
+}
+.site-nav .site-menu { width: 100%; flex-wrap: wrap; gap: 0 28px; align-items: stretch; }
+.site-nav--align-center .site-menu { justify-content: center; }
+.site-nav--align-right .site-menu { justify-content: flex-end; }
+.site-nav .site-menu__link { padding: 13px 2px; }
+.site-nav .site-menu__link::after { bottom: 8px; }
+/* Акцентная/тёмная шапка: разделитель полос — полупрозрачный белый. */
+body.design-header-accent .site-nav,
+body.design-header-dark .site-nav { border-top-color: rgba(255, 255, 255, .14); }
+
+/* На мобильных навигация сворачивается в бургер — полоса не должна занимать
+   место и рисовать пустой разделитель (меню всплывает поверх контента). */
+@media (max-width: 720px) {
+    .site-header--has-nav .site-header__inner { padding-bottom: 20px; }
+    body.design-mmenu-burger .site-nav { border-top: 0; }
+    body.design-mmenu-burger .site-nav__inner { padding: 0; }
+}
+
+/* --- Страница новостей: единый карточный грид (как на главной) --- */
+.news-index__head { border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 28px; position: relative; }
+.news-index__head::after {
+    content: ''; position: absolute; left: 0; bottom: -1px; width: 64px; height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--color-primary, #1f4b8e), var(--color-accent, #5b52e5));
+}
+.news-index__title { font-size: clamp(1.8rem, 3.4vw, 2.5rem); margin: 0 0 6px; }
+.news-index__lead { color: var(--text-muted); max-width: 640px; margin: 0; }
+.news-index__empty { color: var(--text-muted); }
+.news-index__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--card-gap, 24px);
+}
+/* Карточка новости: превью-обложка, «Читать →», бейдж видео. */
+.news-card__body { flex: 1; }
+.news-card__more {
+    margin-top: auto; padding-top: 6px; font-weight: 600; font-size: .9rem;
+    color: var(--color-accent, #5b52e5);
+    transition: transform .15s ease;
+}
+.news-card:hover .news-card__more { transform: translateX(3px); }
+.news-card__cover { position: relative; }
+.news-card__play {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 54px; height: 54px; border-radius: 50%;
+    background: rgba(0, 0, 0, .55); backdrop-filter: blur(2px);
+}
+.news-card__play::after {
+    content: ''; position: absolute; top: 50%; left: 54%; transform: translate(-50%, -50%);
+    border-style: solid; border-width: 9px 0 9px 15px; border-color: transparent transparent transparent #fff;
+}
+
+/* --- Детальная новость: читаемая колонка, дата-чип, возврат --- */
+.news-single { max-width: 760px; }
+.news-single h1 { font-size: clamp(1.7rem, 3.6vw, 2.6rem); margin: 0 0 14px; text-wrap: balance; }
+.news-single > time,
+.news-single--side > time {
+    display: inline-block; margin-bottom: 20px; padding: 4px 12px; border-radius: 999px;
+    background: color-mix(in srgb, var(--color-primary, #1f4b8e) 8%, transparent);
+    color: var(--color-primary, #1f4b8e); font-weight: 600; font-size: .82rem;
+}
+.news-single__content { font-size: 1.05rem; line-height: 1.75; }
+.news-single__content > :first-child { margin-top: 0; }
+.news-single__content img { border-radius: var(--radius, 12px); }
+.news-single__back { margin-top: 36px; }
+.news-single__back a {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 600; text-decoration: none;
+    color: var(--color-accent, #5b52e5);
+}
+.news-single__back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- Hero: не разрастается сверх меры на больших экранах --- */
+.site-content > section.cms-block--cta:first-of-type .block-cta,
+.page-blocks > section.cms-block--cta:first-of-type .block-cta {
+    padding-block: clamp(52px, 7vw, 92px);
+}
+
+/* ==========================================================================
+   ТЁМНАЯ ТЕМА: контраст текста, привязанного к брендовому --color-primary
+   --------------------------------------------------------------------------
+   Множество элементов (логотип, меню, заголовки карточек, чипы дат) красятся
+   в --color-primary. При тёмной палитре организации (напр. почти чёрный
+   #1a1a1a) такой текст сливается с тёмным фоном. Переносим его на
+   тему-зависимый --text-main; акцентные подложки чипов делаем светлее.
+   Пресеты «accent»/«dark» шапки имеют бОльшую специфичность и остаются белыми.
+   ========================================================================== */
+:root[data-theme="dark"] .site-header__logo,
+:root[data-theme="dark"] .site-menu a,
+:root[data-theme="dark"] .site-menu__link,
+:root[data-theme="dark"] .site-lang-switcher__item.is-active,
+:root[data-theme="dark"] .widget-latest-news a,
+:root[data-theme="dark"] .content-card__title a,
+:root[data-theme="dark"] .content-card__meta-item b,
+:root[data-theme="dark"] .content-detail__row dt,
+:root[data-theme="dark"] .site-search-results__link,
+:root[data-theme="dark"] .content-pager__link,
+:root[data-theme="dark"] .news-card__title,
+:root[data-theme="dark"] .site-footer__name,
+:root[data-theme="dark"] .cms-columns__col .cms-block--cta .block-cta h2 {
+    color: var(--text-main);
+}
+/* Чипы дат: на тёмном фоне светлая акцентная подложка + светлый текст. */
+:root[data-theme="dark"] .news-card__date,
+:root[data-theme="dark"] .news-single > time,
+:root[data-theme="dark"] .news-single--side > time,
+:root[data-theme="dark"] .calendar__list time {
+    background: color-mix(in srgb, var(--color-accent, #5b52e5) 22%, transparent);
+    color: var(--text-main);
+}
+/* Кнопка карточки-раздела в тёмной теме: читаемая, на подложке акцента. */
+:root[data-theme="dark"] .cms-columns__col .cms-block--cta .block-cta .block-cta__button {
+    background: color-mix(in srgb, var(--color-accent, #5b52e5) 24%, transparent);
+    color: var(--text-main);
+}
+@media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] .site-header__logo,
+    :root[data-theme="auto"] .site-menu a,
+    :root[data-theme="auto"] .site-menu__link,
+    :root[data-theme="auto"] .content-card__title a,
+    :root[data-theme="auto"] .news-card__title,
+    :root[data-theme="auto"] .cms-columns__col .cms-block--cta .block-cta h2 {
+        color: var(--text-main);
+    }
+    :root[data-theme="auto"] .news-card__date,
+    :root[data-theme="auto"] .news-single > time {
+        background: color-mix(in srgb, var(--color-accent, #5b52e5) 22%, transparent);
+        color: var(--text-main);
+    }
 }

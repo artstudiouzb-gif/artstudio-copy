@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\DateFormatter;
+use App\Core\Locale;
 use App\Core\Media;
 
 /** @var array $news */
@@ -7,10 +9,11 @@ use App\Core\Media;
 $gallery = $gallery ?? [];
 // Слайдер выводится ТОЛЬКО при наличии фотографий (задача 65).
 $hasSlides = !empty($gallery);
+$date = DateFormatter::long((string) $news['published_at'], Locale::current());
 ?>
 <article class="news-single news-single--gallery">
     <h1><?= htmlspecialchars($news['title'], ENT_QUOTES) ?></h1>
-    <time><?= htmlspecialchars(substr((string) $news['published_at'], 0, 10), ENT_QUOTES) ?></time>
+    <?php if ($date !== ''): ?><time datetime="<?= htmlspecialchars(substr((string) $news['published_at'], 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars($date, ENT_QUOTES) ?></time><?php endif; ?>
 
     <?php if ($hasSlides): ?>
         <div class="news-slider" data-news-slider>

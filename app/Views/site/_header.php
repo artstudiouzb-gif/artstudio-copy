@@ -15,9 +15,12 @@ use App\Models\Setting;
 
 $siteName = Setting::get('site_name', 'ArtStudio');
 $logo = Setting::get('logo_url', '');
-$primaryColor = Setting::get('color_primary', '#1a1a1a');
-$accentColor = Setting::get('color_accent', '#e63946');
-$font = Setting::get('font_family', "'Inter', sans-serif");
+// Дефолтная палитра — корпоративный «navy» (основной #223D79, акцент —
+// живой синий) и типографика Montserrat/Manrope (см. fonts.css).
+$primaryColor = Setting::get('color_primary', '#223D79');
+$accentColor = Setting::get('color_accent', '#2f6fed');
+$font = Setting::get('font_family', "'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif");
+$fontHeading = Setting::get('font_heading', "'Montserrat', 'Manrope', system-ui, sans-serif");
 $extraHeadCss = $extraHeadCss ?? '';
 
 // --- Дизайн-система: тема и локальный шрифт ---
@@ -175,12 +178,15 @@ $burgerHtml = $menuHtml !== ''
     : '';
 
 // --- Раскладка по зонам ---
+// Меню выводится отдельной навигационной полосой под верхним рядом (паттерн
+// официального портала): верх — логотип + утилиты, ниже — полноширинная
+// навигация. menu_position задаёт горизонтальное выравнивание этой полосы.
 $zones = ['left' => '', 'center' => '', 'right' => ''];
 $zones['left'] .= $burgerHtml;
 $zones[$hcfg['logo_position']] .= $logoHtml;
-$zones[$hcfg['menu_position']] .= $menuHtml;
-// Утилиты (язык, соцсети, CTA, тема) — в правую зону.
+// Утилиты (поиск, язык, соцсети, CTA, тема, версия для слабовидящих) — справа.
 $zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeToggle . $a11yToggle;
+$navAlign = in_array($hcfg['menu_position'], ['left', 'center', 'right'], true) ? $hcfg['menu_position'] : 'left';
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($currentLang, ENT_QUOTES) ?>" data-theme="<?= htmlspecialchars($defaultTheme, ENT_QUOTES) ?>"<?= $a11y['on'] ? ' data-a11y="1" data-a11y-scheme="' . htmlspecialchars($a11y['scheme'], ENT_QUOTES) . '" data-a11y-size="' . htmlspecialchars($a11y['size'], ENT_QUOTES) . '" data-a11y-images="' . htmlspecialchars($a11y['images'], ENT_QUOTES) . '"' : '' ?>>
@@ -237,6 +243,9 @@ $zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeTogg
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars($pwaShortName, ENT_QUOTES) ?>">
 <?php endif; ?>
+<link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/manrope-400-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/montserrat-700-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/fonts.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/frontend.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/a11y.css'), ENT_QUOTES) ?>">
 <style>
@@ -246,6 +255,7 @@ $zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeTogg
     <?php // Внутри <style> HTML-экранирование ломает кавычки ('Inter' -> &#039;Inter&#039;).
           // Санитизация под CSS: только буквы/цифры/пробел/запятая/дефис/одинарные кавычки. ?>
     --font-family: <?= preg_replace("/[^a-zA-Z0-9 ,'\\-]/", '', (string) $font) ?: 'system-ui, sans-serif' ?>;
+    --font-heading: <?= preg_replace("/[^a-zA-Z0-9 ,'\\-]/", '', (string) $fontHeading) ?: "'Montserrat', system-ui, sans-serif" ?>;
 }
 <?php // Тема-билдер: переменные дизайна (ширина, скругления, отступы, кнопки). ?>
 <?= \App\Core\DesignSettings::cssVariables($designVals) ?>
@@ -291,12 +301,17 @@ $zones['right'] .= $searchHtml . $langHtml . $socialHtml . $ctaHtml . $themeTogg
     </div>
     <a href="#" class="a11y-panel__off">Обычная версия</a>
 </div>
-<header class="site-header site-header--logo-<?= htmlspecialchars($hcfg['logo_position'], ENT_QUOTES) ?>">
+<header class="site-header site-header--logo-<?= htmlspecialchars($hcfg['logo_position'], ENT_QUOTES) ?><?= $menuHtml !== '' ? ' site-header--has-nav' : '' ?>">
     <div class="site-header__inner">
         <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>
         <div class="site-header__zone site-header__zone--center"><?= $zones['center'] ?></div>
         <div class="site-header__zone site-header__zone--right"><?= $zones['right'] ?></div>
     </div>
+    <?php if ($menuHtml !== ''): ?>
+    <div class="site-nav site-nav--align-<?= htmlspecialchars($navAlign, ENT_QUOTES) ?>">
+        <div class="site-nav__inner"><?= $menuHtml ?></div>
+    </div>
+    <?php endif; ?>
 </header>
 <div class="site-search-overlay" data-search-overlay hidden>
     <form class="site-search-overlay__form" method="get" action="<?= $searchAction ?>" role="search">

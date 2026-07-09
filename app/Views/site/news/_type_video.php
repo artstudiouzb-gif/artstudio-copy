@@ -1,13 +1,16 @@
 <?php
 
+use App\Core\DateFormatter;
+use App\Core\Locale;
 use App\Core\Video;
 
 /** @var array $news */
 $videoId = Video::youtubeId($news['video_url'] ?? null);
+$date = DateFormatter::long((string) $news['published_at'], Locale::current());
 ?>
 <article class="news-single news-single--video">
     <h1><?= htmlspecialchars($news['title'], ENT_QUOTES) ?></h1>
-    <time><?= htmlspecialchars(substr((string) $news['published_at'], 0, 10), ENT_QUOTES) ?></time>
+    <?php if ($date !== ''): ?><time datetime="<?= htmlspecialchars(substr((string) $news['published_at'], 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars($date, ENT_QUOTES) ?></time><?php endif; ?>
 
     <?php if ($videoId !== null): ?>
         <?php

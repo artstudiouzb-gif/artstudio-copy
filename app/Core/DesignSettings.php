@@ -23,7 +23,7 @@ final class DesignSettings
      * 'custom' сохраняет цвета, заданные вручную в «Настройках».
      */
     public const PALETTES = [
-        'gov_blue' => ['Гос-синий', '#1f4b8e', '#0f766e'],
+        'gov_blue' => ['Гос-синий', '#223d79', '#2f6fed'],
         'classic_red' => ['Классика', '#1a1a1a', '#e63946'],
         'emerald' => ['Изумруд', '#14532d', '#059669'],
         'graphite' => ['Графит', '#111827', '#374151'],
