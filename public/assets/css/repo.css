@@ -149,3 +149,70 @@ a { color: var(--repo-accent); }
     .repo-table tr { border: 1px solid var(--repo-border); border-radius: 8px; margin-bottom: 12px; padding: 6px 4px; }
     .repo-table td { border-bottom: none; padding: 6px 12px; }
 }
+
+/* ==========================================================================
+   Витрина репозитория (по утверждённому эскизу): hero + поиск, статистика,
+   категории, карточки документов, популярные/последние.
+   ========================================================================== */
+.rd { display: flex; flex-direction: column; gap: 34px; }
+.rd-hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 30px; align-items: center; background: linear-gradient(120deg, #eef3f9, #f7fafc); border-radius: 16px; padding: clamp(24px, 4vw, 46px); }
+@media (max-width: 800px) { .rd-hero { grid-template-columns: 1fr; } .rd-hero__art { display: none; } }
+.rd-hero__title { font-family: 'PT Serif', Georgia, serif; color: #173a63; font-size: clamp(1.8rem, 3.4vw, 2.6rem); margin: 0 0 12px; }
+.rd-hero__lead { color: #5c6b80; line-height: 1.6; max-width: 52ch; margin: 0 0 22px; }
+.rd-search { display: grid; grid-template-columns: 1fr auto; gap: 8px; max-width: 520px; }
+.rd-search input { min-height: 48px; padding: 0 16px; border: 1px solid #d9e0ea; border-radius: 10px; font-size: 15px; }
+.rd-search button { width: 52px; min-height: 48px; border: 0; border-radius: 10px; background: #173a63; color: #fff; cursor: pointer; display: grid; place-items: center; }
+.rd-search button:hover { background: #0f2a4a; }
+.rd-hero__art { display: grid; place-items: center; color: #173a63; opacity: .18; }
+.rd-hero__art svg { width: 160px; height: 160px; }
+
+.rd-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 800px) { .rd-stats { grid-template-columns: repeat(2, 1fr); } }
+.rd-stat { background: #fff; border: 1px solid #e5e9f0; border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
+.rd-stat__num { font-family: 'PT Serif', Georgia, serif; font-weight: 700; font-size: 1.7rem; color: #173a63; }
+.rd-stat__label { color: #6b7789; font-size: .86rem; }
+
+.rd-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.rd-section-head h2 { font-family: 'PT Serif', Georgia, serif; color: #173a63; font-size: 1.3rem; margin: 0; }
+.rd-reset { color: #12807f; font-weight: 700; font-size: .9rem; text-decoration: none; }
+
+.rd-cats__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 1000px) { .rd-cats__grid { grid-template-columns: repeat(2, 1fr); } }
+.rd-cat { display: flex; flex-direction: column; gap: 8px; padding: 16px; background: #fff; border: 1px solid #e5e9f0; border-radius: 12px; text-decoration: none; color: #1f2b3d; transition: border-color .15s ease, box-shadow .15s ease; }
+.rd-cat:hover { border-color: #17999b; box-shadow: 0 8px 20px rgba(19,42,92,.08); }
+.rd-cat.is-active { border-color: #17999b; background: #f0fafa; }
+.rd-cat__icon { color: #17999b; }
+.rd-cat__name { font-weight: 700; color: #173a63; font-size: .95rem; }
+.rd-cat__count, .rd-cat__arrow { color: #6b7789; font-size: .85rem; }
+
+.rd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 1100px) { .rd-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .rd-grid { grid-template-columns: 1fr; } }
+.rd-doc { display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid #e5e9f0; border-radius: 12px; padding: 18px; transition: box-shadow .15s ease; }
+.rd-doc:hover { box-shadow: 0 10px 26px rgba(19,42,92,.1); }
+.rd-doc__head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rd-doc__ext { padding: 4px 10px; border-radius: 999px; background: #eef3f9; color: #173a63; font-weight: 700; font-size: 11px; letter-spacing: .06em; }
+.rd-doc__cat { color: #12807f; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.rd-doc__date { color: #8a94a6; font-size: .82rem; }
+.rd-doc__title { font-family: 'PT Serif', Georgia, serif; color: #173a63; font-size: 1.02rem; line-height: 1.35; margin: 0; flex: 1; }
+.rd-doc__meta { color: #6b7789; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+.rd-doc__desc { color: #5c6b80; font-size: .88rem; line-height: 1.5; margin: 0; }
+.rd-doc__actions { margin-top: 8px; }
+.rd-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: .88rem; text-decoration: none; }
+.rd-btn--primary { background: #173a63; color: #fff; }
+.rd-btn--primary:hover { background: #0f2a4a; }
+.rd-empty { background: #fff; border: 1px dashed #d9e0ea; border-radius: 12px; padding: 40px; text-align: center; color: #6b7789; }
+
+.rd-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .rd-columns { grid-template-columns: 1fr; } }
+.rd-col { background: #fff; border: 1px solid #e5e9f0; border-radius: 12px; padding: 20px 22px; }
+.rd-col__title { font-family: 'PT Serif', Georgia, serif; color: #173a63; font-size: 1.1rem; margin: 0 0 14px; }
+.rd-col__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 13px; }
+.rd-col__list li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+.rd-col__num { font-weight: 700; color: #12807f; font-size: .95rem; padding-top: 2px; }
+.rd-col__date { display: flex; flex-direction: column; align-items: center; min-width: 40px; color: #6b7789; font-size: .68rem; font-weight: 700; }
+.rd-col__date span { font-family: 'PT Serif', Georgia, serif; font-size: 1.15rem; color: #173a63; line-height: 1.1; }
+.rd-col__body { display: flex; flex-direction: column; gap: 3px; }
+.rd-col__body a { color: #1f2b3d; font-weight: 600; font-size: .92rem; line-height: 1.4; text-decoration: none; }
+.rd-col__body a:hover { color: #12807f; }
+.rd-col__meta { color: #8a94a6; font-size: .78rem; }

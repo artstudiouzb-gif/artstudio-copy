@@ -7,77 +7,131 @@ use App\Core\Format;
 /** @var string $query */
 /** @var string $category */
 /** @var array|null $repoUser */
-$pageTitle = 'Файлы';
-require __DIR__ . '/layout/top.php';
-?>
-<h1 class="repo-page-title">Файлы</h1>
+/** @var int $totalCount */
+/** @var array $popular */
+/** @var array $latest */
+$totalCount = $totalCount ?? count($files);
+$popular = $popular ?? [];
+$latest = $latest ?? [];
 
-<div class="repo-card">
-    <form method="get" action="/repo" class="repo-toolbar">
-        <div class="repo-field">
-            <label for="q">Поиск</label>
-            <input type="text" id="q" name="q" value="<?= htmlspecialchars($query, ENT_QUOTES) ?>" placeholder="Название, описание или имя файла">
+$pageTitle = 'Репозиторий документов';
+require __DIR__ . '/layout/top.php';
+
+$docIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/></svg>';
+$extBadge = static function (array $f): string {
+    $ext = strtoupper((string) pathinfo((string) $f['original_name'], PATHINFO_EXTENSION));
+    return $ext !== '' ? $ext : 'FILE';
+};
+?>
+<div class="rd">
+    <header class="rd-hero">
+        <div class="rd-hero__info">
+            <h1 class="rd-hero__title">Репозиторий документов</h1>
+            <p class="rd-hero__lead">Единая база официальных документов, стратегий, отчётов, исследований и аналитических материалов Агентства.</p>
+            <form method="get" action="/repo" class="rd-search" role="search">
+                <input type="search" name="q" value="<?= htmlspecialchars($query, ENT_QUOTES) ?>" placeholder="Поиск по названию, теме или ключевому слову…" aria-label="Поиск по документам">
+                <?php if ($category !== ''): ?><input type="hidden" name="category" value="<?= htmlspecialchars($category, ENT_QUOTES) ?>"><?php endif; ?>
+                <button type="submit" aria-label="Найти"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+            </form>
         </div>
-        <div class="repo-field" style="flex:0 0 220px;">
-            <label for="category">Категория</label>
-            <select id="category" name="category">
-                <option value="">Все категории</option>
+        <div class="rd-hero__art" aria-hidden="true"><?= $docIcon ?></div>
+    </header>
+
+    <div class="rd-stats">
+        <div class="rd-stat"><span class="rd-stat__num"><?= $totalCount ?></span><span class="rd-stat__label">документов в базе</span></div>
+        <div class="rd-stat"><span class="rd-stat__num"><?= count($categories) ?></span><span class="rd-stat__label">категорий</span></div>
+        <div class="rd-stat"><span class="rd-stat__num"><?= array_sum(array_map(static fn ($f) => (int) $f['download_count'], $popular)) ?></span><span class="rd-stat__label">скачиваний популярных</span></div>
+        <div class="rd-stat"><span class="rd-stat__num"><?= count($latest) ?></span><span class="rd-stat__label">новых публикаций</span></div>
+    </div>
+
+    <?php if (!empty($categories)): ?>
+        <section class="rd-cats">
+            <div class="rd-section-head"><h2>Категории документов</h2></div>
+            <div class="rd-cats__grid">
+                <a class="rd-cat<?= $category === '' ? ' is-active' : '' ?>" href="/repo<?= $query !== '' ? '?q=' . rawurlencode($query) : '' ?>">
+                    <span class="rd-cat__icon"><?= $docIcon ?></span>
+                    <span class="rd-cat__name">Все документы</span>
+                    <span class="rd-cat__count"><?= $totalCount ?></span>
+                </a>
                 <?php foreach ($categories as $cat): ?>
-                    <option value="<?= htmlspecialchars($cat, ENT_QUOTES) ?>" <?= $cat === $category ? 'selected' : '' ?>><?= htmlspecialchars($cat, ENT_QUOTES) ?></option>
+                    <a class="rd-cat<?= $cat === $category ? ' is-active' : '' ?>" href="/repo?category=<?= rawurlencode($cat) ?><?= $query !== '' ? '&q=' . rawurlencode($query) : '' ?>">
+                        <span class="rd-cat__icon"><?= $docIcon ?></span>
+                        <span class="rd-cat__name"><?= htmlspecialchars($cat, ENT_QUOTES) ?></span>
+                        <span class="rd-cat__arrow">→</span>
+                    </a>
                 <?php endforeach; ?>
-            </select>
+            </div>
+        </section>
+    <?php endif; ?>
+
+    <section class="rd-list">
+        <div class="rd-section-head">
+            <h2><?= ($query !== '' || $category !== '') ? 'Найдено: ' . count($files) : 'Все документы' ?></h2>
+            <?php if ($query !== '' || $category !== ''): ?><a class="rd-reset" href="/repo">Сбросить фильтры ↺</a><?php endif; ?>
         </div>
-        <div class="repo-field" style="flex:0 0 auto;">
-            <button type="submit" class="repo-btn">Найти</button>
-            <?php if ($query !== '' || $category !== ''): ?>
-                <a href="/repo" class="repo-btn repo-btn--ghost">Сброс</a>
+        <?php if (empty($files)): ?>
+            <div class="rd-empty"><?= ($query !== '' || $category !== '') ? 'По вашему запросу ничего не найдено.' : 'В хранилище пока нет файлов.' ?></div>
+        <?php else: ?>
+            <div class="rd-grid">
+                <?php foreach ($files as $f): ?>
+                    <article class="rd-doc">
+                        <div class="rd-doc__head">
+                            <span class="rd-doc__ext"><?= htmlspecialchars($extBadge($f), ENT_QUOTES) ?></span>
+                            <?php if (!empty($f['category'])): ?><span class="rd-doc__cat"><?= htmlspecialchars((string) $f['category'], ENT_QUOTES) ?></span><?php endif; ?>
+                        </div>
+                        <time class="rd-doc__date"><?= htmlspecialchars(date('d.m.Y', strtotime((string) $f['created_at'])), ENT_QUOTES) ?></time>
+                        <h3 class="rd-doc__title"><?= htmlspecialchars((string) $f['title'], ENT_QUOTES) ?></h3>
+                        <div class="rd-doc__meta"><?= htmlspecialchars($extBadge($f) . ' · ' . Format::fileSize((int) $f['size']), ENT_QUOTES) ?><?= (int) $f['download_count'] > 0 ? ' · скачано ' . (int) $f['download_count'] : '' ?></div>
+                        <?php if (!empty($f['description'])): ?>
+                            <p class="rd-doc__desc"><?= htmlspecialchars(mb_substr((string) $f['description'], 0, 120), ENT_QUOTES) ?></p>
+                        <?php endif; ?>
+                        <div class="rd-doc__actions">
+                            <a class="rd-btn rd-btn--primary" href="/repo/download/<?= (int) $f['id'] ?>">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 19h14"/></svg>
+                                Скачать
+                            </a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </section>
+
+    <?php if (!empty($popular) || !empty($latest)): ?>
+        <div class="rd-columns">
+            <?php if (!empty($popular)): ?>
+                <section class="rd-col">
+                    <h2 class="rd-col__title">Популярные документы</h2>
+                    <ol class="rd-col__list rd-col__list--num">
+                        <?php foreach ($popular as $i => $f): ?>
+                            <li>
+                                <span class="rd-col__num"><?= str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) ?></span>
+                                <span class="rd-col__body">
+                                    <a href="/repo/download/<?= (int) $f['id'] ?>"><?= htmlspecialchars((string) $f['title'], ENT_QUOTES) ?></a>
+                                    <span class="rd-col__meta">Скачано <?= (int) $f['download_count'] ?> раз</span>
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ol>
+                </section>
+            <?php endif; ?>
+            <?php if (!empty($latest)): ?>
+                <section class="rd-col">
+                    <h2 class="rd-col__title">Последние публикации</h2>
+                    <ol class="rd-col__list">
+                        <?php foreach ($latest as $f): ?>
+                            <li>
+                                <span class="rd-col__date"><span><?= htmlspecialchars(date('d', strtotime((string) $f['created_at'])), ENT_QUOTES) ?></span><?= htmlspecialchars(mb_strtoupper(['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'][(int) date('n', strtotime((string) $f['created_at'])) - 1]), ENT_QUOTES) ?></span>
+                                <span class="rd-col__body">
+                                    <a href="/repo/download/<?= (int) $f['id'] ?>"><?= htmlspecialchars((string) $f['title'], ENT_QUOTES) ?></a>
+                                    <span class="rd-col__meta"><?= htmlspecialchars($extBadge($f) . ' · ' . Format::fileSize((int) $f['size']), ENT_QUOTES) ?></span>
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ol>
+                </section>
             <?php endif; ?>
         </div>
-    </form>
-</div>
-
-<div class="repo-card">
-    <?php if (empty($files)): ?>
-        <div class="repo-empty">
-            <?= ($query !== '' || $category !== '') ? 'По вашему запросу ничего не найдено.' : 'В хранилище пока нет файлов.' ?>
-        </div>
-    <?php else: ?>
-        <table class="repo-table">
-            <thead>
-                <tr>
-                    <th>Файл</th>
-                    <th>Категория</th>
-                    <th>Размер</th>
-                    <th>Добавлен</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($files as $f): ?>
-                    <tr>
-                        <td>
-                            <div class="repo-file-title"><?= htmlspecialchars((string) $f['title'], ENT_QUOTES) ?></div>
-                            <?php if (!empty($f['description'])): ?>
-                                <div class="repo-file-desc"><?= htmlspecialchars((string) $f['description'], ENT_QUOTES) ?></div>
-                            <?php endif; ?>
-                            <div class="repo-meta"><?= htmlspecialchars((string) $f['original_name'], ENT_QUOTES) ?></div>
-                        </td>
-                        <td>
-                            <?php if (!empty($f['category'])): ?>
-                                <span class="repo-badge"><?= htmlspecialchars((string) $f['category'], ENT_QUOTES) ?></span>
-                            <?php else: ?>
-                                <span class="repo-meta">—</span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="repo-meta"><?= htmlspecialchars(Format::fileSize((int) $f['size']), ENT_QUOTES) ?></td>
-                        <td class="repo-meta"><?= htmlspecialchars(date('d.m.Y', strtotime((string) $f['created_at'])), ENT_QUOTES) ?></td>
-                        <td style="text-align:right;">
-                            <a href="/repo/download/<?= (int) $f['id'] ?>" class="repo-btn repo-btn--sm">Скачать</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
     <?php endif; ?>
 </div>
 <?php require __DIR__ . '/layout/bottom.php'; ?>

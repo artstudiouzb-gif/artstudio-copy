@@ -29,12 +29,20 @@ final class PortalController
         $query = trim((string) ($_GET['q'] ?? ''));
         $category = trim((string) ($_GET['category'] ?? ''));
 
+        $all = RepoFile::all('', '');
+        // Популярные и последние — для боковых колонок витрины.
+        $popular = $all;
+        usort($popular, static fn (array $a, array $b) => (int) $b['download_count'] <=> (int) $a['download_count']);
+
         View::render('repo/index', [
             'files' => RepoFile::all($query, $category),
             'categories' => RepoFile::categories(),
             'query' => $query,
             'category' => $category,
             'repoUser' => RepoAuth::user(),
+            'totalCount' => count($all),
+            'popular' => array_slice($popular, 0, 5),
+            'latest' => array_slice($all, 0, 5),
         ]);
     }
 
