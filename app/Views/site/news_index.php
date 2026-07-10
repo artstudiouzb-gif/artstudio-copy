@@ -8,8 +8,12 @@ use App\Models\News;
 /** @var array $items */
 /** @var int $page */
 /** @var int $pages */
+/** @var list<string> $badges */
+/** @var string $badge */
 $page = $page ?? 1;
 $pages = $pages ?? 1;
+$badges = $badges ?? [];
+$badge = $badge ?? '';
 
 $metaTitle = 'Новости';
 $metaDescription = 'Официальные новости и аналитические материалы Агентства.';
@@ -24,15 +28,26 @@ require __DIR__ . '/_crumbs.php';
 
 $lang = Locale::current();
 $fmt = static fn (string $d): string => DateFormatter::long($d, $lang);
-// На первой странице первая новость — крупная.
-$featured = ($page === 1 && !empty($items)) ? $items[0] : null;
+// Крупная первая новость — только на первой странице общего списка.
+$featured = ($page === 1 && $badge === '' && !empty($items)) ? $items[0] : null;
 $grid = $featured !== null ? array_slice($items, 1) : $items;
+$pageUrl = static fn (int $p): string => Locale::url('news')
+    . (($p > 1 || $badge !== '') ? '?' . http_build_query(array_filter(['badge' => $badge, 'page' => $p > 1 ? $p : null])) : '');
 ?>
 <div class="listing">
     <div class="listing__head">
         <h1 class="listing__title">Новости и аналитика</h1>
         <p class="listing__lead">Официальные сообщения, события и аналитические материалы Агентства.</p>
     </div>
+
+    <?php if ($badges !== []): ?>
+        <nav class="listing-filter" aria-label="Рубрики">
+            <a class="listing-filter__item<?= $badge === '' ? ' is-active' : '' ?>" href="<?= htmlspecialchars(Locale::url('news'), ENT_QUOTES) ?>">Все материалы</a>
+            <?php foreach ($badges as $b): ?>
+                <a class="listing-filter__item<?= $b === $badge ? ' is-active' : '' ?>" href="<?= htmlspecialchars(Locale::url('news') . '?badge=' . rawurlencode($b), ENT_QUOTES) ?>"><?= htmlspecialchars($b, ENT_QUOTES) ?></a>
+            <?php endforeach; ?>
+        </nav>
+    <?php endif; ?>
 
     <?php if (empty($items)): ?>
         <p class="listing__empty">Пока нет опубликованных новостей.</p>
@@ -70,7 +85,7 @@ $grid = $featured !== null ? array_slice($items, 1) : $items;
                     <?php if ($i === $page): ?>
                         <span class="listing-pager__item is-active" aria-current="page"><?= $i ?></span>
                     <?php else: ?>
-                        <a class="listing-pager__item" href="<?= htmlspecialchars(Locale::url('news') . ($i > 1 ? '?page=' . $i : ''), ENT_QUOTES) ?>"><?= $i ?></a>
+                        <a class="listing-pager__item" href="<?= htmlspecialchars($pageUrl($i), ENT_QUOTES) ?>"><?= $i ?></a>
                     <?php endif; ?>
                 <?php endfor; ?>
             </nav>

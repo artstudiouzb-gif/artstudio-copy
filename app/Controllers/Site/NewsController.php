@@ -18,14 +18,24 @@ final class NewsController
         $lang = Locale::current();
         $perPage = 13; // 1 крупная + 12 в сетке
         $page = max(1, (int) ($_GET['page'] ?? 1));
-        $total = News::publishedCount();
+
+        // Рубрикатор по бейджам (бейдж задаётся в админке у каждой новости).
+        $badges = News::distinctBadges();
+        $badge = trim((string) ($_GET['badge'] ?? ''));
+        if ($badge !== '' && !in_array($badge, $badges, true)) {
+            $badge = '';
+        }
+
+        $total = News::publishedCount($badge !== '' ? $badge : null);
         $pages = max(1, (int) ceil($total / $perPage));
         $page = min($page, $pages);
 
         View::render('site/news_index', [
-            'items' => News::published($perPage, ($page - 1) * $perPage, $lang),
+            'items' => News::published($perPage, ($page - 1) * $perPage, $lang, $badge !== '' ? $badge : null),
             'page' => $page,
             'pages' => $pages,
+            'badges' => $badges,
+            'badge' => $badge,
         ]);
     }
 

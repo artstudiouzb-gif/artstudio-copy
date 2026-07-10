@@ -139,12 +139,18 @@ final class News
     /**
      * Опубликованные новости, локализованные под указанный язык.
      */
-    public static function published(int $limit = 20, int $offset = 0, ?string $lang = null): array
+    public static function published(int $limit = 20, int $offset = 0, ?string $lang = null, ?string $badge = null): array
     {
+        $where = "status = 'published' AND published_at <= NOW() AND deleted_at IS NULL";
+        if ($badge !== null && $badge !== '') {
+            $where .= ' AND badge = :badge';
+        }
         $stmt = Database::pdo()->prepare(
-            "SELECT * FROM news WHERE status = 'published' AND published_at <= NOW() AND deleted_at IS NULL
-             ORDER BY published_at DESC LIMIT :limit OFFSET :offset"
+            "SELECT * FROM news WHERE {$where} ORDER BY published_at DESC LIMIT :limit OFFSET :offset"
         );
+        if ($badge !== null && $badge !== '') {
+            $stmt->bindValue(':badge', $badge);
+        }
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
         $stmt->execute();
@@ -157,12 +163,35 @@ final class News
         return array_map(static fn (array $row) => self::localize($row, $lang), $rows);
     }
 
-    /** Количество опубликованных новостей (для пагинации). */
-    public static function publishedCount(): int
+    /** Количество опубликованных новостей (для пагинации), опционально по бейджу. */
+    public static function publishedCount(?string $badge = null): int
     {
-        return (int) Database::pdo()->query(
-            "SELECT COUNT(*) FROM news WHERE status = 'published' AND published_at <= NOW() AND deleted_at IS NULL"
-        )->fetchColumn();
+        $where = "status = 'published' AND published_at <= NOW() AND deleted_at IS NULL";
+        if ($badge !== null && $badge !== '') {
+            $where .= ' AND badge = :badge';
+            $stmt = Database::pdo()->prepare("SELECT COUNT(*) FROM news WHERE {$where}");
+            $stmt->execute([':badge' => $badge]);
+
+            return (int) $stmt->fetchColumn();
+        }
+
+        return (int) Database::pdo()->query("SELECT COUNT(*) FROM news WHERE {$where}")->fetchColumn();
+    }
+
+    /**
+     * Список бейджей опубликованных новостей (для фильтра-рубрикатора на
+     * странице «Новости»; бейдж задаётся в админке у каждой новости).
+     *
+     * @return list<string>
+     */
+    public static function distinctBadges(): array
+    {
+        return Database::pdo()->query(
+            "SELECT DISTINCT badge FROM news
+             WHERE status = 'published' AND published_at <= NOW() AND deleted_at IS NULL
+               AND badge IS NOT NULL AND badge <> ''
+             ORDER BY badge"
+        )->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     public static function findById(int $id): ?array

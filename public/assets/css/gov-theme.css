@@ -873,3 +873,102 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .projdetail__title { font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height: 1.15; margin: 14px 0 0; }
 .projdetail__media { display: block; aspect-ratio: 16/9; border-radius: 14px; background: #24425f center/cover no-repeat; }
 .projdetail__content { max-width: 76ch; }
+
+/* ===== Рубрикатор по бейджам (страница «Новости») ===== */
+.listing-filter { display: flex; flex-wrap: wrap; gap: 10px; margin-top: -8px; }
+.listing-filter__item { display: inline-flex; align-items: center; min-height: 40px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-navy); font-weight: 600; font-size: .9rem; text-decoration: none; transition: border-color .15s ease, color .15s ease; }
+.listing-filter__item:hover { border-color: var(--gov-teal); color: var(--gov-teal-text); }
+.listing-filter__item.is-active { background: var(--gov-navy); border-color: var(--gov-navy); color: #fff; }
+
+/* ===== Каталог (вакансии, тендеры, документы, мероприятия) ===== */
+.catlist-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.catlist-toolbar__search { position: relative; flex: 1 1 260px; max-width: 460px; }
+.catlist-toolbar__search svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; color: var(--gov-muted); pointer-events: none; }
+.catlist-toolbar__search input { width: 100%; height: 46px; padding: 0 14px 0 42px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font: inherit; }
+.catlist-toolbar__search input:focus-visible { outline: 2px solid var(--gov-teal); outline-offset: 1px; }
+.catlist-toolbar__sort { height: 46px; padding: 0 12px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font: inherit; }
+.catlist-toolbar__btn { height: 46px; padding: 0 22px; border: 0; border-radius: 10px; background: var(--gov-navy); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.catlist-toolbar__btn:hover { background: var(--gov-teal); }
+.catlist-toolbar__reset { color: var(--gov-teal-text); font-weight: 600; text-decoration: none; }
+.catlist-count { color: var(--gov-muted); margin: 0; }
+.catlist-count b { color: var(--gov-navy); }
+
+.catlist { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+@media (max-width: 900px) { .catlist { grid-template-columns: 1fr; } }
+.catcard { display: flex; gap: 18px; padding: 22px; border: 1px solid var(--gov-border); border-radius: 14px; background: var(--gov-surface); transition: border-color .15s ease, box-shadow .15s ease; }
+.catcard:hover { border-color: var(--gov-teal); box-shadow: 0 10px 28px rgba(23, 58, 99, .08); }
+.catcard--archived { background: color-mix(in srgb, var(--gov-surface) 60%, var(--gov-bg)); }
+.catcard--archived .catcard__title a { color: var(--gov-muted); }
+.catcard__main { display: flex; flex-direction: column; gap: 10px; min-width: 0; flex: 1; }
+.catcard__top { display: flex; align-items: center; gap: 12px; }
+.catcard__status { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 999px; background: rgba(23, 153, 155, .12); color: var(--gov-teal-text); font-size: .78rem; font-weight: 700; letter-spacing: .02em; }
+.catcard__status--off { background: rgba(23, 58, 99, .08); color: var(--gov-muted); }
+.catcard__created { margin-left: auto; color: var(--gov-muted); font-size: .82rem; }
+.catcard__title { margin: 0; font-size: 1.15rem; line-height: 1.3; }
+.catcard__title a { color: var(--gov-navy); text-decoration: none; }
+.catcard__title a:hover { color: var(--gov-teal-text); }
+.catcard__meta { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.catcard__meta-item { display: flex; flex-direction: column; gap: 2px; font-size: .9rem; color: var(--gov-navy); }
+.catcard__meta-item i { font-style: normal; font-size: .74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--gov-muted); }
+.catcard__excerpt { margin: 0; color: var(--gov-muted); font-size: .9rem; line-height: 1.55; }
+.catcard__foot { display: flex; align-items: center; gap: 16px; margin-top: auto; padding-top: 6px; }
+.catcard__file { display: inline-flex; align-items: center; gap: 6px; color: var(--gov-muted); font-size: .84rem; }
+.catcard__more { margin-left: auto; color: var(--gov-teal-text); font-weight: 700; font-size: .9rem; text-decoration: none; }
+.catcard__more:hover { text-decoration: underline; }
+
+/* Мероприятия: плитка даты слева. */
+.catlist--events .catcard { align-items: flex-start; }
+.catcard__datebox { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 0 0 74px; min-height: 84px; padding: 10px 6px; border-radius: 12px; background: var(--gov-navy); color: #fff; text-align: center; }
+.catcard__datebox b { font-family: 'PT Serif', serif; font-size: 1.7rem; line-height: 1; }
+.catcard__datebox i { font-style: normal; font-size: .72rem; font-weight: 700; letter-spacing: .08em; margin-top: 4px; }
+.catcard__datebox em { font-style: normal; font-size: .72rem; opacity: .75; }
+
+/* Деталка записи каталога. */
+.catdetail { display: flex; flex-direction: column; gap: clamp(24px, 3.4vw, 40px); padding-block: 10px clamp(40px, 5vw, 64px); }
+.catdetail__head { max-width: 900px; }
+.catdetail__eyebrow { display: inline-block; color: var(--gov-teal-text); font-size: .8rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.catdetail__title { margin: 12px 0 10px; font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1.18; color: var(--gov-navy); }
+.catdetail__date { color: var(--gov-muted); font-size: .9rem; }
+.catdetail__grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: clamp(24px, 3.4vw, 48px); align-items: start; }
+@media (max-width: 900px) { .catdetail__grid { grid-template-columns: 1fr; } }
+.catdetail__body { display: flex; flex-direction: column; gap: 26px; max-width: 76ch; }
+.catdetail__subtitle { margin: 0 0 10px; font-size: 1.2rem; color: var(--gov-navy); }
+.catdetail__text { color: var(--gov-ink, #2b3b4e); line-height: 1.7; }
+.catdetail__text img { max-width: 100%; border-radius: 12px; }
+.catdetail__empty { color: var(--gov-muted); }
+.catdetail__card { position: sticky; top: 90px; display: flex; flex-direction: column; gap: 16px; padding: 24px; border: 1px solid var(--gov-border); border-radius: 14px; background: var(--gov-surface); }
+.catdetail__card-title { margin: 0; font-size: 1.05rem; color: var(--gov-navy); }
+.catdetail__facts { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+.catdetail__fact dt { font-size: .74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--gov-muted); }
+.catdetail__fact dd { margin: 2px 0 0; color: var(--gov-navy); font-weight: 600; }
+.catdetail__download { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 10px; background: var(--gov-navy); color: #fff; font-weight: 700; text-decoration: none; }
+.catdetail__download:hover { background: var(--gov-teal); }
+.catdetail__back { color: var(--gov-teal-text); font-weight: 600; font-size: .9rem; text-decoration: none; }
+.catdetail__back:hover { text-decoration: underline; }
+
+/* Календарь мероприятий. */
+.gcal-nav { display: flex; align-items: center; gap: 14px; }
+.gcal-nav__btn { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font-weight: 700; text-decoration: none; }
+.gcal-nav__btn:hover { border-color: var(--gov-teal); color: var(--gov-teal-text); }
+.gcal-nav__label { font-family: 'PT Serif', serif; font-size: 1.25rem; color: var(--gov-navy); text-transform: capitalize; }
+.gcal-nav__all { margin-left: auto; color: var(--gov-teal-text); font-weight: 700; font-size: .9rem; text-decoration: none; }
+.gcal-scroll { overflow-x: auto; }
+.gcal { width: 100%; min-width: 720px; border-collapse: collapse; border: 1px solid var(--gov-border); border-radius: 14px; overflow: hidden; background: var(--gov-surface); }
+.gcal th { padding: 12px 10px; background: var(--gov-navy); color: #fff; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; text-align: left; }
+.gcal__cell { vertical-align: top; width: 14.28%; height: 96px; padding: 10px; border: 1px solid var(--gov-border); }
+.gcal__cell--empty { background: color-mix(in srgb, var(--gov-surface) 55%, var(--gov-bg)); }
+.gcal__cell--today { box-shadow: inset 0 0 0 2px var(--gov-teal); }
+.gcal__cell--today .gcal__day { color: var(--gov-teal-text); }
+.gcal__day { display: block; font-weight: 700; color: var(--gov-navy); margin-bottom: 6px; }
+.gcal__event { display: block; margin-top: 4px; padding: 5px 8px; border-radius: 8px; background: rgba(23, 153, 155, .12); color: var(--gov-teal-text); font-size: .78rem; font-weight: 600; line-height: 1.3; text-decoration: none; }
+.gcal__event:hover { background: var(--gov-teal); color: #fff; }
+.gcal-list { display: flex; flex-direction: column; gap: 14px; }
+.gcal-list__title { margin: 0; font-size: 1.3rem; color: var(--gov-navy); }
+.gcal-list__items { display: flex; flex-direction: column; gap: 0; margin: 0; padding: 0; list-style: none; border: 1px solid var(--gov-border); border-radius: 14px; background: var(--gov-surface); overflow: hidden; }
+.gcal-list__item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding: 16px 22px; }
+.gcal-list__item + .gcal-list__item { border-top: 1px solid var(--gov-border); }
+.gcal-list__date { font-weight: 700; color: var(--gov-navy); font-variant-numeric: tabular-nums; }
+.gcal-list__time { color: var(--gov-teal-text); font-weight: 700; font-size: .88rem; }
+.gcal-list__link { color: var(--gov-navy); font-weight: 600; text-decoration: none; }
+.gcal-list__link:hover { color: var(--gov-teal-text); }
+.gcal-list__loc { color: var(--gov-muted); font-size: .88rem; }
