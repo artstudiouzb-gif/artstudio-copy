@@ -82,7 +82,8 @@ $renderFooterWidget = function (array $col) use ($logo, $siteName, $address, $ph
                 . '<input type="hidden" name="hp_ts" value="' . htmlspecialchars($ts, ENT_QUOTES) . '">'
                 . '<input type="email" name="email" placeholder="Ваш e-mail" aria-label="E-mail" required>'
                 . '<button type="submit" aria-label="Подписаться">&rarr;</button>'
-                . '</form>';
+                . '</form>'
+                . '<div data-push-optin></div>'; // сюда push.js добавляет кнопку уведомлений
         case 'text':
             // Уже очищено санитайзером при сохранении.
             return '<div class="site-footer__text">' . $col['text'] . '</div>';
@@ -114,6 +115,10 @@ $renderFooterWidget = function (array $col) use ($logo, $siteName, $address, $ph
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/a11y.js'), ENT_QUOTES) ?>" defer></script>
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/frontend.js'), ENT_QUOTES) ?>"></script>
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/forms.js'), ENT_QUOTES) ?>" defer></script>
+<?php if (\App\Core\WebPush::isEnabled()): ?>
+<script>window.__pushEnabled = true;</script>
+<script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/push.js'), ENT_QUOTES) ?>" defer></script>
+<?php endif; ?>
 <?= \App\Core\AssetCollector::renderScripts() /* JS блоков — по одному разу */ ?>
 <?php if ($analyticsInit !== ''): ?>
 <?php // Код счётчиков инертен (type text/plain); consent.js активирует его. ?>

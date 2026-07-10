@@ -423,7 +423,7 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 CREATE TABLE IF NOT EXISTS social_posts (
     id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     news_id     INT UNSIGNED NOT NULL,
-    network     ENUM('facebook','linkedin','instagram') NOT NULL,
+    network     ENUM('telegram','facebook','linkedin','instagram') NOT NULL,
     status      ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
     attempts    INT UNSIGNED NOT NULL DEFAULT 0,
     locked_until DATETIME NULL,
@@ -743,6 +743,29 @@ CREATE TABLE IF NOT EXISTS migrations (
 -- для свежей установки помечаем их как применённые — database/migrate.php не
 -- будет пытаться накатить их повторно. (Старые установки, созданные на схеме
 -- этапов 1–2, накатят их через migrate.php.)
+
+-- Webpush: подписки браузеров и очередь уведомлений о новостях.
+CREATE TABLE IF NOT EXISTS webpush_subscriptions (
+    id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    endpoint      VARCHAR(1000) NOT NULL,
+    endpoint_hash CHAR(40) NOT NULL COMMENT 'sha1(endpoint) для уникального индекса',
+    p256dh        VARCHAR(255) NOT NULL,
+    auth          VARCHAR(64) NOT NULL,
+    created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_webpush_endpoint (endpoint_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS webpush_queue (
+    id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    news_id    INT UNSIGNED NOT NULL,
+    status     ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+    attempts   INT UNSIGNED NOT NULL DEFAULT 0,
+    last_error VARCHAR(500) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at    DATETIME NULL,
+    UNIQUE KEY uniq_webpush_queue_news (news_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO migrations (filename) VALUES
     ('2026_07_05_block5_multilang_header_widgets.sql'),
     ('2026_07_05_soft_deletes.sql'),
@@ -772,7 +795,9 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_09_menu_icons_dividers.sql'),
     ('2026_07_09_news_detail_extras.sql'),
     ('2026_07_09_news_premium_layout.sql'),
-    ('2026_07_10_pages_transparent_header.sql')
+    ('2026_07_10_pages_transparent_header.sql'),
+    ('2026_07_10_social_telegram.sql'),
+    ('2026_07_10_webpush.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

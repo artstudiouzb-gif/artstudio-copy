@@ -41,6 +41,7 @@
 * * * * *  php /path/app/Console/mail_worker.php     >> /path/storage/logs/mail_worker.log 2>&1
 * * * * *  php /path/app/Console/webhook_worker.php  >> /path/storage/logs/webhook_worker.log 2>&1
 */5 * * * * php /path/app/Console/social_worker.php   >> /path/storage/logs/social_worker.log 2>&1
+*/5 * * * * php /path/app/Console/push_worker.php     >> /path/storage/logs/push_worker.log 2>&1
 0 3 * * *  php /path/app/Console/backup_worker.php    >> /path/storage/logs/backup_worker.log 2>&1
 30 3 * * * php /path/app/Console/gdpr_cleanup.php     >> /path/storage/logs/gdpr_cleanup.log 2>&1
 0 9 * * 1  php /path/app/Console/digest_worker.php    >> /path/storage/logs/digest_worker.log 2>&1

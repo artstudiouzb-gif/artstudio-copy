@@ -984,3 +984,9 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .widget--pad-spacious.widget--style-card, .widget--pad-spacious.widget--style-tinted, .widget--pad-spacious.widget--style-navy { padding: 32px; }
 .widget--accent .widget__title { padding-bottom: 10px; position: relative; }
 .widget--accent .widget__title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 44px; height: 3px; border-radius: 2px; background: var(--gov-teal); }
+
+/* ===== Кнопка webpush-подписки (футер) ===== */
+.push-optin { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; min-height: 40px; padding: 0 16px; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; background: transparent; color: #fff; font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.push-optin:hover { border-color: var(--gov-teal); background: rgba(23,153,155,.15); }
+.push-optin.is-on { border-color: var(--gov-teal); background: var(--gov-teal); }
+.push-optin[disabled] { opacity: .6; cursor: default; }

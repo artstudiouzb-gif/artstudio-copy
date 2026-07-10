@@ -70,6 +70,9 @@ final class NewsController
         // Авто-публикация в соцсети + вебхук при создании опубликованной новости.
         if ($data['status'] === 'published') {
             \App\Core\SocialSettings::enqueueForNews($id);
+            if (\App\Core\WebPush::isEnabled()) {
+                \App\Models\WebPushSubscription::enqueueNews($id);
+            }
             $this->dispatchNewsPublished($id, $data);
         }
 
@@ -156,6 +159,9 @@ final class NewsController
         // Авто-публикация + вебхук при переходе черновик -> опубликовано.
         if ($data['status'] === 'published' && !$wasPublished) {
             \App\Core\SocialSettings::enqueueForNews($id);
+            if (\App\Core\WebPush::isEnabled()) {
+                \App\Models\WebPushSubscription::enqueueNews($id);
+            }
             $this->dispatchNewsPublished($id, $data);
         }
 

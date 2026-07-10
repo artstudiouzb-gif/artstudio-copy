@@ -94,6 +94,21 @@ require __DIR__ . '/../layout/header.php';
         </fieldset>
 
         <fieldset class="settings-group">
+            <legend>Push-уведомления в браузере</legend>
+            <div class="form-field form-field--checkbox">
+                <input type="checkbox" id="webpush_enabled" name="webpush_enabled" value="1" <?= ($settings['webpush_enabled'] ?? '') === '1' ? 'checked' : '' ?>>
+                <label for="webpush_enabled">Предлагать посетителям push-уведомления о новостях</label>
+            </div>
+            <span class="form-hint">
+                В блоке подписки футера появится кнопка «Уведомления о новостях».
+                При публикации новости уведомление рассылается воркером
+                <code>app/Console/push_worker.php</code> (Cron, как social_worker).
+                Ключи VAPID генерируются автоматически. Нужен HTTPS.
+                Подписчиков сейчас: <strong><?= \App\Models\WebPushSubscription::count() ?></strong>.
+            </span>
+        </fieldset>
+
+        <fieldset class="settings-group">
             <legend>Веб-аналитика и трекинг</legend>
             <div class="form-field">
                 <label for="analytics_ga_id">Google Analytics ID</label>

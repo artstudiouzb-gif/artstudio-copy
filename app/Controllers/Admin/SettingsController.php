@@ -57,6 +57,12 @@ final class SettingsController
         Setting::set('form_consent_enabled', !empty($_POST['form_consent_enabled']) ? '1' : '0');
         Setting::set('form_consent_text', mb_substr(trim((string) ($_POST['form_consent_text'] ?? '')), 0, 500));
 
+        // --- Webpush-уведомления о новостях ---
+        Setting::set('webpush_enabled', !empty($_POST['webpush_enabled']) ? '1' : '0');
+        if (!empty($_POST['webpush_enabled'])) {
+            \App\Core\WebPush::ensureKeys(); // пара VAPID создаётся один раз
+        }
+
         // --- Favicon / PWA / Theme Color ---
         $favicon = ImageField::resolve('favicon_file', 'favicon_url', Setting::get('favicon_url'), Auth::id());
         Setting::set('favicon_url', $favicon ?? '');
