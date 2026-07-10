@@ -72,6 +72,23 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .site-lang-switcher__item.is-active { color: var(--gov-teal); }
 .a11y-toggle, .site-theme-toggle, .site-search input, .site-search-toggle { color: var(--gov-navy); }
 .site-search input { border-color: var(--gov-border); border-radius: 999px; }
+.site-burger { color: var(--gov-navy); border-color: var(--gov-border); }
+
+/* Тёмная тема: элементы управления в сплошной (непрозрачной) шапке. Без этих
+   переопределений иконки-утилиты, звезда-эмблема и мобильный бургер рисуются
+   тёмно-синим (--gov-navy) или чёрным по тёмному фону и становятся невидимы.
+   Прозрачную шапку поверх hero это не затрагивает — там элементы уже белые. */
+:root[data-theme="dark"] .site-header__logo { color: var(--gov-ink); }
+:root[data-theme="dark"] .site-header__logo:not(:has(img))::before { background: var(--gov-ink); }
+:root[data-theme="dark"] .a11y-toggle,
+:root[data-theme="dark"] .site-theme-toggle,
+:root[data-theme="dark"] .site-search-toggle,
+:root[data-theme="dark"] .site-search input,
+:root[data-theme="dark"] .site-menu__link,
+:root[data-theme="dark"] .site-lang-switcher__item { color: var(--gov-ink); }
+:root[data-theme="dark"] .site-lang-switcher__item.is-active { color: var(--gov-teal-text, #3fc1c0); }
+:root[data-theme="dark"] .site-burger { color: var(--gov-ink); border-color: var(--gov-border); }
+:root[data-theme="dark"] .site-search input { background: color-mix(in srgb, var(--gov-surface) 70%, #000); }
 
 /* --- Хлебные крошки --- */
 .crumbs, .content-crumbs { color: var(--gov-muted); font-size: .9rem; }

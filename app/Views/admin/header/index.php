@@ -70,7 +70,7 @@ $heightSelect = function (string $name, string $current): string {
 };
 ?>
 <div class="form-card">
-    <form method="post" action="/admin/header" class="form-grid">
+    <form method="post" action="/admin/header" class="form-grid" enctype="multipart/form-data">
         <?= Csrf::field() ?>
 
         <div class="header-builder__group">
@@ -103,6 +103,7 @@ $heightSelect = function (string $name, string $current): string {
                         <option value="left" <?= $config['logo_position'] === 'left' ? 'selected' : '' ?>>Слева</option>
                         <option value="center" <?= $config['logo_position'] === 'center' ? 'selected' : '' ?>>По центру</option>
                     </select>
+                    <span class="form-hint">Здесь — положение. Само изображение логотипа загружается в <a href="/admin/settings#logo">Настройки → Логотип</a> (там кнопка загрузки и медиабиблиотека).</span>
                 </div>
                 <div class="form-field">
                     <label for="menu_position">Выравнивание меню</label>
@@ -130,10 +131,13 @@ $heightSelect = function (string $name, string $current): string {
                 <label class="hb-switch"><input type="checkbox" name="header_sticky" value="1" <?= !empty($config['sticky']) ? 'checked' : '' ?>><span class="hb-switch__track"></span> Липкая шапка (следует за прокруткой)</label>
                 <label class="hb-switch"><input type="checkbox" name="header_transparent" value="1" <?= !empty($config['transparent']) ? 'checked' : '' ?>><span class="hb-switch__track"></span> Прозрачная шапка (поверх первого экрана)</label>
                 <span class="form-hint">Прозрачная шапка эффектна с полноэкранным hero (фото/видео). При прокрутке она становится сплошной; вместе с «липкой» — классическое поведение премиальных сайтов. В прозрачном режиме элементы и логотип автоматически белые.</span>
-                <div class="form-field" style="margin-top:10px;">
-                    <label for="logo_light">Светлый логотип для прозрачной шапки (URL, необязательно)</label>
-                    <input type="text" id="logo_light" name="logo_light" value="<?= htmlspecialchars($config['logo_light'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/logo-white.svg">
-                    <span class="form-hint">Если основной логотип — картинка, здесь задаётся его белая версия. Эмблема-звезда без картинки перекрашивается автоматически.</span>
+                <div style="margin-top:10px;">
+                    <?= \App\Core\AdminUi::imageField('logo_light', $config['logo_light'] ?? '', [
+                        'label' => 'Светлый логотип для прозрачной шапки (необязательно)',
+                        'file' => 'logo_light_file',
+                        'hint' => 'Если основной логотип — картинка, здесь задаётся его белая версия. '
+                            . 'Эмблема-звезда без картинки перекрашивается автоматически.',
+                    ]) ?>
                 </div>
             </div>
         </div>

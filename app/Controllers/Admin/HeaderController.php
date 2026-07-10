@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\HeaderConfig;
+use App\Core\ImageField;
 use App\Core\View;
 
 final class HeaderController
@@ -42,13 +43,21 @@ final class HeaderController
             return $out;
         };
 
+        // Светлый логотип: URL из поля, загрузка файла или ранее сохранённое.
+        $logoLight = ImageField::resolve(
+            'logo_light_file',
+            'logo_light',
+            (string) (HeaderConfig::get()['logo_light'] ?? ''),
+            Auth::id()
+        );
+
         HeaderConfig::save([
             'layout' => $_POST['layout'] ?? 'stacked',
             'logo_position' => $_POST['logo_position'] ?? 'left',
             'menu_position' => $_POST['menu_position'] ?? 'right',
             'sticky' => !empty($_POST['header_sticky']),
             'transparent' => !empty($_POST['header_transparent']),
-            'logo_light' => $_POST['logo_light'] ?? '',
+            'logo_light' => $logoLight ?? '',
             'elements' => $parseZones('elements'),
             'elements_mobile' => $parseZones('elements_mobile'),
             'language_switcher' => [
