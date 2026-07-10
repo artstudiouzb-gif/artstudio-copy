@@ -7,13 +7,13 @@ use App\Core\Csrf;
 $step = '2';
 require __DIR__ . '/_header.php';
 ?>
-<p class="auth-hint">Укажите параметры подключения к MySQL. База данных будет создана (если её нет) и заполнена структурой таблиц.</p>
+<p class="auth-hint">Укажите параметры подключения к MySQL. Если база уже создана в панели хостинга — установщик подключится к ней и зальёт структуру таблиц; если базы нет и у пользователя есть права — создаст её сам. На shared-хостинге базу и пользователя создайте заранее в панели и назначьте пользователя на базу со всеми привилегиями.</p>
 <?php if (!empty($error)): ?><div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div><?php endif; ?>
 <form method="post" action="/install/step2" class="form-grid">
     <?= Csrf::field() ?>
     <div class="form-field">
         <label for="db_host">Хост</label>
-        <input type="text" id="db_host" name="db_host" value="<?= htmlspecialchars($data['host'] ?? '127.0.0.1', ENT_QUOTES) ?>" required>
+        <input type="text" id="db_host" name="db_host" value="<?= htmlspecialchars($data['host'] ?? 'localhost', ENT_QUOTES) ?>" required>
     </div>
     <div class="form-field">
         <label for="db_port">Порт</label>
