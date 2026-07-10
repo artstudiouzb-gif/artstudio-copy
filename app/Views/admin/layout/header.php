@@ -106,8 +106,9 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?> — Панель управления</title>
+<title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?> — <?= htmlspecialchars(\App\Core\AdminBrand::name(), ENT_QUOTES) ?></title>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/admin.css'), ENT_QUOTES) ?>">
+<?= \App\Core\AdminBrand::styleTag() ?>
 </head>
 <body class="admin-body">
 <header class="admin-topbar">
@@ -115,8 +116,8 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
     <a href="/admin" class="admin-topbar__brand">
-        <span class="admin-topbar__logo">A</span>
-        <span class="admin-topbar__name">ArtStudio</span>
+        <?= \App\Core\AdminBrand::badgeHtml() ?>
+        <span class="admin-topbar__name"><?= htmlspecialchars(\App\Core\AdminBrand::name(), ENT_QUOTES) ?></span>
     </a>
     <span class="admin-topbar__crumb"><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?></span>
     <div class="admin-topbar__spacer"></div>

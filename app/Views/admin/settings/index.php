@@ -75,6 +75,28 @@ require __DIR__ . '/../layout/header.php';
         </div>
 
         <fieldset class="settings-group">
+            <legend>Брендинг панели управления</legend>
+            <div class="form-field">
+                <label for="admin_brand_name">Название панели</label>
+                <input type="text" id="admin_brand_name" name="admin_brand_name" maxlength="60"
+                       value="<?= htmlspecialchars($settings['admin_brand_name'] ?? '', ENT_QUOTES) ?>"
+                       placeholder="<?= \App\Core\AdminBrand::DEFAULT_NAME ?>">
+                <span class="form-hint">Показывается в шапке админки, заголовке вкладки и на странице входа. Пусто — «<?= \App\Core\AdminBrand::DEFAULT_NAME ?>».</span>
+            </div>
+            <?= \App\Core\AdminUi::imageField('admin_brand_logo', $settings['admin_brand_logo'] ?? '', [
+                'label' => 'Логотип панели',
+                'file' => 'admin_brand_logo_file',
+            ]) ?>
+            <span class="form-hint">Заменяет буквенный бейдж в шапке админки и на странице входа. Лучше всего — горизонтальный логотип на прозрачном фоне (SVG или PNG).</span>
+            <div class="form-field">
+                <label for="admin_brand_accent">Акцентный цвет панели</label>
+                <input type="color" id="admin_brand_accent" name="admin_brand_accent" style="width:64px;height:38px;padding:4px;"
+                       value="<?= htmlspecialchars(\App\Core\AdminBrand::accent(), ENT_QUOTES) ?>">
+                <span class="form-hint">Кнопки, ссылки и активные пункты меню админки. Стандартный — фиолетовый <?= \App\Core\AdminBrand::DEFAULT_ACCENT ?>; оттенки (hover, подсветка) вычисляются автоматически.</span>
+            </div>
+        </fieldset>
+
+        <fieldset class="settings-group">
             <legend>Вход в панель: код через Telegram</legend>
             <div class="form-field">
                 <label for="telegram_bot_token">Токен Telegram-бота (бесплатно, рекомендуется)</label>

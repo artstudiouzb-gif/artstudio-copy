@@ -60,6 +60,15 @@ final class SettingsController
         // Капча на публичных формах (включена по умолчанию).
         Setting::set('captcha_enabled', !empty($_POST['captcha_enabled']) ? '1' : '0');
 
+        // --- Брендинг панели управления (white-label) ---
+        Setting::set('admin_brand_name', mb_substr(trim((string) ($_POST['admin_brand_name'] ?? '')), 0, 60));
+        $brandLogo = ImageField::resolve('admin_brand_logo_file', 'admin_brand_logo', Setting::get('admin_brand_logo'), Auth::id());
+        Setting::set('admin_brand_logo', $brandLogo ?? '');
+        Setting::set('admin_brand_accent', SettingsValidator::hexColor(
+            (string) ($_POST['admin_brand_accent'] ?? ''),
+            \App\Core\AdminBrand::DEFAULT_ACCENT
+        ));
+
         // --- Webpush-уведомления о новостях ---
         Setting::set('webpush_enabled', !empty($_POST['webpush_enabled']) ? '1' : '0');
         if (!empty($_POST['webpush_enabled'])) {

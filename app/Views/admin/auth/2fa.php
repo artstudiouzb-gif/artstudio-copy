@@ -12,9 +12,14 @@ use App\Core\Csrf;
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Код подтверждения — вход в панель</title>
 <link rel="stylesheet" href="/assets/css/admin.css">
+<?= \App\Core\AdminBrand::styleTag() ?>
 </head>
 <body class="auth-page">
 <div class="auth-card">
+    <div class="auth-brand">
+        <?= \App\Core\AdminBrand::badgeHtml('auth-brand__logoimg', 'auth-brand__logo') ?>
+        <span class="auth-brand__name"><?= htmlspecialchars(\App\Core\AdminBrand::name(), ENT_QUOTES) ?></span>
+    </div>
     <h1>Код из Telegram</h1>
     <p class="auth-hint">Мы отправили 6-значный код на ваш телефон в Telegram —
        сообщение придёт от официального канала
