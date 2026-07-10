@@ -43,9 +43,16 @@ $widgetSelect = function (string $name, string $current) use ($widgets): string 
                 Для виджета «Текст / HTML» можно вставить произвольную разметку или сниппет
                 (скрипты и небезопасные теги вырезаются).
             </p>
-            <div data-repeater="footcol">
+            <div data-repeater="footcol" class="fb-grid">
                 <?php foreach ($config['columns'] as $i => $col): ?>
-                    <div class="repeater-row footer-col">
+                    <div class="repeater-row footer-col fb-card">
+                        <div class="fb-card__head">
+                            <span class="fb-card__badge">Колонка</span>
+                            <span class="fb-card__tools">
+                                <button type="button" class="fb-move" data-fb-move="up" aria-label="Выше/левее" title="Переместить">←</button>
+                                <button type="button" class="fb-move" data-fb-move="down" aria-label="Ниже/правее" title="Переместить">→</button>
+                            </span>
+                        </div>
                         <div class="form-field">
                             <label>Заголовок колонки</label>
                             <input type="text" name="columns[<?= $i ?>][heading]" value="<?= htmlspecialchars($col['heading'], ENT_QUOTES) ?>" placeholder="напр. Разделы">
@@ -63,6 +70,13 @@ $widgetSelect = function (string $name, string $current) use ($widgets): string 
                 <?php endforeach; ?>
             </div>
             <template data-repeater-template="footcol">
+                <div class="fb-card__head">
+                    <span class="fb-card__badge">Колонка</span>
+                    <span class="fb-card__tools">
+                        <button type="button" class="fb-move" data-fb-move="up" aria-label="Выше/левее" title="Переместить">←</button>
+                        <button type="button" class="fb-move" data-fb-move="down" aria-label="Ниже/правее" title="Переместить">→</button>
+                    </span>
+                </div>
                 <div class="form-field">
                     <label>Заголовок колонки</label>
                     <input type="text" name="columns[__INDEX__][heading]" placeholder="напр. Разделы">

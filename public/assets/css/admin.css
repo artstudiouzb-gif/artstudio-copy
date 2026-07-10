@@ -690,3 +690,12 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .hb-tabs .hdr-tabs__tab.is-active { background: #fff; color: #173a63; box-shadow: 0 1px 3px rgba(19,42,92,.12); }
 
 .hb-inline-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+
+/* Конструктор футера Pro Max: колонки-карточки с перестановкой. */
+.fb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.fb-grid > .repeater-row, .fb-card { border: 1px solid var(--admin-border, #e1e3e8); border-radius: 12px; background: #fff; padding: 14px 16px; box-shadow: 0 1px 3px rgba(19,42,92,.06); }
+.fb-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.fb-card__badge { padding: 3px 10px; border-radius: 999px; background: #4a5a74; color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.fb-card__tools { display: inline-flex; gap: 4px; }
+.fb-move { width: 30px; height: 30px; border: 1px solid var(--admin-border, #e1e3e8); border-radius: 8px; background: #f7f9fc; color: #173a63; cursor: pointer; font-size: 14px; line-height: 1; }
+.fb-move:hover { background: #173a63; color: #fff; border-color: #173a63; }

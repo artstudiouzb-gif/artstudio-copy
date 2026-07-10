@@ -595,3 +595,21 @@
         });
     });
 })();
+
+/* Конструктор футера: перестановка колонок стрелками. */
+(function () {
+    'use strict';
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-fb-move]');
+        if (!btn) { return; }
+        var row = btn.closest('.repeater-row');
+        if (!row) { return; }
+        if (btn.getAttribute('data-fb-move') === 'up') {
+            var prev = row.previousElementSibling;
+            if (prev) { row.parentNode.insertBefore(row, prev); }
+        } else {
+            var next = row.nextElementSibling;
+            if (next) { row.parentNode.insertBefore(next, row); }
+        }
+    });
+})();
