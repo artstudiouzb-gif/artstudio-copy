@@ -4,15 +4,13 @@ use App\Core\Csrf;
 
 $pageTitle = $type['name'] ?? 'Записи';
 $activeNav = 'content:' . ($type['slug'] ?? '');
+$pageActions = '<a href="/admin/content/' . htmlspecialchars((string) ($type['slug'] ?? ''), ENT_QUOTES)
+    . '/create" class="btn btn--primary">+ Добавить запись</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $type */
 /** @var array $items */
 ?>
-<div class="page-toolbar">
-    <a href="/admin/content/<?= htmlspecialchars((string) $type['slug'], ENT_QUOTES) ?>/create" class="btn btn--primary">+ Добавить запись</a>
-</div>
-
 <table class="data-table">
     <thead><tr><th>Заголовок</th><th>Статус</th><th>Обновлено</th><th></th></tr></thead>
     <tbody>

@@ -68,6 +68,14 @@ input, select, textarea {
     max-width: 100%;
 }
 input[type="checkbox"], input[type="radio"] { width: auto; accent-color: var(--admin-accent); }
+/* Нативный выбор файла под общий стиль кнопок */
+input[type="file"] { padding: 7px 12px; font-size: 13px; color: var(--admin-muted); cursor: pointer; }
+input[type="file"]::file-selector-button {
+    margin-right: 12px; padding: 7px 14px; border-radius: 7px;
+    border: 1px solid var(--admin-border-strong); background: #fff; color: var(--admin-text);
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+input[type="file"]::file-selector-button:hover { background: #f6f7f9; }
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--admin-accent);
@@ -205,7 +213,9 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .admin-main { flex: 1; min-width: 0; padding: 28px 32px; }
 .admin-main__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
 .admin-main__header h1 { margin: 0; font-size: 22px; }
+.admin-main__actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
+/* Тулбар действий страницы (устаревшая обёртка — действия теперь в шапке страницы) */
 .page-toolbar { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
 
 /* ============================================================================
@@ -624,6 +634,9 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 /* Конструктор шапки: палитра, зоны и чипы микро-виджетов. */
 .hdr-builder { display: grid; grid-template-columns: 220px 1fr; gap: 16px; margin-top: 8px; }
 @media (max-width: 720px) { .hdr-builder { grid-template-columns: 1fr; } }
+/* В новом конструкторе (.hb-section) шапка секции и зоны идут в столбик на всю ширину —
+   легаси-грид .hdr-builder не должен зажимать зоны в узкую правую колонку. */
+.hb-section.hdr-builder { display: block; gap: 0; margin-top: 0; }
 .hdr-builder__palette-label,
 .hdr-builder__zone-label { font-size: 12px; font-weight: 600; color: var(--admin-muted, #667); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
 .hdr-builder__dropzone {
@@ -636,9 +649,10 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .hdr-builder__zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 @media (max-width: 720px) { .hdr-builder__zones { grid-template-columns: 1fr; } }
 .hdr-chip {
-    display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 8px 0 6px;
+    display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 8px 4px 6px;
     background: #fff; border: 1px solid var(--admin-border); border-radius: 8px;
-    font-size: 13px; font-weight: 500; cursor: grab; user-select: none; white-space: nowrap;
+    font-size: 13px; font-weight: 500; cursor: grab; user-select: none;
+    max-width: 100%; min-width: 0;
     box-shadow: 0 1px 2px rgba(16,24,40,.06);
 }
 .hdr-chip:active { cursor: grabbing; }
@@ -687,7 +701,11 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .hb-zone__drop { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-height: 56px; padding: 9px; border: 2px dashed #d6dce6; border-radius: 10px; background: #fbfcfe; transition: border-color .15s ease, background .15s ease; }
 .hb-zone__drop.is-over { border-color: #17999b; background: #f0fafa; }
 
-.hb-el { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid #dde3ec; border-radius: 9px; box-shadow: 0 1px 2px rgba(19,42,92,.07); font-size: 13px; font-weight: 600; color: #1f2b3d; cursor: grab; transition: box-shadow .15s ease, border-color .15s ease, transform .12s ease; }
+.hb-el { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid #dde3ec; border-radius: 9px; box-shadow: 0 1px 2px rgba(19,42,92,.07); font-size: 13px; font-weight: 600; color: #1f2b3d; cursor: grab; transition: box-shadow .15s ease, border-color .15s ease, transform .12s ease; max-width: 100%; min-width: 0; }
+.hb-el__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+/* В узких зонах (Слева/Центр/Справа) чипы стоят в столбик во всю ширину; подпись — в одну строку. */
+.hb-zone__drop .hdr-chip { width: 100%; }
+.hb-palette__items .hdr-chip { width: auto; }
 .hb-el:hover { border-color: #17999b; box-shadow: 0 4px 12px rgba(19,42,92,.12); }
 .hb-el:active { cursor: grabbing; }
 .hb-el.is-dragging { opacity: .45; transform: scale(.97); }

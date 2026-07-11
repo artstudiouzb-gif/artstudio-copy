@@ -5,6 +5,7 @@ use App\Models\Language;
 
 $pageTitle = 'Новости';
 $activeNav = 'news';
+$pageActions = '<a href="/admin/news/create" class="btn btn--primary">+ Добавить новость</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
@@ -14,10 +15,6 @@ $filterStatus = $filterStatus ?? '';
 $filterLang = $filterLang ?? '';
 $langs = Language::active();
 ?>
-<div class="page-toolbar">
-    <a href="/admin/news/create" class="btn btn--primary">+ Добавить новость</a>
-</div>
-
 <form method="get" action="/admin/news" class="list-filters">
     <select name="status" data-auto-submit>
         <option value="">Все статусы</option>

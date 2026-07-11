@@ -5,6 +5,7 @@ use App\Models\Widget;
 
 $pageTitle = 'Виджеты сайдбара';
 $activeNav = 'widgets';
+$pageActions = '<a href="/admin/widgets/create" class="btn btn--primary">+ Добавить виджет</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $left */
@@ -48,9 +49,6 @@ $renderColumn = static function (string $title, array $widgets): void {
     <?php
 };
 ?>
-<div class="page-toolbar">
-    <a href="/admin/widgets/create" class="btn btn--primary">+ Добавить виджет</a>
-</div>
 
 <p class="form-hint">Виджеты выводятся в сайдбаре тех страниц, где выбран макет «Левый сайдбар» или «Правый сайдбар».</p>
 

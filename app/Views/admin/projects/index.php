@@ -4,15 +4,13 @@ use App\Core\Csrf;
 
 $pageTitle = 'Проекты';
 $activeNav = 'projects';
+$pageActions = '<a href="/admin/projects/create" class="btn btn--primary">+ Добавить проект</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
 /** @var string $filterStatus */
 $filterStatus = $filterStatus ?? '';
 ?>
-<div class="page-toolbar">
-    <a href="/admin/projects/create" class="btn btn--primary">+ Добавить проект</a>
-</div>
 
 <form method="get" action="/admin/projects" class="list-filters">
     <select name="status" data-auto-submit>

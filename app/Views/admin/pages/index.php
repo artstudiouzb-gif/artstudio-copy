@@ -5,6 +5,7 @@ use App\Models\Language;
 
 $pageTitle = 'Страницы';
 $activeNav = 'pages';
+$pageActions = '<a href="/admin/pages/create" class="btn btn--primary">+ Добавить страницу</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
@@ -14,9 +15,6 @@ $filterStatus = $filterStatus ?? '';
 $filterLang = $filterLang ?? '';
 $langs = Language::active();
 ?>
-<div class="page-toolbar">
-    <a href="/admin/pages/create" class="btn btn--primary">+ Добавить страницу</a>
-</div>
 
 <form method="get" action="/admin/pages" class="list-filters">
     <select name="status" data-auto-submit>

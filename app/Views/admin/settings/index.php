@@ -2,7 +2,7 @@
 
 use App\Core\Csrf;
 
-$pageTitle = 'Настройки дизайна';
+$pageTitle = 'Настройки';
 $activeNav = 'settings';
 require __DIR__ . '/../layout/header.php';
 

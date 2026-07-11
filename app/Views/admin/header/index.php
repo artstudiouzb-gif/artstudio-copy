@@ -27,7 +27,8 @@ $elementIcons = [
 
 $renderChip = function (string $type) use ($elements, $elementIcons): string {
     $label = $elements[$type] ?? $type;
-    return '<span class="hdr-chip hb-el" draggable="true" data-el="' . htmlspecialchars($type, ENT_QUOTES) . '">'
+    return '<span class="hdr-chip hb-el" draggable="true" data-el="' . htmlspecialchars($type, ENT_QUOTES) . '"'
+        . ' title="' . htmlspecialchars($label, ENT_QUOTES) . '">'
         . '<span class="hb-el__grip" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" width="10" height="14"><circle cx="8" cy="5" r="1.6"/><circle cx="16" cy="5" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/></svg></span>'
         . '<span class="hb-el__icon">' . ($elementIcons[$type] ?? '') . '</span>'
         . '<span class="hb-el__label">' . htmlspecialchars($label, ENT_QUOTES) . '</span>'

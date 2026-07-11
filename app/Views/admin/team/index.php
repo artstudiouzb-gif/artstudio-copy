@@ -4,13 +4,11 @@ use App\Core\Csrf;
 
 $pageTitle = 'Команда';
 $activeNav = 'team';
+$pageActions = '<a href="/admin/team/create" class="btn btn--primary">+ Добавить сотрудника</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
 ?>
-<div class="page-toolbar">
-    <a href="/admin/team/create" class="btn btn--primary">+ Добавить сотрудника</a>
-</div>
 
 <table class="data-table">
     <thead>

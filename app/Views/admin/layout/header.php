@@ -172,4 +172,7 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
         <?php endforeach; ?>
         <div class="admin-main__header">
             <h1><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?></h1>
+            <?php if (!empty($pageActions)): ?>
+                <div class="admin-main__actions"><?= $pageActions ?></div>
+            <?php endif; ?>
         </div>
