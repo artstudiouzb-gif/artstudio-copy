@@ -91,6 +91,11 @@ foreach ($blocks as $b) {
                             <input type="text" name="title" value="<?= htmlspecialchars($page['title'] ?? '', ENT_QUOTES) ?>" required>
                         </div>
                         <div class="form-field">
+                            <label>Описание / лид (необязательно)</label>
+                            <textarea name="lead" rows="2"><?= htmlspecialchars($page['lead'] ?? '', ENT_QUOTES) ?></textarea>
+                            <span class="form-hint">Короткий подзаголовок под названием страницы. Показывается на простых страницах (без hero-блока в начале).</span>
+                        </div>
+                        <div class="form-field">
                             <label>SEO: meta title</label>
                             <input type="text" name="meta_title" value="<?= htmlspecialchars($page['meta_title'] ?? '', ENT_QUOTES) ?>">
                         </div>
@@ -104,6 +109,10 @@ foreach ($blocks as $b) {
                         <div class="form-field">
                             <label>Заголовок страницы</label>
                             <input type="text" name="translations[<?= $code ?>][title]" value="<?= htmlspecialchars($t['title'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                        <div class="form-field">
+                            <label>Описание / лид</label>
+                            <textarea name="translations[<?= $code ?>][lead]" rows="2"><?= htmlspecialchars($t['lead'] ?? '', ENT_QUOTES) ?></textarea>
                         </div>
                         <div class="form-field">
                             <label>SEO: meta title</label>

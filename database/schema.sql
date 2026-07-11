@@ -129,6 +129,7 @@ CREATE TABLE IF NOT EXISTS pages (
     slug            VARCHAR(255) NOT NULL,
     meta_title      VARCHAR(255) NULL,
     meta_description VARCHAR(500) NULL,
+    lead            TEXT NULL COMMENT 'видимый лид/подзаголовок страницы',
     status          ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
     is_home         TINYINT(1) NOT NULL DEFAULT 0,
     layout_type     ENUM('no_sidebar', 'left_sidebar', 'right_sidebar') NOT NULL DEFAULT 'no_sidebar',
@@ -151,6 +152,7 @@ CREATE TABLE IF NOT EXISTS page_translations (
     title           VARCHAR(255) NULL,
     meta_title      VARCHAR(255) NULL,
     meta_description VARCHAR(500) NULL,
+    lead            TEXT NULL,
     UNIQUE KEY uq_page_translations (page_id, lang),
     CONSTRAINT fk_page_translations_page FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -797,7 +799,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_09_news_premium_layout.sql'),
     ('2026_07_10_pages_transparent_header.sql'),
     ('2026_07_10_social_telegram.sql'),
-    ('2026_07_10_webpush.sql')
+    ('2026_07_10_webpush.sql'),
+    ('2026_07_11_pages_lead.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

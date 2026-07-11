@@ -14,15 +14,18 @@ $hideChrome = !empty($page['hide_chrome']); // лендинг (группа 6)
 $transparentHeader = !empty($page['transparent_header']);
 require __DIR__ . '/_header.php';
 
+// Первый блок — hero (шапка-герой)? Тогда он служит заголовком страницы.
+$firstIsHero = (bool) preg_match('/^\s*<section\b[^>]*\bcms-block--hero\b/', $content);
+$pageLead = trim((string) ($page['lead'] ?? ''));
+
 // Хлебные крошки для обычных страниц (не главная, не лендинг).
 if (empty($page['is_home']) && !$hideChrome) {
     $crumbs = [
-        ['label' => 'Главная', 'url' => \App\Core\Locale::url('/')],
+        ['label' => \App\Core\Lang::t('Главная'), 'url' => \App\Core\Locale::url('/')],
         ['label' => (string) ($page['title'] ?? '')],
     ];
     // Если первый блок страницы — hero (шапка-герой), крошки встраиваем внутрь
     // hero (поверх фона, сверху), а не отдельной серой полосой над ним.
-    $firstIsHero = (bool) preg_match('/^\s*<section\b[^>]*\bcms-block--hero\b/', $content);
     if ($firstIsHero) {
         // Помечаем первый hero как «шапку страницы» — CSS убирает отступ между
         // шапкой сайта и hero (герой встаёт вплотную под меню).
@@ -41,6 +44,18 @@ if (empty($page['is_home']) && !$hideChrome) {
     }
 }
 
+// Заголовок страницы + лид для простых страниц (без hero-шапки): показываем,
+// когда задан лид, чтобы не менять вид существующих страниц без описания.
+$showLeadHead = empty($page['is_home']) && !$hideChrome && !$firstIsHero && $pageLead !== '';
+if ($showLeadHead): ?>
+    <div class="content-pagehead">
+        <div class="content-pagehead__inner">
+            <h1 class="content-pagehead__title"><?= htmlspecialchars((string) ($page['title'] ?? ''), ENT_QUOTES) ?></h1>
+            <p class="content-pagehead__lead"><?= nl2br(htmlspecialchars($pageLead, ENT_QUOTES)) ?></p>
+        </div>
+    </div>
+<?php endif; ?>
+<?php
 $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
 ?>
 <?php if ($hasSidebar): ?>

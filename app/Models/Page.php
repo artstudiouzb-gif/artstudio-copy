@@ -149,6 +149,9 @@ final class Page
         }
         $row['meta_title'] = $translation['meta_title'] ?? null;
         $row['meta_description'] = $translation['meta_description'] ?? null;
+        if (isset($translation['lead']) && trim((string) $translation['lead']) !== '') {
+            $row['lead'] = $translation['lead'];
+        }
 
         return $row;
     }
@@ -210,14 +213,15 @@ final class Page
             }
 
             $stmt = $pdo->prepare(
-                'INSERT INTO pages (title, slug, meta_title, meta_description, status, is_home, layout_type, hide_chrome, transparent_header, created_at)
-                 VALUES (:title, :slug, :meta_title, :meta_description, :status, :is_home, :layout_type, :hide_chrome, :transparent_header, NOW())'
+                'INSERT INTO pages (title, slug, meta_title, meta_description, lead, status, is_home, layout_type, hide_chrome, transparent_header, created_at)
+                 VALUES (:title, :slug, :meta_title, :meta_description, :lead, :status, :is_home, :layout_type, :hide_chrome, :transparent_header, NOW())'
             );
             $stmt->execute([
                 ':title' => $data['title'],
                 ':slug' => $data['slug'],
                 ':meta_title' => $data['meta_title'],
                 ':meta_description' => $data['meta_description'],
+                ':lead' => $data['lead'] ?? null,
                 ':status' => $data['status'],
                 ':is_home' => !empty($data['is_home']) ? 1 : 0,
                 ':layout_type' => $data['layout_type'] ?? 'no_sidebar',
@@ -247,7 +251,7 @@ final class Page
 
             $stmt = $pdo->prepare(
                 'UPDATE pages SET title = :title, slug = :slug, meta_title = :meta_title,
-                 meta_description = :meta_description, status = :status, is_home = :is_home,
+                 meta_description = :meta_description, lead = :lead, status = :status, is_home = :is_home,
                  layout_type = :layout_type, hide_chrome = :hide_chrome,
                  transparent_header = :transparent_header WHERE id = :id'
             );
@@ -256,6 +260,7 @@ final class Page
                 ':slug' => $data['slug'],
                 ':meta_title' => $data['meta_title'],
                 ':meta_description' => $data['meta_description'],
+                ':lead' => $data['lead'] ?? null,
                 ':status' => $data['status'],
                 ':is_home' => !empty($data['is_home']) ? 1 : 0,
                 ':layout_type' => $data['layout_type'] ?? 'no_sidebar',

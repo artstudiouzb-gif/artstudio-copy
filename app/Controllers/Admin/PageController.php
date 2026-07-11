@@ -207,6 +207,7 @@ final class PageController
                 'title' => trim((string) ($t['title'] ?? '')),
                 'meta_title' => trim((string) ($t['meta_title'] ?? '')),
                 'meta_description' => trim((string) ($t['meta_description'] ?? '')),
+                'lead' => trim((string) ($t['lead'] ?? '')),
             ]);
         }
     }
@@ -220,6 +221,7 @@ final class PageController
         $slugInput = trim((string) ($_POST['slug'] ?? ''));
         $metaTitle = trim((string) ($_POST['meta_title'] ?? ''));
         $metaDescription = trim((string) ($_POST['meta_description'] ?? ''));
+        $lead = trim((string) ($_POST['lead'] ?? ''));
         $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
         $isHome = !empty($_POST['is_home']);
         $layoutType = in_array($_POST['layout_type'] ?? '', ['no_sidebar', 'left_sidebar', 'right_sidebar'], true)
@@ -239,6 +241,7 @@ final class PageController
             'slug' => $slug,
             'meta_title' => $metaTitle !== '' ? $metaTitle : null,
             'meta_description' => $metaDescription !== '' ? $metaDescription : null,
+            'lead' => $lead !== '' ? $lead : null,
             'status' => $status,
             'is_home' => $isHome,
             'layout_type' => $layoutType,
