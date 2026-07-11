@@ -17,15 +17,136 @@ final class DemoSeeder
     /** @return array<string,int> счётчики добавленного по разделам */
     public static function run(PDO $pdo): array
     {
-        $c = ['news' => 0, 'documenty' => 0, 'vakansii' => 0, 'tendery' => 0, 'team' => 0, 'pages' => 0, 'menu' => 0];
+        $c = ['assets' => 0, 'home' => 0, 'news' => 0, 'documenty' => 0, 'vakansii' => 0, 'tendery' => 0, 'team' => 0, 'pages' => 0, 'menu' => 0];
 
+        self::seedAssets($pdo, $c);
         self::seedNews($pdo, $c);
         self::seedEntries($pdo, $c);
         self::seedTeam($pdo, $c);
+        self::seedHome($pdo, $c);
         self::seedPages($pdo, $c);
         self::seedMenu($pdo, $c);
 
         return $c;
+    }
+
+    /** Абсолютный путь каталога публичных загрузок. */
+    private static function uploadsDir(): string
+    {
+        $dir = (string) Config::get('paths.public_uploads', '');
+        return $dir !== '' ? rtrim($dir, '/') : \dirname(__DIR__, 2) . '/public/uploads/public';
+    }
+
+    /**
+     * Копирует демо-изображения из database/demo_assets в каталог публичных
+     * загрузок и регистрирует их в медиабиблиотеке (таблица files). Нужно,
+     * чтобы демо-главная и карточки показывали реальные картинки после чистой
+     * установки (сами загрузки в репозиторий не входят).
+     */
+    private static function seedAssets(PDO $pdo, array &$c): void
+    {
+        $src = \dirname(__DIR__, 2) . '/database/demo_assets';
+        $dest = self::uploadsDir();
+        if (!is_dir($src)) {
+            return;
+        }
+        if (!is_dir($dest)) {
+            @mkdir($dest, 0775, true);
+        }
+
+        $hasFiles = (bool) $pdo->query("SHOW TABLES LIKE 'files'")->fetchColumn();
+        $fileIns = $hasFiles ? $pdo->prepare(
+            "INSERT INTO files (original_name, stored_name, mime_type, size, access_type, uploaded_by, created_at)
+             SELECT :n, :s, 'image/jpeg', :sz, 'public', NULL, NOW()
+             FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM files WHERE stored_name = :s2)"
+        ) : null;
+
+        foreach (glob($src . '/*.jpg') ?: [] as $file) {
+            $name = basename($file);
+            $target = $dest . '/' . $name;
+            if (!is_file($target)) {
+                @copy($file, $target);
+                $c['assets']++;
+            }
+            if ($fileIns !== null) {
+                $fileIns->execute([':n' => $name, ':s' => $name, ':sz' => (int) @filesize($file), ':s2' => $name]);
+            }
+        }
+    }
+
+    /**
+     * Демо-главная по эскизу: hero, счётчики, направления, проекты, новости и
+     * медиа. Блоки берутся из фикстуры database/demo_assets/home_blocks.json.
+     * Идемпотентно: страница создаётся при отсутствии, блоки — только если
+     * главная ещё пуста.
+     */
+    private static function seedHome(PDO $pdo, array &$c): void
+    {
+        $fixture = \dirname(__DIR__, 2) . '/database/demo_assets/home_blocks.json';
+        if (!is_file($fixture)) {
+            return;
+        }
+        $blocks = json_decode((string) file_get_contents($fixture), true);
+        if (!is_array($blocks) || $blocks === []) {
+            return;
+        }
+
+        // Есть ли уже главная страница сайта?
+        $homeId = $pdo->query('SELECT id FROM pages WHERE is_home = 1 LIMIT 1')->fetchColumn();
+        if ($homeId === false) {
+            // Не переносим главную у существующего сайта — создаём, только если её нет.
+            $pdo->prepare(
+                "INSERT INTO pages (title, slug, status, is_home, layout_type, transparent_header, created_at)
+                 SELECT 'Главная', 'home', 'published', 1, 'no_sidebar', 1, NOW()
+                 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM pages WHERE slug = 'home')"
+            )->execute();
+            $homeId = $pdo->query('SELECT id FROM pages WHERE is_home = 1 LIMIT 1')->fetchColumn();
+            if ($homeId === false) {
+                $homeId = $pdo->query("SELECT id FROM pages WHERE slug = 'home' LIMIT 1")->fetchColumn();
+            }
+            $c['pages'] += $homeId !== false ? 1 : 0;
+        }
+        if ($homeId === false) {
+            return;
+        }
+        $homeId = (int) $homeId;
+
+        // Наполняем демо-главную, только если она пуста или содержит нетронутую
+        // «стартовую» вёрстку из schema.sql (cta+columns+news_latest). Если
+        // редактор уже менял главную — не трогаем, чтобы не стереть работу.
+        $count = (int) $pdo->query('SELECT COUNT(*) FROM blocks WHERE page_id = ' . $homeId)->fetchColumn();
+        if ($count > 0) {
+            $topTypes = $pdo->query('SELECT type FROM blocks WHERE page_id = ' . $homeId . ' AND parent_block_id IS NULL ORDER BY sort_order')->fetchAll(PDO::FETCH_COLUMN);
+            if ($topTypes !== ['cta', 'columns', 'news_latest']) {
+                return;
+            }
+            $pdo->exec('DELETE FROM blocks WHERE page_id = ' . $homeId);
+        }
+
+        // Демо-главной нужна прозрачная шапка поверх hero.
+        $pdo->prepare('UPDATE pages SET transparent_header = 1, layout_type = ? WHERE id = ?')
+            ->execute(['no_sidebar', $homeId]);
+
+        $lang = self::defaultLang($pdo);
+        $ins = $pdo->prepare(
+            'INSERT INTO blocks (page_id, lang, type, title, data, sort_order, is_active, created_at)
+             VALUES (:pid, :lang, :ty, :ti, :d, :so, 1, NOW())'
+        );
+        $order = 1;
+        foreach ($blocks as $b) {
+            if (!isset($b['type'])) {
+                continue;
+            }
+            $ins->execute([
+                ':pid' => $homeId,
+                ':lang' => $lang,
+                ':ty' => (string) $b['type'],
+                ':ti' => (string) ($b['title'] ?? ''),
+                ':d' => json_encode($b['data'] ?? [], JSON_UNESCAPED_UNICODE),
+                ':so' => $order++,
+            ]);
+        }
+        $c['home'] = $order - 1;
     }
 
     private static function seedNews(PDO $pdo, array &$c): void
@@ -37,13 +158,15 @@ final class DemoSeeder
             ['Расширен перечень электронных услуг', 'elektronnye-uslugi', 'Теперь больше документов можно получить онлайн без личного визита.'],
             ['Объявлен новый набор специалистов', 'nabor-specialistov', 'Открыты вакансии в нескольких подразделениях. Подробности — в разделе «Вакансии».'],
         ];
+        // Обложки берём из демо-изображений (регистрируются в seedAssets).
+        $covers = ['/uploads/public/hero-demo.jpg', '/uploads/public/hero-demo-g2.jpg', '/uploads/public/hero-demo-g3.jpg', '/uploads/public/hero-demo-g4.jpg'];
         $ins = $pdo->prepare(
-            "INSERT INTO news (title, slug, excerpt, content, status, published_at, created_at)
-             SELECT :t, :s, :e, :co, 'published', NOW() - INTERVAL :d DAY, NOW()
+            "INSERT INTO news (title, slug, excerpt, content, image, status, published_at, created_at)
+             SELECT :t, :s, :e, :co, :img, 'published', NOW() - INTERVAL :d DAY, NOW()
              FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM news WHERE slug = :s2)"
         );
         foreach ($news as $i => $n) {
-            $ins->execute([':t' => $n[0], ':s' => $n[1], ':e' => $n[2], ':co' => '<p>' . $n[2] . '</p><p>Полный текст материала.</p>', ':d' => $i * 2, ':s2' => $n[1]]);
+            $ins->execute([':t' => $n[0], ':s' => $n[1], ':e' => $n[2], ':co' => '<p>' . $n[2] . '</p><p>Полный текст материала.</p>', ':img' => $covers[$i % count($covers)], ':d' => $i * 2, ':s2' => $n[1]]);
             $c['news'] += $ins->rowCount();
         }
     }
