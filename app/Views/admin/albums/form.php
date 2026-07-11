@@ -34,6 +34,10 @@ require __DIR__ . '/../layout/header.php';
             <input type="checkbox" id="is_published" name="is_published" value="1" <?= (int) $album['is_published'] === 1 ? 'checked' : '' ?>>
             <label for="is_published">Опубликован (виден на сайте)</label>
         </div>
+        <div class="form-field form-field--checkbox">
+            <input type="checkbox" id="is_featured" name="is_featured" value="1" <?= (int) ($album['is_featured'] ?? 0) === 1 ? 'checked' : '' ?>>
+            <label for="is_featured">Показать на главной (блок «Медиа»)</label>
+        </div>
         <div class="form-actions">
             <button type="submit" class="btn btn--primary">Сохранить</button>
         </div>

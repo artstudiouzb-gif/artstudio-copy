@@ -43,6 +43,7 @@ require __DIR__ . '/../layout/header.php';
                         <?php else: ?>
                             <span class="badge">Черновик</span>
                         <?php endif; ?>
+                        <?php if (!empty($item['is_featured'])): ?><span class="badge badge--success" title="Показывается в блоке «Медиа» на главной">★ на главной</span><?php endif; ?>
                     </td>
                     <td style="white-space:nowrap;"><?= htmlspecialchars((string) $item['created_at'], ENT_QUOTES) ?></td>
                     <td class="data-table__actions" style="white-space:nowrap;">

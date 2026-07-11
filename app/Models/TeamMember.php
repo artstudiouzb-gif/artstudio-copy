@@ -50,8 +50,12 @@ final class TeamMember
             ':sort_order' => $data['sort_order'] ?? 0,
         ]);
 
+        // id читаем до сброса кэша: bustPageCache() делает запрос к settings,
+        // который обнуляет lastInsertId() (см. Project::create).
+        $id = (int) Database::pdo()->lastInsertId();
         self::bustPageCache();
-        return (int) Database::pdo()->lastInsertId();
+
+        return $id;
     }
 
     public static function update(int $id, array $data): void

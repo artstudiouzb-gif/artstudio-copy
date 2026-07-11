@@ -644,6 +644,15 @@ final class BlockController
                     ];
                 }
                 $cols = (int) ($_POST['columns'] ?? 5);
+                // Источник данных: «Проекты» (image_cards) или «Фотоальбомы»
+                // (media_gallery) собирают карточки из отмеченных «на главной»
+                // записей автоматически; иначе — ручной список items.
+                $source = 'manual';
+                if ($type === 'image_cards' && ($_POST['source'] ?? '') === 'projects') {
+                    $source = 'projects';
+                } elseif ($type === 'media_gallery' && ($_POST['source'] ?? '') === 'albums') {
+                    $source = 'albums';
+                }
                 return [
                     'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
                     'all_text' => trim((string) ($_POST['all_text'] ?? '')),
@@ -651,6 +660,8 @@ final class BlockController
                     'columns' => max(2, min(5, $cols)),
                     'card_bg' => self::color('card_bg'),
                     'text_color' => self::color('text_color'),
+                    'source' => $source,
+                    'limit' => max(2, min(24, (int) ($_POST['limit'] ?? 6))),
                     'items' => $items,
                 ];
             case 'news_feature':

@@ -72,7 +72,8 @@ final class AlbumController
             (string) ($_POST['title'] ?? ''),
             (string) ($_POST['description'] ?? ''),
             (string) ($_POST['cover_url'] ?? ''),
-            !empty($_POST['is_published'])
+            !empty($_POST['is_published']),
+            !empty($_POST['is_featured'])
         );
         Flash::success('Альбом сохранён.');
         header('Location: /admin/albums/' . $id . '/edit');

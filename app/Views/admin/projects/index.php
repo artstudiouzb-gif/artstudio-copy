@@ -51,7 +51,10 @@ $filterStatus = $filterStatus ?? '';
         <?php foreach ($items as $item): ?>
             <tr>
                 <td><input type="checkbox" name="ids[]" value="<?= (int) $item['id'] ?>" form="bulkform" data-bulk-item></td>
-                <td><?= htmlspecialchars($item['title'], ENT_QUOTES) ?></td>
+                <td>
+                    <?= htmlspecialchars($item['title'], ENT_QUOTES) ?>
+                    <?php if (!empty($item['is_featured'])): ?><span class="badge badge--success" title="Показывается в блоке «Проекты» на главной">★ на главной</span><?php endif; ?>
+                </td>
                 <td>
                     <span class="badge badge--<?= $item['status'] ?>">
                         <?= $item['status'] === 'published' ? 'Опубликовано' : 'Черновик' ?>

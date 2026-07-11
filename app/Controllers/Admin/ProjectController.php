@@ -165,6 +165,7 @@ final class ProjectController
             'description' => $description !== '' ? $description : null,
             'cover_image' => $coverImage,
             'status' => $status,
+            'is_featured' => !empty($_POST['is_featured']),
             'sort_order' => $sortOrder,
         ];
 

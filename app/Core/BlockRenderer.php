@@ -37,8 +37,8 @@ final class BlockRenderer
         'categories_grid' => ['title' => '', 'items' => []],
         'media_materials' => ['title' => '', 'items' => []],
         'cards_grid' => ['title' => '', 'all_text' => '', 'all_url' => '', 'columns' => 5, 'card_bg' => '', 'text_color' => '', 'items' => []],
-        'image_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
-        'media_gallery' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
+        'image_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'source' => 'manual', 'limit' => 6, 'items' => []],
+        'media_gallery' => ['title' => '', 'all_text' => '', 'all_url' => '', 'source' => 'manual', 'limit' => 8, 'items' => []],
         'news_feature' => ['title' => 'Новости и аналитика', 'all_text' => 'Все новости', 'all_url' => '', 'limit' => 6],
         'person_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
         'timeline' => ['title' => '', 'items' => [], 'button_text' => '', 'button_url' => '', 'cta_title' => '', 'cta_text' => '', 'cta_button_text' => '', 'cta_button_url' => '', 'cta_image' => ''],
@@ -342,6 +342,49 @@ final class BlockRenderer
             $data['news'] = $items;
             if (($data['news_all_url'] ?? '') === '') {
                 $data['news_all_url'] = Locale::url('news', $lang);
+            }
+        }
+
+        // Блок «Проекты» (image_cards) с источником «Проекты»: карточки
+        // собираются автоматически из опубликованных проектов, помеченных
+        // «показать на главном» — без ручного дублирования (задача 42).
+        if ($type === 'image_cards' && ($data['source'] ?? 'manual') === 'projects') {
+            $lang = Locale::current();
+            $limit = (int) ($data['limit'] ?? 6);
+            $items = [];
+            foreach (\App\Models\Project::forHome($limit) as $p) {
+                $items[] = [
+                    'image' => (string) ($p['cover_image'] ?? ''),
+                    'title' => (string) $p['title'],
+                    'text' => '',
+                    'url' => Locale::url('projects/' . $p['slug'], $lang),
+                ];
+            }
+            $data['items'] = $items;
+            if (($data['all_url'] ?? '') === '') {
+                $data['all_url'] = Locale::url('projects', $lang);
+            }
+        }
+
+        // Блок «Медиа» (media_gallery) с источником «Фотоальбомы»: карточки-фото
+        // собираются автоматически из опубликованных альбомов, помеченных
+        // «показать на главном».
+        if ($type === 'media_gallery' && ($data['source'] ?? 'manual') === 'albums') {
+            $lang = Locale::current();
+            $limit = (int) ($data['limit'] ?? 8);
+            $items = [];
+            foreach (\App\Models\PhotoAlbum::forHome($limit) as $a) {
+                $items[] = [
+                    'kind' => 'photo',
+                    'image' => \App\Models\PhotoAlbum::coverFor($a),
+                    'title' => (string) $a['title'],
+                    'meta' => '',
+                    'url' => Locale::url('albums/' . $a['slug'], $lang),
+                ];
+            }
+            $data['items'] = $items;
+            if (($data['all_url'] ?? '') === '') {
+                $data['all_url'] = Locale::url('albums', $lang);
             }
         }
 

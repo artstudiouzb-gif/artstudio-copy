@@ -207,6 +207,7 @@ CREATE TABLE IF NOT EXISTS projects (
     description     LONGTEXT NULL,
     cover_image     VARCHAR(255) NULL,
     status          ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+    is_featured     TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'показывать на главной (блок Проекты)',
     sort_order      INT NOT NULL DEFAULT 0,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -519,6 +520,7 @@ CREATE TABLE IF NOT EXISTS photo_albums (
     description  TEXT NULL,
     cover_url    VARCHAR(500) NOT NULL DEFAULT '',
     is_published TINYINT(1) NOT NULL DEFAULT 1,
+    is_featured  TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'показывать на главной (блок Медиа)',
     created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_albums_slug (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -800,7 +802,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_10_pages_transparent_header.sql'),
     ('2026_07_10_social_telegram.sql'),
     ('2026_07_10_webpush.sql'),
-    ('2026_07_11_pages_lead.sql')
+    ('2026_07_11_pages_lead.sql'),
+    ('2026_07_11_featured_home.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;
