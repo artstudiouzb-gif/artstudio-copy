@@ -24,6 +24,8 @@ $navIcon = static function (string $name): string {
         'menu' => '<path d="M4 6h16M4 12h16M4 18h16"/>',
         'widgets' => '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',
         'header' => '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>',
+        'footer' => '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15h18"/>',
+        'performance' => '<path d="M13 2 3 14h7l-1 8 10-12h-7z"/>',
         'languages' => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
         'users' => '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
         'content_types' => '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
@@ -73,11 +75,13 @@ if ($navIsSuper) {
         'menu' => ['/admin/menu', 'Меню'],
         'widgets' => ['/admin/widgets', 'Виджеты'],
         'header' => ['/admin/header', 'Шапка сайта'],
+        'footer' => ['/admin/footer', 'Подвал сайта'],
         'languages' => ['/admin/languages', 'Языки'],
         'content_types' => ['/admin/content-types', 'Типы контента'],
         'social' => ['/admin/social', 'Соцсети'],
         'webhooks' => ['/admin/webhooks', 'Вебхуки'],
         'redirects' => ['/admin/redirects', 'Редиректы'],
+        'performance' => ['/admin/performance', 'Производительность'],
         'settings' => ['/admin/settings', 'Настройки'],
     ];
     $navUsersGroup = [
@@ -102,8 +106,9 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?> — Панель управления</title>
+<title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?> — <?= htmlspecialchars(\App\Core\AdminBrand::name(), ENT_QUOTES) ?></title>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/admin.css'), ENT_QUOTES) ?>">
+<?= \App\Core\AdminBrand::styleTag() ?>
 </head>
 <body class="admin-body">
 <header class="admin-topbar">
@@ -111,8 +116,8 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
     <a href="/admin" class="admin-topbar__brand">
-        <span class="admin-topbar__logo">A</span>
-        <span class="admin-topbar__name">ArtStudio</span>
+        <?= \App\Core\AdminBrand::badgeHtml() ?>
+        <span class="admin-topbar__name"><?= htmlspecialchars(\App\Core\AdminBrand::name(), ENT_QUOTES) ?></span>
     </a>
     <span class="admin-topbar__crumb"><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?></span>
     <div class="admin-topbar__spacer"></div>
@@ -123,6 +128,46 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
         <kbd class="admin-search__kbd">Ctrl K</kbd>
         <div class="admin-search__results" data-search-results hidden></div>
     </div>
+
+    <div class="admin-tools">
+        <details class="admin-menu admin-tools__quick">
+            <summary class="admin-tbtn admin-tbtn--primary" aria-label="Быстрые действия" title="Быстрые действия">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                <span class="admin-tbtn__label">Создать</span>
+            </summary>
+            <div class="admin-menu__list">
+                <div class="admin-menu__label">Быстрые действия</div>
+                <a href="/admin/news/create" class="admin-user__link">Новость</a>
+                <a href="/admin/pages/create" class="admin-user__link">Страницу</a>
+                <a href="/admin/projects/create" class="admin-user__link">Проект</a>
+                <a href="/admin/team/create" class="admin-user__link">Сотрудника</a>
+                <a href="/admin/albums" class="admin-user__link">Фотоальбом</a>
+                <a href="/admin/forms/create" class="admin-user__link">Форму</a>
+                <?php foreach ($navContent as $navKey => [$navUrl, $navText]): ?>
+                    <?php if (str_starts_with($navKey, 'content:')): ?>
+                        <a href="<?= $navUrl ?>/create" class="admin-user__link"><?= htmlspecialchars($navText, ENT_QUOTES) ?></a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </details>
+
+        <?php if ($navIsSuper): ?>
+        <form method="post" action="/admin/performance/clear-cache" class="admin-tools__form">
+            <?= Csrf::field() ?>
+            <input type="hidden" name="redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/admin', ENT_QUOTES) ?>">
+            <button type="submit" class="admin-tbtn" title="Сбросить кэш страниц">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>
+                <span class="admin-tbtn__label">Сброс кэша</span>
+            </button>
+        </form>
+        <?php endif; ?>
+
+        <a href="/" target="_blank" rel="noopener" class="admin-tbtn" title="Открыть сайт в новой вкладке">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>
+            <span class="admin-tbtn__label">Сайт</span>
+        </a>
+    </div>
+
     <details class="admin-user">
         <summary class="admin-user__btn" aria-label="Аккаунт">
             <span class="admin-user__avatar"><?= htmlspecialchars($navInitials, ENT_QUOTES) ?></span>
@@ -167,4 +212,7 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
         <?php endforeach; ?>
         <div class="admin-main__header">
             <h1><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?></h1>
+            <?php if (!empty($pageActions)): ?>
+                <div class="admin-main__actions"><?= $pageActions ?></div>
+            <?php endif; ?>
         </div>

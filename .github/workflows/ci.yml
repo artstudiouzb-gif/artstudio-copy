@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    name: Lint + Tests (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3']
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: ''
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: '1'
+          MARIADB_DATABASE: artstudio_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo_mysql, mbstring, gd, curl, dom, fileinfo
+          coverage: none
+
+      - name: Wait for MariaDB
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -P 3306 -uroot --silent; then echo "db up"; break; fi
+            echo "waiting for db ($i)"; sleep 2
+          done
+
+      - name: Load schema
+        run: mysql -h 127.0.0.1 -P 3306 -uroot artstudio_test < database/schema.sql
+
+      - name: PHP lint (php -l)
+        run: |
+          find . -path ./vendor -prune -o -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l >/dev/null
+
+      - name: Run test suite
+        env:
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_PORT: '3306'
+          TEST_DB_DATABASE: artstudio_test
+          TEST_DB_USERNAME: root
+          TEST_DB_PASSWORD: ''
+        run: php tests/run.php
+
+  static-analysis:
+    name: Static analysis (PHPStan, advisory)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, gd, curl, dom, fileinfo, pdo_mysql
+          tools: phpstan
+          coverage: none
+
+      # Пока без базлайна — шаг информативный: находки видны в логе, но НЕ роняют
+      # пайплайн (иначе постоянный красный крест приучает игнорировать CI).
+      # Когда находки разберут и заведут baseline — уберите «|| true» и включите
+      # блокировку.
+      - name: PHPStan (advisory, non-blocking)
+        run: phpstan analyse --no-progress --error-format=table || true

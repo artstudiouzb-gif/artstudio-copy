@@ -17,6 +17,7 @@
             wrapper.className = 'repeater-row';
             wrapper.innerHTML = html;
             container.appendChild(wrapper);
+            if (window.__enhanceIconFields) { window.__enhanceIconFields(wrapper); }
             return;
         }
 
@@ -198,28 +199,41 @@
         var currentCallback = null; // режим выбора для WYSIWYG (вставка URL в контент)
         var loaded = false;
 
-        function open(targetSelector, callback) {
+        var loadedType = null;
+
+        function open(targetSelector, callback, type) {
             currentTarget = targetSelector ? document.querySelector(targetSelector) : null;
             currentCallback = callback || null;
+            type = type || 'image';
             modal.hidden = false;
-            if (loaded) { return; }
+            if (loaded && loadedType === type) { return; }
+            loaded = false; loadedType = type;
             grid.innerHTML = '<div class="media-modal__empty">Загрузка…</div>';
-            fetch('/admin/media/list', { credentials: 'same-origin' })
+            fetch('/admin/media/list?type=' + encodeURIComponent(type), { credentials: 'same-origin' })
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     loaded = true;
                     grid.setAttribute('aria-busy', 'false');
                     var items = data.items || [];
-                    if (!items.length) { grid.innerHTML = '<div class="media-modal__empty">В библиотеке нет изображений.</div>'; return; }
+                    if (!items.length) { grid.innerHTML = '<div class="media-modal__empty">В библиотеке нет подходящих файлов.</div>'; return; }
                     grid.innerHTML = '';
                     items.forEach(function (it) {
                         var fig = document.createElement('button');
                         fig.type = 'button';
                         fig.className = 'media-modal__item';
                         fig.title = it.name;
-                        var img = document.createElement('img');
-                        img.src = it.url; img.alt = it.name; img.loading = 'lazy';
-                        fig.appendChild(img);
+                        var isVideo = /\.(mp4|webm|ogg|mov|m4v)$/i.test(it.url);
+                        if (isVideo) {
+                            // Видео не рисуем картинкой — плитка с названием файла.
+                            fig.classList.add('media-modal__item--file');
+                            fig.innerHTML = '<span class="media-modal__fileicon" aria-hidden="true">▶</span>'
+                                + '<span class="media-modal__filename"></span>';
+                            fig.querySelector('.media-modal__filename').textContent = it.name;
+                        } else {
+                            var img = document.createElement('img');
+                            img.src = it.url; img.alt = it.name; img.loading = 'lazy';
+                            fig.appendChild(img);
+                        }
                         fig.addEventListener('click', function () {
                             if (currentCallback) {
                                 currentCallback(it.url);
@@ -236,16 +250,68 @@
         }
         function close() { modal.hidden = true; currentCallback = null; }
 
-        // Публичный API для редактора: выбор изображения с колбэком.
-        window.MediaPicker = { pick: function (cb) { open(null, cb); } };
+        // Публичный API для редактора: выбор изображения/SVG с колбэком.
+        window.MediaPicker = {
+            pick: function (cb) { open(null, cb, 'image'); },
+            pickSvg: function (cb) { open(null, cb, 'svg'); }
+        };
 
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('[data-media-pick]');
-            if (btn) { e.preventDefault(); open(btn.getAttribute('data-media-target')); return; }
+            if (btn) { e.preventDefault(); open(btn.getAttribute('data-media-target'), null, btn.getAttribute('data-media-type')); return; }
             if (e.target.closest('[data-media-close]') || e.target === modal) { close(); }
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); } });
     })();
+
+    // --- Поля SVG-иконок: код вручную ИЛИ выбор файла из медиабиблиотеки ---
+    // К каждому textarea иконки добавляется панель с кнопкой «Выбрать из медиа»:
+    // выбранный SVG-файл подгружается и вставляется как код (инлайн). Так поле
+    // остаётся единым (icon_svg), а на сохранении код санитайзится сервером.
+    (function () {
+        function enhance(ta) {
+            if (ta.getAttribute('data-icon-enhanced')) { return; }
+            ta.setAttribute('data-icon-enhanced', '1');
+            var bar = document.createElement('div');
+            bar.className = 'icon-field__tools';
+            var pick = document.createElement('button');
+            pick.type = 'button'; pick.className = 'btn btn--small'; pick.textContent = 'Выбрать SVG из медиа';
+            var clear = document.createElement('button');
+            clear.type = 'button'; clear.className = 'btn btn--small'; clear.textContent = 'Очистить';
+            bar.appendChild(pick); bar.appendChild(clear);
+            ta.insertAdjacentElement('afterend', bar);
+
+            pick.addEventListener('click', function () {
+                if (!window.MediaPicker) { return; }
+                window.MediaPicker.pickSvg(function (url) {
+                    fetch(url, { credentials: 'same-origin' })
+                        .then(function (r) { return r.text(); })
+                        .then(function (txt) {
+                            ta.value = txt.trim();
+                            ta.dispatchEvent(new Event('input', { bubbles: true }));
+                        })
+                        .catch(function () { window.alert('Не удалось загрузить SVG-файл.'); });
+                });
+            });
+            clear.addEventListener('click', function () {
+                ta.value = '';
+                ta.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+        }
+        function enhanceIn(root) {
+            (root || document).querySelectorAll('textarea[name$="[icon_svg]"], textarea[name="icon_svg"]').forEach(enhance);
+        }
+        window.__enhanceIconFields = enhanceIn;
+        enhanceIn(document);
+    })();
+
+    // --- Живое значение ползунков прозрачности (overlay/подложка hero и др.) ---
+    document.addEventListener('input', function (e) {
+        var input = e.target.closest('input[type="range"][data-range-input]');
+        if (!input) { return; }
+        var out = document.querySelector('[data-range-output="' + input.getAttribute('data-range-input') + '"]');
+        if (out) { out.textContent = input.value; }
+    });
 
     // --- Поле изображения с превью (медиабиблиотека / URL / загрузка файла) ---
     (function () {
@@ -310,6 +376,62 @@
         });
     }
 
+    // --- Панель явного сохранения порядка ---
+    // Раньше перетаскивание сохранялось мгновенно (AJAX на каждый drop). Теперь
+    // изменения порядка копятся, а применяются только по кнопке «Сохранить» —
+    // при уходе со страницы с несохранёнными правками браузер предупреждает.
+    var ReorderBar = (function () {
+        var bar = null, saveBtn = null, statusEl = null;
+        var pendingSave = null, dirty = false, saving = false, hideTimer = null;
+
+        function build() {
+            bar = document.createElement('div');
+            bar.className = 'reorder-bar';
+            bar.setAttribute('hidden', '');
+            bar.innerHTML = '<span class="reorder-bar__text"></span>'
+                + '<button type="button" class="btn btn--small" data-reorder-cancel>Отменить</button>'
+                + '<button type="button" class="btn btn--small btn--primary" data-reorder-save>Сохранить</button>';
+            document.body.appendChild(bar);
+            statusEl = bar.querySelector('.reorder-bar__text');
+            saveBtn = bar.querySelector('[data-reorder-save]');
+            saveBtn.addEventListener('click', function () {
+                if (!pendingSave || saving) { return; }
+                saving = true; saveBtn.disabled = true;
+                statusEl.textContent = 'Сохранение…';
+                pendingSave(function (ok, msg) {
+                    saving = false; saveBtn.disabled = false;
+                    if (ok) {
+                        dirty = false;
+                        statusEl.textContent = 'Порядок сохранён ✓';
+                        hideTimer = window.setTimeout(function () { bar.setAttribute('hidden', ''); }, 1400);
+                    } else {
+                        statusEl.textContent = msg || 'Не удалось сохранить. Попробуйте ещё раз.';
+                    }
+                });
+            });
+            bar.querySelector('[data-reorder-cancel]').addEventListener('click', function () {
+                // Отмена = вернуться к последнему сохранённому порядку (перезагрузка).
+                dirty = false;
+                window.location.reload();
+            });
+        }
+
+        window.addEventListener('beforeunload', function (e) {
+            if (dirty) { e.preventDefault(); e.returnValue = ''; return ''; }
+        });
+
+        return {
+            markDirty: function (saveFn) {
+                if (!bar) { build(); }
+                if (hideTimer) { window.clearTimeout(hideTimer); hideTimer = null; }
+                pendingSave = saveFn;
+                dirty = true;
+                statusEl.textContent = 'Есть несохранённые изменения порядка';
+                bar.removeAttribute('hidden');
+            }
+        };
+    })();
+
     // --- Drag-and-drop сортировка блоков (задача 134, нативный HTML5 DnD) ---
     document.querySelectorAll('[data-block-sortable]').forEach(function (list) {
         var dragged = null;
@@ -322,7 +444,7 @@
             });
             item.addEventListener('dragend', function () {
                 item.classList.remove('is-dragging');
-                persist();
+                ReorderBar.markDirty(saveOrder);
             });
         });
 
@@ -339,7 +461,7 @@
             else { list.insertBefore(dragged, after); }
         });
 
-        function persist() {
+        function saveOrder(done) {
             var order = Array.prototype.map.call(
                 list.querySelectorAll('.block-list-item'),
                 function (el) { return el.getAttribute('data-block-id'); }
@@ -354,8 +476,8 @@
                 method: 'POST', body: body, credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             }).then(function (r) { return r.json(); })
-              .then(function (res) { if (!res.ok) { alert('Не удалось сохранить порядок.'); } })
-              .catch(function () { alert('Сетевая ошибка при сохранении порядка.'); });
+              .then(function (res) { done(!!res.ok, res.ok ? '' : 'Не удалось сохранить порядок.'); })
+              .catch(function () { done(false, 'Сетевая ошибка при сохранении порядка.'); });
         }
     });
 
@@ -384,7 +506,7 @@
         root.addEventListener('dragend', function () {
             if (dragged) { dragged.classList.remove('is-dragging'); }
             dragged = null;
-            persist();
+            ReorderBar.markDirty(saveOrder);
         });
 
         // Разрешаем вставку в root и в любой children-список.
@@ -408,7 +530,7 @@
             });
         });
 
-        function persist() {
+        function saveOrder(done) {
             var ids = [];
             var parents = [];
             Array.prototype.forEach.call(root.querySelectorAll(':scope > .menu-node'), function (top) {
@@ -432,8 +554,8 @@
                 method: 'POST', body: body, credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             }).then(function (r) { return r.json(); })
-              .then(function (res) { if (!res.ok) { alert('Не удалось сохранить меню. Обновите страницу.'); } })
-              .catch(function () { alert('Сетевая ошибка при сохранении меню.'); });
+              .then(function (res) { done(!!res.ok, res.ok ? '' : 'Не удалось сохранить меню. Обновите страницу.'); })
+              .catch(function () { done(false, 'Сетевая ошибка при сохранении меню.'); });
         }
     });
 
@@ -451,5 +573,184 @@
                 });
             });
         });
+    });
+})();
+
+/* ==========================================================================
+   Конструктор шапки: drag-and-drop микро-виджетов по зонам (палитра ↔ зоны).
+   Палитра — источник доступных элементов. Неповторяемые (поиск, языки, тема,
+   слабовидящие, соцсети, кнопка) размещаются по одному; «Разделитель» —
+   повторяемый (клонируется из палитры). Порядок в зоне задаётся перетаскиванием.
+   ========================================================================== */
+(function () {
+    'use strict';
+    var REPEATABLE = ['divider'];
+    var builders = document.querySelectorAll('[data-hdr-builder]');
+    if (!builders.length) { return; }
+    // Pro Max: палитра — общий источник (чипы клонируются), секции — приёмники.
+    // Перетаскивание работает МЕЖДУ билдерами (глобальное состояние).
+    var palette = document.querySelector('[data-hdr-zone="palette"]');
+    var dragged = null;       // перетаскиваемый чип (клон или размещённый)
+    var fromPalette = false;  // тянем из палитры (клонировать)
+
+    function serializeAll() {
+        builders.forEach(function (builder) {
+            builder.querySelectorAll('[data-hdr-input]').forEach(function (input) {
+                var dz = builder.querySelector('[data-hdr-zone="' + input.getAttribute('data-hdr-input') + '"]');
+                if (!dz) { return; }
+                var types = Array.prototype.map.call(dz.querySelectorAll('.hdr-chip'), function (c) {
+                    return c.getAttribute('data-el');
+                });
+                input.value = types.join(',');
+            });
+        });
+    }
+
+    // Уникальность в пределах одной секции (билдера): повторяем только divider.
+    function sectionHasType(builder, type) {
+        return !!builder.querySelector('[data-hdr-zone]:not([data-hdr-zone="palette"]) .hdr-chip[data-el="' + type + '"]:not(.is-dragging)');
+    }
+
+    function makeChip(type) {
+        var src = palette ? palette.querySelector('.hdr-chip[data-el="' + type + '"]') : null;
+        if (!src) { return null; }
+        var chip = src.cloneNode(true);
+        chip.classList.add('hdr-chip--placed');
+        bindChip(chip);
+        return chip;
+    }
+
+    function bindChip(chip) {
+        chip.addEventListener('dragstart', function (e) {
+            fromPalette = !!chip.closest('[data-hdr-zone="palette"]');
+            dragged = fromPalette ? makeChip(chip.getAttribute('data-el')) : chip;
+            if (!fromPalette) {
+                setTimeout(function () { chip.classList.add('is-dragging'); }, 0);
+            }
+            e.dataTransfer.effectAllowed = fromPalette ? 'copy' : 'move';
+            try { e.dataTransfer.setData('text/plain', chip.getAttribute('data-el')); } catch (err) {}
+        });
+        chip.addEventListener('dragend', function () {
+            chip.classList.remove('is-dragging');
+            // Отменённое перетаскивание из палитры: убираем невставленный клон.
+            if (fromPalette && dragged && !dragged.parentNode) { /* не вставлен */ }
+            dragged = null;
+            fromPalette = false;
+            serializeAll();
+        });
+        var rm = chip.querySelector('.hdr-chip__remove, .hb-el__remove');
+        if (rm) {
+            rm.addEventListener('click', function () {
+                if (chip.closest('[data-hdr-zone="palette"]')) { return; }
+                chip.remove();
+                serializeAll();
+            });
+        }
+    }
+
+    function afterElement(zone, x, y) {
+        var chips = Array.prototype.slice.call(zone.querySelectorAll('.hdr-chip:not(.is-dragging)'));
+        var closest = { offset: -Infinity, el: null };
+        chips.forEach(function (c) {
+            var box = c.getBoundingClientRect();
+            // Горизонтальные зоны: сравниваем по X в пределах строки, иначе по Y.
+            var offset = (Math.abs(y - (box.top + box.height / 2)) < box.height)
+                ? x - box.left - box.width / 2
+                : y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) { closest = { offset: offset, el: c }; }
+        });
+        return closest.el;
+    }
+
+    document.querySelectorAll('[data-hdr-zone]').forEach(function (zone) {
+        var isPalette = zone.getAttribute('data-hdr-zone') === 'palette';
+        zone.addEventListener('dragover', function (e) {
+            if (!dragged) { return; }
+            e.preventDefault();
+            zone.classList.add('is-over');
+            var type = dragged.getAttribute('data-el');
+
+            if (isPalette) {
+                // Бросок размещённого чипа в палитру = удаление из секции.
+                if (!fromPalette && dragged.parentNode) { dragged.remove(); }
+                return;
+            }
+
+            var builder = zone.closest('[data-hdr-builder]');
+            // Не даём дублировать неповторяемый элемент в той же секции
+            // (перенос внутри секции — можно; из палитры/другой секции — нет).
+            var draggedBuilder = dragged.parentNode ? dragged.closest('[data-hdr-builder]') : null;
+            if (REPEATABLE.indexOf(type) === -1 && draggedBuilder !== builder && sectionHasType(builder, type)) {
+                return;
+            }
+            var after = afterElement(zone, e.clientX, e.clientY);
+            if (after == null) { zone.appendChild(dragged); }
+            else { zone.insertBefore(dragged, after); }
+        });
+        zone.addEventListener('dragleave', function () { zone.classList.remove('is-over'); });
+        zone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            zone.classList.remove('is-over');
+            serializeAll();
+        });
+    });
+
+    document.querySelectorAll('.hdr-chip').forEach(bindChip);
+    serializeAll();
+})();
+
+/* Вкладки конструктора (Десктоп / Мобильный). */
+(function () {
+    'use strict';
+    document.querySelectorAll('[data-hdr-tabs]').forEach(function (tabs) {
+        var group = tabs.parentElement;
+        tabs.querySelectorAll('[data-hdr-tab]').forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                var name = tab.getAttribute('data-hdr-tab');
+                tabs.querySelectorAll('[data-hdr-tab]').forEach(function (t) {
+                    t.classList.toggle('is-active', t === tab);
+                });
+                group.querySelectorAll('[data-hdr-panel]').forEach(function (p) {
+                    p.classList.toggle('is-active', p.getAttribute('data-hdr-panel') === name);
+                });
+            });
+        });
+    });
+})();
+
+/* Конструктор футера: перестановка колонок стрелками. */
+(function () {
+    'use strict';
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-fb-move]');
+        if (!btn) { return; }
+        var row = btn.closest('.repeater-row');
+        if (!row) { return; }
+        if (btn.getAttribute('data-fb-move') === 'up') {
+            var prev = row.previousElementSibling;
+            if (prev) { row.parentNode.insertBefore(row, prev); }
+        } else {
+            var next = row.nextElementSibling;
+            if (next) { row.parentNode.insertBefore(next, row); }
+        }
+    });
+})();
+
+/* Делегированные обработчики вместо инлайн-атрибутов (CSP без 'unsafe-inline'). */
+(function () {
+    'use strict';
+    // Селект с автоотправкой формы (фильтры списков новостей/страниц/проектов).
+    document.addEventListener('change', function (e) {
+        var el = e.target;
+        if (el.matches && el.matches('select[data-auto-submit]') && el.form) {
+            el.form.submit();
+            return;
+        }
+        // Селект типа виджета показывает поля выбранного типа.
+        if (el.matches && el.matches('select[data-widget-type-select]')) {
+            document.querySelectorAll('[data-wtype]').forEach(function (block) {
+                block.style.display = block.getAttribute('data-wtype') === el.value ? 'flex' : 'none';
+            });
+        }
     });
 })();

@@ -45,6 +45,18 @@ final class Mailer
             return false;
         }
 
+        // Защита от инъекции SMTP-команд и заголовков: адрес получателя
+        // подставляется в RCPT TO и в заголовок To напрямую, поэтому любые
+        // управляющие символы (CR/LF/NUL) в нём недопустимы. Имя кодируется в
+        // base64, но перестраховываемся и здесь. Тема/тело безопасны (base64).
+        if (self::hasControlChars($toEmail) || ($toName !== null && self::hasControlChars($toName))) {
+            $this->lastError = 'Недопустимые символы в адресе получателя';
+            Logger::security('Mailer: отклонён адрес с управляющими символами', [
+                'email' => preg_replace('/[\r\n\x00]+/', '⏎', $toEmail),
+            ]);
+            return false;
+        }
+
         try {
             $this->connect();
             $this->ehlo();
@@ -179,6 +191,12 @@ final class Mailer
         ];
 
         return implode("\r\n", $headers) . "\r\n\r\n" . $encodedBody;
+    }
+
+    /** Содержит ли строка CR, LF или NUL (признак попытки инъекции заголовков). */
+    private static function hasControlChars(string $value): bool
+    {
+        return strpbrk($value, "\r\n\0") !== false;
     }
 
     private function formatAddress(string $email, ?string $name): string

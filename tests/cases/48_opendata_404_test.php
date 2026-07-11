@@ -108,3 +108,27 @@ test('Mailer::lastError содержит точную причину сбоя SM
     assert_true($mailer->lastError() !== null, 'ошибка сохранена');
     assert_true(str_contains((string) $mailer->lastError(), 'SMTP'), 'текст содержит причину');
 });
+
+test('Mailer отклоняет адрес с CRLF (защита от инъекции SMTP-команд)', function () {
+    \App\Core\Config::merge(['mail' => [
+        'host' => '127.0.0.1', 'port' => 1, 'timeout' => 1,
+        'encryption' => '', 'username' => '', 'password' => '',
+        'from_email' => 'noreply@test', 'from_name' => 'Test',
+    ]]);
+
+    $mailer = new \App\Core\Mailer();
+    // Попытка вписать лишний заголовок/команду через перевод строки в адресе.
+    $injected = "user@example.com\r\nRCPT TO:<victim@example.com>";
+    assert_false($mailer->send($injected, 'S', 'B'), 'адрес с CRLF отклоняется');
+    assert_true(
+        str_contains((string) $mailer->lastError(), 'Недопустимые символы'),
+        'причина — управляющие символы, а не сбой соединения'
+    );
+
+    // То же для отображаемого имени получателя.
+    $mailer2 = new \App\Core\Mailer();
+    assert_false(
+        $mailer2->send('user@example.com', 'S', 'B', "Имя\r\nBcc: evil@example.com"),
+        'имя с CRLF отклоняется'
+    );
+});

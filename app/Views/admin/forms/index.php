@@ -4,13 +4,11 @@ use App\Core\Csrf;
 
 $pageTitle = 'Формы';
 $activeNav = 'forms';
+$pageActions = '<a href="/admin/forms/create" class="btn btn--primary">+ Добавить форму</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
 ?>
-<div class="page-toolbar">
-    <a href="/admin/forms/create" class="btn btn--primary">+ Добавить форму</a>
-</div>
 
 <table class="data-table">
     <thead>

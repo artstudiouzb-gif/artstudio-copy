@@ -16,8 +16,27 @@ final class NewsController
     public function index(): void
     {
         $lang = Locale::current();
-        $items = News::published(20, 0, $lang);
-        View::render('site/news_index', ['items' => $items]);
+        $perPage = 13; // 1 крупная + 12 в сетке
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+
+        // Рубрикатор по бейджам (бейдж задаётся в админке у каждой новости).
+        $badges = News::distinctBadges();
+        $badge = trim((string) ($_GET['badge'] ?? ''));
+        if ($badge !== '' && !in_array($badge, $badges, true)) {
+            $badge = '';
+        }
+
+        $total = News::publishedCount($badge !== '' ? $badge : null);
+        $pages = max(1, (int) ceil($total / $perPage));
+        $page = min($page, $pages);
+
+        View::render('site/news_index', [
+            'items' => News::published($perPage, ($page - 1) * $perPage, $lang, $badge !== '' ? $badge : null),
+            'page' => $page,
+            'pages' => $pages,
+            'badges' => $badges,
+            'badge' => $badge,
+        ]);
     }
 
     /**
@@ -58,6 +77,64 @@ final class NewsController
         exit;
     }
 
+    /**
+     * Скачивание всех фото новости одним zip-архивом (кнопка «Скачать все фото»).
+     * В архив попадают только файлы из каталога публичных загрузок.
+     */
+    public function photosZip(array $params): void
+    {
+        $lang = Locale::current();
+        $news = News::findPublishedBySlug($params['slug'] ?? '', $lang);
+        if (!$news || !class_exists(\ZipArchive::class)) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        $uploadsDir = rtrim((string) Config::get('paths.public_uploads', ''), '/');
+        $uploadsUrl = rtrim((string) Config::get('paths.public_uploads_url', '/uploads/public'), '/');
+        $paths = [];
+        $cover = trim((string) ($news['image'] ?? ''));
+        if ($cover !== '') {
+            $paths[] = $cover;
+        }
+        foreach (NewsImage::forNews((int) $news['id']) as $img) {
+            $paths[] = (string) $img['path'];
+        }
+
+        $files = [];
+        foreach (array_unique($paths) as $url) {
+            // Разрешаем только файлы из публичных загрузок; realpath отсекает выход из каталога.
+            if ($uploadsDir === '' || strncmp($url, $uploadsUrl . '/', strlen($uploadsUrl) + 1) !== 0) {
+                continue;
+            }
+            $file = realpath($uploadsDir . '/' . substr($url, strlen($uploadsUrl) + 1));
+            if ($file !== false && strncmp($file, (string) realpath($uploadsDir), strlen((string) realpath($uploadsDir))) === 0 && is_file($file)) {
+                $files[] = $file;
+            }
+        }
+        if ($files === []) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        $tmp = tempnam(sys_get_temp_dir(), 'ndz');
+        $zip = new \ZipArchive();
+        $zip->open($tmp, \ZipArchive::OVERWRITE);
+        foreach ($files as $i => $file) {
+            $zip->addFile($file, sprintf('photo-%02d-%s', $i + 1, basename($file)));
+        }
+        $zip->close();
+
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . rawurlencode((string) $news['slug']) . '-photos.zip"');
+        header('Content-Length: ' . (string) filesize($tmp));
+        readfile($tmp);
+        @unlink($tmp);
+        exit;
+    }
+
     public function show(array $params): void
     {
         $lang = Locale::current();
@@ -69,9 +146,17 @@ final class NewsController
             return;
         }
 
+        News::incrementViews((int) $news['id']);
+        // hreflang и переключатель — только языки с переводом этой новости.
+        Locale::setContentLangs(News::availableLangs((int) $news['id']));
+        $adjacent = News::adjacent($news, $lang);
+
         View::render('site/news_show', [
             'news' => $news,
             'gallery' => NewsImage::forNews((int) $news['id']),
+            'related' => News::related((int) $news['id'], 4, $lang),
+            'prevNews' => $adjacent['prev'],
+            'nextNews' => $adjacent['next'],
         ]);
     }
 }

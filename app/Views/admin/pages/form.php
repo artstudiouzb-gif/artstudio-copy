@@ -37,6 +37,26 @@ $blockTypeLabels = [
     'banner' => 'Баннер с фоном',
     'subscribe' => 'Подписка на дайджест',
     'faq' => 'FAQ / аккордеон',
+    'contact_cards' => 'Контактные карточки',
+    'hero' => 'Герой (титул + фото/видео)',
+    'categories_grid' => 'Сетка категорий',
+    'media_materials' => 'Медиаматериалы',
+    'cards_grid' => 'Карточки-направления (иконка+текст)',
+    'image_cards' => 'Карточки с фото (проекты)',
+    'media_gallery' => 'Медиа-галерея (видео/фото)',
+    'news_feature' => 'Новости и аналитика (крупная + список)',
+    'person_cards' => 'Руководство (карточки персон)',
+    'timeline' => 'История (таймлайн + CTA-карточка)',
+    'news_docs' => 'Новости + документы (2 колонки)',
+    'cta_band' => 'CTA-полоса (обратная связь)',
+    'person_profile' => 'Профиль руководителя',
+    'feature_band' => 'Полоса компетенций (тёмная)',
+    'bio_education' => 'Биография + образование',
+    'anchor_nav' => 'Якорная навигация (вкладки)',
+    'stages' => 'Этапы реализации (таймлайн)',
+    'text_image' => 'Текст + фото (о проекте)',
+    'docs_list' => 'Документы (сетка)',
+    'map_point' => 'Карта с меткой',
 ];
 
 // Дочерние блоки колонок (группа 4.1): подгружаем детей каждого columns-блока.
@@ -71,6 +91,11 @@ foreach ($blocks as $b) {
                             <input type="text" name="title" value="<?= htmlspecialchars($page['title'] ?? '', ENT_QUOTES) ?>" required>
                         </div>
                         <div class="form-field">
+                            <label>Описание / лид (необязательно)</label>
+                            <textarea name="lead" rows="2"><?= htmlspecialchars($page['lead'] ?? '', ENT_QUOTES) ?></textarea>
+                            <span class="form-hint">Короткий подзаголовок под названием страницы. Показывается на простых страницах (без hero-блока в начале).</span>
+                        </div>
+                        <div class="form-field">
                             <label>SEO: meta title</label>
                             <input type="text" name="meta_title" value="<?= htmlspecialchars($page['meta_title'] ?? '', ENT_QUOTES) ?>">
                         </div>
@@ -84,6 +109,10 @@ foreach ($blocks as $b) {
                         <div class="form-field">
                             <label>Заголовок страницы</label>
                             <input type="text" name="translations[<?= $code ?>][title]" value="<?= htmlspecialchars($t['title'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                        <div class="form-field">
+                            <label>Описание / лид</label>
+                            <textarea name="translations[<?= $code ?>][lead]" rows="2"><?= htmlspecialchars($t['lead'] ?? '', ENT_QUOTES) ?></textarea>
                         </div>
                         <div class="form-field">
                             <label>SEO: meta title</label>
@@ -132,6 +161,10 @@ foreach ($blocks as $b) {
         <div class="form-field form-field--checkbox">
             <input type="checkbox" id="hide_chrome" name="hide_chrome" value="1" <?= !empty($page['hide_chrome']) ? 'checked' : '' ?>>
             <label for="hide_chrome">Лендинг: скрыть шапку и футер сайта</label>
+        </div>
+        <div class="form-field form-field--checkbox">
+            <input type="checkbox" id="transparent_header" name="transparent_header" value="1" <?= !empty($page['transparent_header']) ? 'checked' : '' ?>>
+            <label for="transparent_header">Прозрачная шапка на этой странице (нужен full-bleed hero первым блоком; режим включается в конструкторе шапки)</label>
         </div>
 
         <div class="form-actions">

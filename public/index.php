@@ -178,6 +178,17 @@ $router->post('/admin/menu/{id}/move', [AdminMenuController::class, 'move']);
 $router->get('/admin/header', [AdminHeaderController::class, 'index']);
 $router->post('/admin/header', [AdminHeaderController::class, 'update']);
 
+// --- Admin: конструктор подвала ---
+$router->get('/admin/footer', [\App\Controllers\Admin\FooterController::class, 'index']);
+$router->post('/admin/footer', [\App\Controllers\Admin\FooterController::class, 'update']);
+
+// --- Admin: производительность ---
+$router->get('/admin/performance', [\App\Controllers\Admin\PerformanceController::class, 'index']);
+$router->post('/admin/performance', [\App\Controllers\Admin\PerformanceController::class, 'update']);
+$router->post('/admin/performance/clear-cache', [\App\Controllers\Admin\PerformanceController::class, 'clearCache']);
+$router->post('/admin/cloudflare/verify', [\App\Controllers\Admin\PerformanceController::class, 'cloudflareVerify']);
+$router->post('/admin/cloudflare/purge', [\App\Controllers\Admin\PerformanceController::class, 'cloudflarePurge']);
+
 // --- Admin: боковые виджеты ---
 $router->get('/admin/widgets', [AdminWidgetController::class, 'index']);
 $router->get('/admin/widgets/create', [AdminWidgetController::class, 'create']);
@@ -296,13 +307,20 @@ $router->get('/robots.txt', [\App\Controllers\Site\SitemapController::class, 'ro
 // --- Публичный сайт ---
 $router->get('/', [SitePageController::class, 'home']);
 $router->get('/news', [SiteNewsController::class, 'index']);
+$router->get('/projects', [\App\Controllers\Site\ProjectController::class, 'index']);
+$router->get('/projects/{slug}', [\App\Controllers\Site\ProjectController::class, 'show']);
 $router->get('/news/rss.xml', [SiteNewsController::class, 'feed']);
+$router->get('/news/{slug}/photos.zip', [SiteNewsController::class, 'photosZip']);
 $router->get('/news/{slug}', [SiteNewsController::class, 'show']);
 $router->get('/search', [\App\Controllers\Site\SearchController::class, 'index']);
 $router->get('/calendar', [\App\Controllers\Site\CalendarController::class, 'index']);
 $router->get('/albums', [\App\Controllers\Site\AlbumController::class, 'index']);
 $router->get('/albums/{slug}', [\App\Controllers\Site\AlbumController::class, 'show']);
 $router->post('/subscribe', [\App\Controllers\Site\SubscribeController::class, 'subscribe']);
+$router->get('/captcha.png', [\App\Controllers\Site\CaptchaController::class, 'image']);
+$router->get('/push/key', [\App\Controllers\Site\PushController::class, 'key']);
+$router->post('/push/subscribe', [\App\Controllers\Site\PushController::class, 'subscribe']);
+$router->post('/push/unsubscribe', [\App\Controllers\Site\PushController::class, 'unsubscribe']);
 $router->get('/unsubscribe', [\App\Controllers\Site\SubscribeController::class, 'unsubscribe']);
 $router->get('/opendata', [\App\Controllers\Site\OpenDataController::class, 'index']);
 $router->get('/opendata/{dataset}', [\App\Controllers\Site\OpenDataController::class, 'dataset']);

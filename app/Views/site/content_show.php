@@ -20,56 +20,69 @@ foreach ($fields as $f) {
     }
 }
 require __DIR__ . '/_header.php';
-?>
-<article class="content-detail">
-    <nav class="content-crumbs" aria-label="Хлебные крошки">
-        <a href="<?= htmlspecialchars(Locale::url('/'), ENT_QUOTES) ?>">Главная</a>
-        <span>/</span>
-        <a href="<?= htmlspecialchars(Locale::url('catalog/' . $type['slug']), ENT_QUOTES) ?>"><?= htmlspecialchars((string) $type['name'], ENT_QUOTES) ?></a>
-        <span>/</span>
-        <span><?= htmlspecialchars((string) $entry['title'], ENT_QUOTES) ?></span>
-    </nav>
-    <h1 class="content-detail__title"><?= htmlspecialchars((string) $entry['title'], ENT_QUOTES) ?></h1>
-    <time class="content-detail__date"><?= htmlspecialchars(date('d.m.Y', strtotime((string) $entry['created_at'])), ENT_QUOTES) ?></time>
 
-    <?php
-    // Раскладка «С боковой панелью»: длинный контент (текст/изображение) — в
-    // основную колонку, короткие поля и файлы — в мета-панель. Раскладка «В
-    // одну колонку» показывает всё подряд (CSS схлопывает грид). Драйвер —
-    // класс design-detail-* на <body>.
-    $mainTypes = ['textarea', 'image'];
-    $renderRow = static function (array $f, string $val, array $entry): string {
-        $out = '<div class="content-detail__row content-detail__row--' . htmlspecialchars((string) $f['field_type'], ENT_QUOTES) . '">';
-        $out .= '<dt>' . htmlspecialchars((string) $f['label'], ENT_QUOTES) . '</dt><dd>';
-        if ($f['field_type'] === 'file') {
-            $out .= '<a class="content-detail__download" href="' . htmlspecialchars((string) $entry['data'][$f['name']], ENT_QUOTES) . '" target="_blank" rel="noopener" download>📎 Скачать</a>';
-        } else {
-            $out .= $val;
-        }
-        return $out . '</dd></div>';
-    };
-    $mainHtml = '';
-    $asideHtml = '';
-    foreach ($fields as $f) {
-        $val = ContentFields::displayValue($f, $entry['data'][$f['name']] ?? null);
-        if ($val === '') {
-            continue;
-        }
-        if (in_array($f['field_type'], $mainTypes, true)) {
-            $mainHtml .= $renderRow($f, $val, $entry);
-        } else {
-            $asideHtml .= $renderRow($f, $val, $entry);
-        }
-    }
-    ?>
-    <div class="content-detail__grid">
-        <div class="content-detail__body">
-            <?php if ($mainHtml !== ''): ?><dl class="content-detail__fields"><?= $mainHtml ?></dl><?php endif; ?>
-            <?php if ($mainHtml === '' && $asideHtml === ''): ?><p class="content-detail__empty">Нет данных.</p><?php endif; ?>
+$crumbs = [
+    ['label' => 'Главная', 'url' => Locale::url('/')],
+    ['label' => (string) $type['name'], 'url' => Locale::url('catalog/' . $type['slug'])],
+    ['label' => (string) $entry['title']],
+];
+require __DIR__ . '/_crumbs.php';
+
+// Длинные поля (текст/изображение) — в основную колонку, короткие и файлы —
+// в боковую карточку «Сведения».
+$mainTypes = ['textarea', 'image'];
+$mainFields = array_values(array_filter($fields, static fn ($f) => in_array($f['field_type'], $mainTypes, true)));
+$sideFields = array_values(array_filter($fields, static fn ($f) => !in_array($f['field_type'], $mainTypes, true)));
+?>
+<article class="catdetail">
+    <header class="catdetail__head">
+        <span class="catdetail__eyebrow"><?= htmlspecialchars((string) $type['name'], ENT_QUOTES) ?></span>
+        <h1 class="catdetail__title"><?= htmlspecialchars((string) $entry['title'], ENT_QUOTES) ?></h1>
+        <time class="catdetail__date">Опубликовано <?= htmlspecialchars(date('d.m.Y', strtotime((string) $entry['created_at'])), ENT_QUOTES) ?></time>
+    </header>
+
+    <div class="catdetail__grid">
+        <div class="catdetail__body">
+            <?php $hasMain = false; ?>
+            <?php foreach ($mainFields as $f): ?>
+                <?php $val = ContentFields::displayValue($f, $entry['data'][$f['name']] ?? null); ?>
+                <?php if ($val === '') { continue; } $hasMain = true; ?>
+                <section class="catdetail__section">
+                    <h2 class="catdetail__subtitle"><?= htmlspecialchars((string) $f['label'], ENT_QUOTES) ?></h2>
+                    <div class="catdetail__text"><?= $val ?></div>
+                </section>
+            <?php endforeach; ?>
+            <?php if (!$hasMain): ?><p class="catdetail__empty">Описание не заполнено.</p><?php endif; ?>
         </div>
-        <?php if ($asideHtml !== ''): ?>
-            <aside class="content-detail__aside"><dl class="content-detail__fields"><?= $asideHtml ?></dl></aside>
-        <?php endif; ?>
+
+        <aside class="catdetail__aside">
+            <div class="catdetail__card">
+                <h2 class="catdetail__card-title">Сведения</h2>
+                <dl class="catdetail__facts">
+                    <?php foreach ($sideFields as $f): ?>
+                        <?php
+                        $val = ContentFields::displayValue($f, $entry['data'][$f['name']] ?? null);
+                        if ($val === '' || $f['field_type'] === 'file') {
+                            continue;
+                        }
+                        ?>
+                        <div class="catdetail__fact">
+                            <dt><?= htmlspecialchars((string) $f['label'], ENT_QUOTES) ?></dt>
+                            <dd><?= $val ?></dd>
+                        </div>
+                    <?php endforeach; ?>
+                </dl>
+                <?php foreach ($sideFields as $f): ?>
+                    <?php if ($f['field_type'] === 'file' && !empty($entry['data'][$f['name']])): ?>
+                        <a class="catdetail__download" href="<?= htmlspecialchars((string) $entry['data'][$f['name']], ENT_QUOTES) ?>" target="_blank" rel="noopener" download>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4"/><path d="M5 19h14"/></svg>
+                            <?= htmlspecialchars((string) $f['label'], ENT_QUOTES) ?>
+                        </a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                <a class="catdetail__back" href="<?= htmlspecialchars(Locale::url('catalog/' . $type['slug']), ENT_QUOTES) ?>">← Ко всем записям раздела</a>
+            </div>
+        </aside>
     </div>
 </article>
 <?php // Schema.org: хлебные крошки; для мероприятий — карточка события. ?>

@@ -63,12 +63,16 @@ final class NewsController
         }
 
         $id = News::create($data);
+        News::updateExtras($id, $this->collectExtras());
         $this->saveTranslations($id);
         $this->handleGallery($id);
 
         // Авто-публикация в соцсети + вебхук при создании опубликованной новости.
         if ($data['status'] === 'published') {
             \App\Core\SocialSettings::enqueueForNews($id);
+            if (\App\Core\WebPush::isEnabled()) {
+                \App\Models\WebPushSubscription::enqueueNews($id);
+            }
             $this->dispatchNewsPublished($id, $data);
         }
 
@@ -148,12 +152,16 @@ final class NewsController
 
         $wasPublished = ($news['status'] ?? '') === 'published';
         News::update($id, $data);
+        News::updateExtras($id, $this->collectExtras());
         $this->saveTranslations($id);
         $this->handleGallery($id);
 
         // Авто-публикация + вебхук при переходе черновик -> опубликовано.
         if ($data['status'] === 'published' && !$wasPublished) {
             \App\Core\SocialSettings::enqueueForNews($id);
+            if (\App\Core\WebPush::isEnabled()) {
+                \App\Models\WebPushSubscription::enqueueNews($id);
+            }
             $this->dispatchNewsPublished($id, $data);
         }
 
@@ -236,6 +244,35 @@ final class NewsController
     /**
      * @return array{0: array, 1: string|null}
      */
+    /** Поля детальной страницы (эскиз): бейдж, тезисы, мероприятие, документы. */
+    private function collectExtras(): array
+    {
+        $safeUrl = static function (string $u): string {
+            return ($u !== '' && \App\Core\UrlGuard::isSafeLink($u)) ? $u : '';
+        };
+        $docs = [];
+        foreach ((array) ($_POST['docs'] ?? []) as $doc) {
+            $title = trim((string) ($doc['title'] ?? ''));
+            if ($title === '') {
+                continue;
+            }
+            $docs[] = [
+                'title' => $title,
+                'meta' => trim((string) ($doc['meta'] ?? '')),
+                'url' => $safeUrl(trim((string) ($doc['url'] ?? ''))),
+            ];
+        }
+
+        return [
+            'badge' => trim((string) ($_POST['badge'] ?? '')),
+            'press_release_url' => $safeUrl(trim((string) ($_POST['press_release_url'] ?? ''))),
+            'key_points' => trim((string) ($_POST['key_points'] ?? '')),
+            'event_meta' => trim((string) ($_POST['event_meta'] ?? '')),
+            'docs' => $docs,
+            'source_note' => trim((string) ($_POST['source_note'] ?? '')),
+        ];
+    }
+
     private function collectInput(?int $id, ?array $existing = null): array
     {
         $title = trim((string) ($_POST['title'] ?? ''));

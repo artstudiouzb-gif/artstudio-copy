@@ -70,14 +70,27 @@ final class InstallController
         }
 
         try {
-            // Подключаемся к серверу без выбора БД, создаём базу при необходимости.
-            $dsn = sprintf('mysql:host=%s;port=%s;charset=utf8mb4', $data['host'], $data['port']);
-            $pdo = new PDO($dsn, $data['username'], $data['password'], [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            ]);
-            $pdo->exec('CREATE DATABASE IF NOT EXISTS `' . str_replace('`', '', $data['database'])
-                . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
-            $pdo->exec('USE `' . str_replace('`', '', $data['database']) . '`');
+            $dbName = str_replace('`', '', $data['database']);
+            $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+            try {
+                // Сначала подключаемся сразу к указанной базе: на shared-хостинге
+                // она уже создана в панели, а глобального права CREATE у
+                // пользователя нет — «CREATE DATABASE IF NOT EXISTS» там падает
+                // с 1044 даже для существующей базы (MySQL проверяет привилегию
+                // раньше, чем IF NOT EXISTS).
+                $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $data['host'], $data['port'], $dbName);
+                $pdo = new PDO($dsn, $data['username'], $data['password'], $options);
+            } catch (\PDOException $e) {
+                if (!str_contains($e->getMessage(), '[1049]') && (int) $e->getCode() !== 1049) {
+                    throw $e;
+                }
+                // Базы не существует — создаём (VPS/свой сервер, где у
+                // пользователя есть право CREATE).
+                $dsn = sprintf('mysql:host=%s;port=%s;charset=utf8mb4', $data['host'], $data['port']);
+                $pdo = new PDO($dsn, $data['username'], $data['password'], $options);
+                $pdo->exec('CREATE DATABASE `' . $dbName . '` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+                $pdo->exec('USE `' . $dbName . '`');
+            }
 
             // Импортируем схему.
             $schema = file_get_contents(APP_ROOT . '/database/schema.sql');
@@ -86,7 +99,10 @@ final class InstallController
             }
             $pdo->exec($schema);
         } catch (\Throwable $e) {
-            View::render('install/step2', ['error' => 'Ошибка подключения/импорта: ' . $e->getMessage(), 'data' => $data]);
+            View::render('install/step2', [
+                'error' => 'Ошибка подключения/импорта: ' . $e->getMessage() . self::dbErrorHint($e->getMessage()),
+                'data' => $data,
+            ]);
             return;
         }
 
@@ -96,6 +112,29 @@ final class InstallController
         $_SESSION['install_db'] = $data;
         header('Location: /install/step3');
         exit;
+    }
+
+    /**
+     * Подсказка к типичным ошибкам MySQL на шаге 2, чтобы пользователь
+     * панельного хостинга понял, что делать, без чтения документации.
+     */
+    public static function dbErrorHint(string $message): string
+    {
+        if (str_contains($message, '1044')) {
+            return ' Подсказка: у пользователя нет прав на эту базу. На shared-хостинге'
+                . ' создайте базу и пользователя в панели и назначьте пользователя на базу'
+                . ' со всеми привилегиями (cPanel: «Базы данных MySQL» → «Добавить'
+                . ' пользователя в базу данных»), затем повторите этот шаг.';
+        }
+        if (str_contains($message, '1045')) {
+            return ' Подсказка: неверный логин или пароль пользователя БД. Проверьте их'
+                . ' в панели хостинга (пароль можно задать заново).';
+        }
+        if (str_contains($message, '2002') || stripos($message, 'getaddrinfo') !== false) {
+            return ' Подсказка: сервер БД недоступен по указанному хосту/порту.'
+                . ' На shared-хостинге обычно нужен хост «localhost».';
+        }
+        return '';
     }
 
     // --- Шаг 3: сайт и локаль ---

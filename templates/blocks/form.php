@@ -44,7 +44,35 @@ $form = $data['form'] ?? null;
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
-            <button type="submit" class="block-form__submit">Отправить</button>
+            <?php if (\App\Core\Captcha::isEnabled()): ?>
+                <?= \App\Core\Captcha::field('captcha-' . (int) $blockId) ?>
+            <?php endif; ?>
+            <?php
+            // Согласие на обработку персональных данных (глобальная настройка).
+            $consentOn = \App\Models\Setting::get('form_consent_enabled', '0') === '1';
+            if ($consentOn):
+                $consentText = (string) \App\Models\Setting::get('form_consent_text', 'Я согласен на обработку персональных данных');
+                // Ссылка на политику конфиденциальности, если задана страница.
+                $ppId = (int) \App\Models\Setting::get('privacy_policy_page_id', '');
+                $ppUrl = '';
+                if ($ppId > 0) {
+                    $pp = \App\Models\Page::findById($ppId);
+                    if ($pp && ($pp['status'] ?? '') === 'published') {
+                        $ppUrl = \App\Core\Locale::url($pp['slug']);
+                    }
+                }
+                $consentId = 'consent-' . (int) $blockId;
+                ?>
+                <div class="block-form__consent">
+                    <input type="checkbox" id="<?= $consentId ?>" name="_consent" value="1" required>
+                    <label for="<?= $consentId ?>">
+                        <?= htmlspecialchars($consentText, ENT_QUOTES) ?><?php if ($ppUrl !== ''): ?>
+                            (<a href="<?= htmlspecialchars($ppUrl, ENT_QUOTES) ?>" target="_blank" rel="noopener">политика конфиденциальности</a>)
+                        <?php endif; ?>
+                    </label>
+                </div>
+            <?php endif; ?>
+            <button type="submit" class="block-form__submit"><?= htmlspecialchars(t('Отправить'), ENT_QUOTES) ?></button>
         </form>
     <?php endif; ?>
 </div>

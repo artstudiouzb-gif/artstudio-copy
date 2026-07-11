@@ -52,6 +52,14 @@ $action = $isEdit ? '/admin/projects/' . (int) $project['id'] . '/edit' : '/admi
             <input type="number" id="sort_order" name="sort_order" value="<?= (int) ($project['sort_order'] ?? 0) ?>">
         </div>
 
+        <div class="form-field">
+            <label class="checkbox-label">
+                <input type="checkbox" name="is_featured" value="1" <?= !empty($project['is_featured']) ? 'checked' : '' ?>>
+                Показать на главной
+            </label>
+            <span class="form-hint">Блок «Проекты» на главной может автоматически собирать отмеченные проекты — не нужно дублировать их вручную.</span>
+        </div>
+
         <div>
             <label>Галерея изображений</label>
             <div data-repeater="gallery">

@@ -46,6 +46,7 @@ final class Project
         }
         $stmt = Database::pdo()->prepare('UPDATE projects SET status = :s WHERE id = :id AND deleted_at IS NULL');
         $stmt->execute([':s' => $status, ':id' => $id]);
+        self::bustPageCache();
     }
 
     /** Полная копия проекта с изображениями и полями (черновик, slug -copy). */
@@ -84,12 +85,14 @@ final class Project
     {
         $stmt = Database::pdo()->prepare('UPDATE projects SET deleted_at = NULL WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
     }
 
     public static function forceDelete(int $id): void
     {
         $stmt = Database::pdo()->prepare('DELETE FROM projects WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
     }
 
     public static function published(): array
@@ -97,6 +100,34 @@ final class Project
         $stmt = Database::pdo()->query(
             "SELECT * FROM projects WHERE status = 'published' AND deleted_at IS NULL ORDER BY sort_order ASC, created_at DESC"
         );
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Проекты для блока главной: только помеченные «показать на главном».
+     * Если ни один не отмечен — откат на последние опубликованные (чтобы блок
+     * не был пустым при первом включении источника).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function forHome(int $limit = 6): array
+    {
+        $limit = max(1, min(24, $limit));
+        $stmt = Database::pdo()->prepare(
+            "SELECT * FROM projects WHERE status = 'published' AND deleted_at IS NULL AND is_featured = 1
+             ORDER BY sort_order ASC, created_at DESC LIMIT {$limit}"
+        );
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+        if (!empty($rows)) {
+            return $rows;
+        }
+        $stmt = Database::pdo()->prepare(
+            "SELECT * FROM projects WHERE status = 'published' AND deleted_at IS NULL
+             ORDER BY sort_order ASC, created_at DESC LIMIT {$limit}"
+        );
+        $stmt->execute();
 
         return $stmt->fetchAll();
     }
@@ -138,8 +169,8 @@ final class Project
     public static function create(array $data): int
     {
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO projects (title, slug, description, cover_image, status, sort_order, created_at)
-             VALUES (:title, :slug, :description, :cover_image, :status, :sort_order, NOW())'
+            'INSERT INTO projects (title, slug, description, cover_image, status, is_featured, sort_order, created_at)
+             VALUES (:title, :slug, :description, :cover_image, :status, :is_featured, :sort_order, NOW())'
         );
         $stmt->execute([
             ':title' => $data['title'],
@@ -147,17 +178,23 @@ final class Project
             ':description' => $data['description'],
             ':cover_image' => $data['cover_image'],
             ':status' => $data['status'],
+            ':is_featured' => !empty($data['is_featured']) ? 1 : 0,
             ':sort_order' => $data['sort_order'] ?? 0,
         ]);
 
-        return (int) Database::pdo()->lastInsertId();
+        // ВАЖНО: id читаем ДО сброса кэша — bustPageCache() выполняет запрос к
+        // settings (проверка CDN/Cloudflare), который обнуляет lastInsertId().
+        $id = (int) Database::pdo()->lastInsertId();
+        self::bustPageCache();
+
+        return $id;
     }
 
     public static function update(int $id, array $data): void
     {
         $stmt = Database::pdo()->prepare(
             'UPDATE projects SET title = :title, slug = :slug, description = :description,
-             cover_image = :cover_image, status = :status, sort_order = :sort_order WHERE id = :id'
+             cover_image = :cover_image, status = :status, is_featured = :is_featured, sort_order = :sort_order WHERE id = :id'
         );
         $stmt->execute([
             ':title' => $data['title'],
@@ -165,9 +202,11 @@ final class Project
             ':description' => $data['description'],
             ':cover_image' => $data['cover_image'],
             ':status' => $data['status'],
+            ':is_featured' => !empty($data['is_featured']) ? 1 : 0,
             ':sort_order' => $data['sort_order'] ?? 0,
             ':id' => $id,
         ]);
+        self::bustPageCache();
     }
 
     public static function delete(int $id): void
@@ -175,5 +214,11 @@ final class Project
         // Мягкое удаление: проект отправляется в корзину.
         $stmt = Database::pdo()->prepare('UPDATE projects SET deleted_at = NOW() WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
+    }
+
+    private static function bustPageCache(): void
+    {
+        \App\Core\Cache::forgetPrefix('page:');
     }
 }

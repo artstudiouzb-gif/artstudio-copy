@@ -149,6 +149,9 @@ final class Page
         }
         $row['meta_title'] = $translation['meta_title'] ?? null;
         $row['meta_description'] = $translation['meta_description'] ?? null;
+        if (isset($translation['lead']) && trim((string) $translation['lead']) !== '') {
+            $row['lead'] = $translation['lead'];
+        }
 
         return $row;
     }
@@ -160,6 +163,29 @@ final class Page
         $row = $stmt->fetch();
 
         return $row ?: null;
+    }
+
+    /**
+     * Языки, на которых страница реально наполнена: язык по умолчанию (базовая
+     * строка) + языки с переводом заголовка или собственным стеком блоков.
+     * Используется переключателем языков и hreflang (roadmap 1.2).
+     *
+     * @return string[]
+     */
+    public static function availableLangs(int $id): array
+    {
+        $langs = [Language::defaultCode()];
+
+        $stmt = Database::pdo()->prepare(
+            "SELECT lang FROM page_translations WHERE page_id = :id AND TRIM(COALESCE(title, '')) <> ''
+             UNION SELECT DISTINCT lang FROM blocks WHERE page_id = :id2"
+        );
+        $stmt->execute([':id' => $id, ':id2' => $id]);
+        foreach ($stmt->fetchAll(\PDO::FETCH_COLUMN) as $lang) {
+            $langs[] = (string) $lang;
+        }
+
+        return array_values(array_unique($langs));
     }
 
     public static function slugExists(string $slug, ?int $excludeId = null): bool
@@ -187,18 +213,20 @@ final class Page
             }
 
             $stmt = $pdo->prepare(
-                'INSERT INTO pages (title, slug, meta_title, meta_description, status, is_home, layout_type, hide_chrome, created_at)
-                 VALUES (:title, :slug, :meta_title, :meta_description, :status, :is_home, :layout_type, :hide_chrome, NOW())'
+                'INSERT INTO pages (title, slug, meta_title, meta_description, lead, status, is_home, layout_type, hide_chrome, transparent_header, created_at)
+                 VALUES (:title, :slug, :meta_title, :meta_description, :lead, :status, :is_home, :layout_type, :hide_chrome, :transparent_header, NOW())'
             );
             $stmt->execute([
                 ':title' => $data['title'],
                 ':slug' => $data['slug'],
                 ':meta_title' => $data['meta_title'],
                 ':meta_description' => $data['meta_description'],
+                ':lead' => $data['lead'] ?? null,
                 ':status' => $data['status'],
                 ':is_home' => !empty($data['is_home']) ? 1 : 0,
                 ':layout_type' => $data['layout_type'] ?? 'no_sidebar',
                 ':hide_chrome' => !empty($data['hide_chrome']) ? 1 : 0,
+                ':transparent_header' => !empty($data['transparent_header']) ? 1 : 0,
             ]);
             $id = (int) $pdo->lastInsertId();
 
@@ -223,18 +251,21 @@ final class Page
 
             $stmt = $pdo->prepare(
                 'UPDATE pages SET title = :title, slug = :slug, meta_title = :meta_title,
-                 meta_description = :meta_description, status = :status, is_home = :is_home,
-                 layout_type = :layout_type, hide_chrome = :hide_chrome WHERE id = :id'
+                 meta_description = :meta_description, lead = :lead, status = :status, is_home = :is_home,
+                 layout_type = :layout_type, hide_chrome = :hide_chrome,
+                 transparent_header = :transparent_header WHERE id = :id'
             );
             $stmt->execute([
                 ':title' => $data['title'],
                 ':slug' => $data['slug'],
                 ':meta_title' => $data['meta_title'],
                 ':meta_description' => $data['meta_description'],
+                ':lead' => $data['lead'] ?? null,
                 ':status' => $data['status'],
                 ':is_home' => !empty($data['is_home']) ? 1 : 0,
                 ':layout_type' => $data['layout_type'] ?? 'no_sidebar',
                 ':hide_chrome' => !empty($data['hide_chrome']) ? 1 : 0,
+                ':transparent_header' => !empty($data['transparent_header']) ? 1 : 0,
                 ':id' => $id,
             ]);
 

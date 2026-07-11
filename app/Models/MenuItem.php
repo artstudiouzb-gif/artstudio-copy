@@ -75,12 +75,14 @@ final class MenuItem
         $nextOrder = (int) $stmt->fetchColumn();
 
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO menu_items (lang, title, url_type, url_value, parent_id, sort_order, is_active, created_at)
-             VALUES (:lang, :title, :url_type, :url_value, :parent_id, :sort_order, :is_active, NOW())'
+            'INSERT INTO menu_items (lang, title, icon_svg, is_divider, url_type, url_value, parent_id, sort_order, is_active, created_at)
+             VALUES (:lang, :title, :icon_svg, :is_divider, :url_type, :url_value, :parent_id, :sort_order, :is_active, NOW())'
         );
         $stmt->execute([
             ':lang' => $data['lang'],
             ':title' => $data['title'],
+            ':icon_svg' => self::cleanIcon($data['icon_svg'] ?? null),
+            ':is_divider' => !empty($data['is_divider']) ? 1 : 0,
             ':url_type' => $data['url_type'],
             ':url_value' => $data['url_value'],
             ':parent_id' => $parentId,
@@ -96,18 +98,40 @@ final class MenuItem
         $parentId = isset($data['parent_id']) && $data['parent_id'] !== null ? (int) $data['parent_id'] : null;
 
         $stmt = Database::pdo()->prepare(
-            'UPDATE menu_items SET lang = :lang, title = :title, url_type = :url_type,
-             url_value = :url_value, parent_id = :parent_id, is_active = :is_active WHERE id = :id'
+            'UPDATE menu_items SET lang = :lang, title = :title, icon_svg = :icon_svg,
+             is_divider = :is_divider, url_type = :url_type, url_value = :url_value,
+             parent_id = :parent_id, is_active = :is_active WHERE id = :id'
         );
         $stmt->execute([
             ':lang' => $data['lang'],
             ':title' => $data['title'],
+            ':icon_svg' => self::cleanIcon($data['icon_svg'] ?? null),
+            ':is_divider' => !empty($data['is_divider']) ? 1 : 0,
             ':url_type' => $data['url_type'],
             ':url_value' => $data['url_value'],
             ':parent_id' => $parentId,
             ':is_active' => !empty($data['is_active']) ? 1 : 0,
             ':id' => $id,
         ]);
+    }
+
+    /**
+     * Очистка инлайновой SVG-иконки перед сохранением: пусто → null; иначе
+     * прогоняем через строгий санитайзер (тот же, что для загружаемых SVG —
+     * вырезает скрипты, обработчики событий, внешние ссылки и XXE). Слишком
+     * крупные строки отбрасываем (иконка должна быть компактной).
+     */
+    private static function cleanIcon(mixed $svg): ?string
+    {
+        $svg = trim((string) $svg);
+        if ($svg === '' || mb_stripos($svg, '<svg') === false) {
+            return null;
+        }
+        if (mb_strlen($svg) > 20000) {
+            return null;
+        }
+
+        return \App\Core\Uploader::sanitizeSvgString($svg);
     }
 
     /**

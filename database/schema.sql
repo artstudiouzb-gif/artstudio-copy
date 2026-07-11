@@ -46,10 +46,17 @@ CREATE TABLE IF NOT EXISTS news (
     title           VARCHAR(255) NOT NULL,
     slug            VARCHAR(255) NOT NULL,
     excerpt         TEXT NULL,
+    badge           VARCHAR(100) NULL COMMENT 'бейдж категории детальной страницы',
     content         LONGTEXT NULL,
     image           VARCHAR(255) NULL,
     video_url       VARCHAR(255) NULL,
-    layout_type     ENUM('standard','gallery','video','side_image') NOT NULL DEFAULT 'standard',
+    press_release_url VARCHAR(255) NULL,
+    key_points      TEXT NULL COMMENT 'ключевые тезисы, по одному на строку',
+    event_meta      TEXT NULL COMMENT 'карточка «О мероприятии», по строке на пункт',
+    docs            TEXT NULL COMMENT 'JSON-список документов [{title, meta, url}]',
+    source_note     VARCHAR(255) NULL COMMENT 'подпись источника (пресс-служба)',
+    views           INT UNSIGNED NOT NULL DEFAULT 0,
+    layout_type     ENUM('standard','gallery','video','side_image','premium') NOT NULL DEFAULT 'standard',
     focal_x         TINYINT UNSIGNED NULL COMMENT 'фокальная точка обложки X, %',
     focal_y         TINYINT UNSIGNED NULL COMMENT 'фокальная точка обложки Y, %',
     meta_title      VARCHAR(255) NULL,
@@ -122,10 +129,12 @@ CREATE TABLE IF NOT EXISTS pages (
     slug            VARCHAR(255) NOT NULL,
     meta_title      VARCHAR(255) NULL,
     meta_description VARCHAR(500) NULL,
+    lead            TEXT NULL COMMENT 'видимый лид/подзаголовок страницы',
     status          ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
     is_home         TINYINT(1) NOT NULL DEFAULT 0,
     layout_type     ENUM('no_sidebar', 'left_sidebar', 'right_sidebar') NOT NULL DEFAULT 'no_sidebar',
-    hide_chrome     TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'лендинг: скрыть шапку/футер сайта',
+    hide_chrome     TINYINT(1) NOT NULL DEFAULT 0,
+    transparent_header TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'прозрачная шапка на этой странице' COMMENT 'лендинг: скрыть шапку/футер сайта',
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at      DATETIME NULL COMMENT 'мягкое удаление (корзина)',
@@ -143,6 +152,7 @@ CREATE TABLE IF NOT EXISTS page_translations (
     title           VARCHAR(255) NULL,
     meta_title      VARCHAR(255) NULL,
     meta_description VARCHAR(500) NULL,
+    lead            TEXT NULL,
     UNIQUE KEY uq_page_translations (page_id, lang),
     CONSTRAINT fk_page_translations_page FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -197,6 +207,7 @@ CREATE TABLE IF NOT EXISTS projects (
     description     LONGTEXT NULL,
     cover_image     VARCHAR(255) NULL,
     status          ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+    is_featured     TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'показывать на главной (блок Проекты)',
     sort_order      INT NOT NULL DEFAULT 0,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -321,6 +332,8 @@ CREATE TABLE IF NOT EXISTS menu_items (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     lang            VARCHAR(8) NOT NULL DEFAULT '' COMMENT 'код языка или пусто для всех',
     title           VARCHAR(190) NOT NULL,
+    icon_svg        TEXT NULL COMMENT 'инлайновая SVG-иконка пункта',
+    is_divider      TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'пункт-разделитель меню',
     url_type        ENUM('page', 'news_index', 'custom') NOT NULL DEFAULT 'custom',
     url_value       VARCHAR(500) NULL COMMENT 'slug страницы или произвольный URL',
     parent_id       INT UNSIGNED NULL,
@@ -413,7 +426,7 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 CREATE TABLE IF NOT EXISTS social_posts (
     id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     news_id     INT UNSIGNED NOT NULL,
-    network     ENUM('facebook','linkedin','instagram') NOT NULL,
+    network     ENUM('telegram','facebook','linkedin','instagram') NOT NULL,
     status      ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
     attempts    INT UNSIGNED NOT NULL DEFAULT 0,
     locked_until DATETIME NULL,
@@ -507,6 +520,7 @@ CREATE TABLE IF NOT EXISTS photo_albums (
     description  TEXT NULL,
     cover_url    VARCHAR(500) NOT NULL DEFAULT '',
     is_published TINYINT(1) NOT NULL DEFAULT 1,
+    is_featured  TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'показывать на главной (блок Медиа)',
     created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_albums_slug (slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -729,10 +743,33 @@ CREATE TABLE IF NOT EXISTS migrations (
     UNIQUE KEY uq_migrations_filename (filename)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Webpush: подписки браузеров и очередь уведомлений о новостях.
+CREATE TABLE IF NOT EXISTS webpush_subscriptions (
+    id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    endpoint      VARCHAR(1000) NOT NULL,
+    endpoint_hash CHAR(40) NOT NULL COMMENT 'sha1(endpoint) для уникального индекса',
+    p256dh        VARCHAR(255) NOT NULL,
+    auth          VARCHAR(64) NOT NULL,
+    created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_webpush_endpoint (endpoint_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS webpush_queue (
+    id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    news_id    INT UNSIGNED NOT NULL,
+    status     ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+    attempts   INT UNSIGNED NOT NULL DEFAULT 0,
+    last_error VARCHAR(500) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at    DATETIME NULL,
+    UNIQUE KEY uniq_webpush_queue_news (news_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Этот schema.sql уже содержит структуру всех существующих миграций, поэтому
 -- для свежей установки помечаем их как применённые — database/migrate.php не
 -- будет пытаться накатить их повторно. (Старые установки, созданные на схеме
 -- этапов 1–2, накатят их через migrate.php.)
+
 INSERT INTO migrations (filename) VALUES
     ('2026_07_05_block5_multilang_header_widgets.sql'),
     ('2026_07_05_soft_deletes.sql'),
@@ -758,7 +795,15 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_08_photo_albums.sql'),
     ('2026_07_08_subscribers.sql'),
     ('2026_07_08_queue_locks.sql'),
-    ('2026_07_08_not_found_log.sql')
+    ('2026_07_08_not_found_log.sql'),
+    ('2026_07_09_menu_icons_dividers.sql'),
+    ('2026_07_09_news_detail_extras.sql'),
+    ('2026_07_09_news_premium_layout.sql'),
+    ('2026_07_10_pages_transparent_header.sql'),
+    ('2026_07_10_social_telegram.sql'),
+    ('2026_07_10_webpush.sql'),
+    ('2026_07_11_pages_lead.sql'),
+    ('2026_07_11_featured_home.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

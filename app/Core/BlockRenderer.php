@@ -17,21 +17,41 @@ final class BlockRenderer
     public const DEFAULTS = [
         'text' => ['title' => '', 'content' => ''],
         'html' => ['html' => ''],
-        'cta' => ['title' => '', 'text' => '', 'button_text' => '', 'button_url' => ''],
+        'cta' => ['title' => '', 'text' => '', 'button_text' => '', 'button_url' => '', 'bg_color' => '', 'text_color' => '', 'button_color' => ''],
         'advantages' => ['title' => '', 'items' => []],
         'slider' => ['slides' => []],
         'gallery' => ['title' => '', 'images' => []],
         'form' => ['form_id' => null],
         'columns' => ['columns' => 2, 'gap' => 'medium'],
         'testimonials' => ['title' => '', 'items' => []],
-        'counters' => ['title' => '', 'items' => []],
+        'counters' => ['title' => '', 'card_bg' => '', 'text_color' => '', 'items' => []],
         'team_list' => ['title' => '', 'limit' => 0],
         'projects_list' => ['title' => '', 'limit' => 3],
         'news_latest' => ['title' => 'Последние новости', 'limit' => 3],
         'partners' => ['title' => 'Партнёры', 'items' => []],
-        'banner' => ['title' => '', 'text' => '', 'image' => '', 'button_text' => '', 'button_url' => ''],
+        'banner' => ['title' => '', 'text' => '', 'image' => '', 'button_text' => '', 'button_url' => '', 'bg_color' => '', 'text_color' => '', 'button_color' => ''],
         'subscribe' => ['title' => 'Подписка на новости', 'text' => 'Получайте дайджест новостей на почту раз в неделю.', 'button_text' => 'Подписаться'],
         'faq' => ['title' => '', 'items' => []],
+        'contact_cards' => ['title' => '', 'items' => []],
+        'hero' => ['title' => '', 'eyebrow' => '', 'subtitle' => '', 'bg_type' => '', 'image' => '', 'video_url' => '', 'youtube_url' => '', 'bg_color' => '', 'width' => 'full', 'height' => 'regular', 'overlay_color' => '#0b1a30', 'overlay_opacity' => 55, 'text_position' => 'left', 'text_color' => '', 'button_color' => '', 'panel_enabled' => false, 'panel_color' => '#0b1a30', 'panel_opacity' => 0, 'button_text' => '', 'button_url' => '', 'button2_text' => '', 'button2_url' => '', 'video_button_text' => '', 'video_button_url' => ''],
+        'categories_grid' => ['title' => '', 'items' => []],
+        'media_materials' => ['title' => '', 'items' => []],
+        'cards_grid' => ['title' => '', 'all_text' => '', 'all_url' => '', 'columns' => 5, 'card_bg' => '', 'text_color' => '', 'items' => []],
+        'image_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'source' => 'manual', 'limit' => 6, 'items' => []],
+        'media_gallery' => ['title' => '', 'all_text' => '', 'all_url' => '', 'source' => 'manual', 'limit' => 8, 'items' => []],
+        'news_feature' => ['title' => 'Новости и аналитика', 'all_text' => 'Все новости', 'all_url' => '', 'limit' => 6],
+        'person_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
+        'timeline' => ['title' => '', 'items' => [], 'button_text' => '', 'button_url' => '', 'cta_title' => '', 'cta_text' => '', 'cta_button_text' => '', 'cta_button_url' => '', 'cta_image' => ''],
+        'news_docs' => ['news_title' => 'Актуальные новости', 'news_all_text' => 'Все новости', 'news_all_url' => '', 'limit' => 3, 'docs_title' => 'Документы', 'docs_all_text' => 'Все документы', 'docs_all_url' => '', 'docs' => []],
+        'cta_band' => ['title' => '', 'text' => '', 'icon_svg' => '', 'button_text' => '', 'button_url' => '', 'bg_color' => '', 'text_color' => '', 'button_color' => ''],
+        'person_profile' => ['photo' => '', 'name' => '', 'position' => '', 'text' => '', 'phone' => '', 'phone_label' => 'Приёмная:', 'email' => '', 'email_label' => 'E-mail:', 'button_text' => '', 'button_url' => ''],
+        'feature_band' => ['title' => '', 'items' => []],
+        'bio_education' => ['bio_title' => 'Биография', 'bio_text' => '', 'career' => [], 'edu_title' => 'Образование', 'edu_items' => [], 'extra_title' => '', 'extra_text' => '', 'quote_text' => '', 'quote_author' => ''],
+        'anchor_nav' => ['items' => []],
+        'stages' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
+        'text_image' => ['title' => '', 'text' => '', 'image' => '', 'items' => []],
+        'docs_list' => ['title' => '', 'all_text' => '', 'all_url' => '', 'columns' => 4, 'items' => []],
+        'map_point' => ['title' => '', 'image' => '', 'embed_url' => '', 'card_title' => '', 'address' => '', 'button_text' => '', 'button_url' => ''],
     ];
 
     public static function defaultsFor(string $type): array
@@ -101,13 +121,40 @@ final class BlockRenderer
             ? ' data-reveal data-reveal-type="' . htmlspecialchars($revealType, ENT_QUOTES) . '"'
             : '';
 
+        // Фон секции, полноширинная подложка и независимые отступы сверху/снизу.
+        $bg = (string) ($data['_bg'] ?? 'none');
+        if (!in_array($bg, ['none', 'light', 'tint', 'navy'], true)) {
+            $bg = 'none';
+        }
+        $fullwidth = !empty($data['_fullwidth']);
+        $padMap = ['none' => '0', 'small' => 'var(--space-small)', 'medium' => 'var(--space-premium)', 'large' => 'var(--space-max)'];
+        $extraClass = '';
+        if ($bg !== 'none') {
+            $extraClass .= ' cms-block--bg cms-block--bg-' . $bg;
+        }
+        if ($fullwidth) {
+            $extraClass .= ' cms-block--fullwidth';
+        }
+        $styleVars = '';
+        $padTop = (string) ($data['_pad_top'] ?? 'default');
+        $padBottom = (string) ($data['_pad_bottom'] ?? 'default');
+        if (isset($padMap[$padTop])) {
+            $styleVars .= '--block-pad-top:' . $padMap[$padTop] . ';';
+        }
+        if (isset($padMap[$padBottom])) {
+            $styleVars .= '--block-pad-bottom:' . $padMap[$padBottom] . ';';
+        }
+        $styleAttr = $styleVars !== '' ? ' style="' . $styleVars . '"' : '';
+
         $wrapped = sprintf(
-            '<section id="block-%d" class="cms-block cms-block--%s cms-block--space-%s" data-block-type="%s"%s>%s</section>',
+            '<section id="block-%d" class="cms-block cms-block--%s cms-block--space-%s%s" data-block-type="%s"%s%s>%s</section>',
             $blockId,
             htmlspecialchars($type, ENT_QUOTES),
             htmlspecialchars($spacing, ENT_QUOTES),
+            $extraClass,
             htmlspecialchars($type, ENT_QUOTES),
             $reveal,
+            $styleAttr,
             $html
         );
 
@@ -248,6 +295,97 @@ final class BlockRenderer
             }
             $data['news'] = $items;
             $data['all_url'] = Locale::url('news', $lang);
+        }
+
+        // Блок «Новости и аналитика»: крупная главная новость + список (для
+        // главной страницы). limit 0 -> 6.
+        if ($type === 'news_feature') {
+            $limit = (int) ($data['limit'] ?? 6);
+            if ($limit <= 0) {
+                $limit = 6;
+            }
+            $lang = Locale::current();
+            $items = [];
+            foreach (\App\Models\News::published($limit, 0, $lang) as $row) {
+                $items[] = [
+                    'title' => (string) $row['title'],
+                    'slug' => (string) $row['slug'],
+                    'published_at' => (string) ($row['published_at'] ?? ''),
+                    'excerpt' => (string) ($row['excerpt'] ?? ''),
+                    'cover' => \App\Models\News::getCoverImage($row),
+                    'url' => Locale::url('news/' . $row['slug'], $lang),
+                ];
+            }
+            $data['news'] = $items;
+            if (($data['all_url'] ?? '') === '') {
+                $data['all_url'] = Locale::url('news', $lang);
+            }
+        }
+
+        // Блок «Новости + документы» (две колонки): лента подтягивается из БД,
+        // документы — ручной список. limit 0 -> 3.
+        if ($type === 'news_docs') {
+            $limit = (int) ($data['limit'] ?? 3);
+            if ($limit <= 0) {
+                $limit = 3;
+            }
+            $lang = Locale::current();
+            $items = [];
+            foreach (\App\Models\News::published($limit, 0, $lang) as $row) {
+                $items[] = [
+                    'title' => (string) $row['title'],
+                    'published_at' => (string) ($row['published_at'] ?? ''),
+                    'cover' => \App\Models\News::getCoverImage($row),
+                    'url' => Locale::url('news/' . $row['slug'], $lang),
+                ];
+            }
+            $data['news'] = $items;
+            if (($data['news_all_url'] ?? '') === '') {
+                $data['news_all_url'] = Locale::url('news', $lang);
+            }
+        }
+
+        // Блок «Проекты» (image_cards) с источником «Проекты»: карточки
+        // собираются автоматически из опубликованных проектов, помеченных
+        // «показать на главном» — без ручного дублирования (задача 42).
+        if ($type === 'image_cards' && ($data['source'] ?? 'manual') === 'projects') {
+            $lang = Locale::current();
+            $limit = (int) ($data['limit'] ?? 6);
+            $items = [];
+            foreach (\App\Models\Project::forHome($limit) as $p) {
+                $items[] = [
+                    'image' => (string) ($p['cover_image'] ?? ''),
+                    'title' => (string) $p['title'],
+                    'text' => '',
+                    'url' => Locale::url('projects/' . $p['slug'], $lang),
+                ];
+            }
+            $data['items'] = $items;
+            if (($data['all_url'] ?? '') === '') {
+                $data['all_url'] = Locale::url('projects', $lang);
+            }
+        }
+
+        // Блок «Медиа» (media_gallery) с источником «Фотоальбомы»: карточки-фото
+        // собираются автоматически из опубликованных альбомов, помеченных
+        // «показать на главном».
+        if ($type === 'media_gallery' && ($data['source'] ?? 'manual') === 'albums') {
+            $lang = Locale::current();
+            $limit = (int) ($data['limit'] ?? 8);
+            $items = [];
+            foreach (\App\Models\PhotoAlbum::forHome($limit) as $a) {
+                $items[] = [
+                    'kind' => 'photo',
+                    'image' => \App\Models\PhotoAlbum::coverFor($a),
+                    'title' => (string) $a['title'],
+                    'meta' => '',
+                    'url' => Locale::url('albums/' . $a['slug'], $lang),
+                ];
+            }
+            $data['items'] = $items;
+            if (($data['all_url'] ?? '') === '') {
+                $data['all_url'] = Locale::url('albums', $lang);
+            }
         }
 
         return $data;

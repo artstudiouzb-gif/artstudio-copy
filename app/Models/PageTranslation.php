@@ -38,10 +38,10 @@ final class PageTranslation
     public static function upsert(int $pageId, string $lang, array $data): void
     {
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO page_translations (page_id, lang, title, meta_title, meta_description)
-             VALUES (:page_id, :lang, :title, :meta_title, :meta_description)
+            'INSERT INTO page_translations (page_id, lang, title, meta_title, meta_description, lead)
+             VALUES (:page_id, :lang, :title, :meta_title, :meta_description, :lead)
              ON DUPLICATE KEY UPDATE title = VALUES(title), meta_title = VALUES(meta_title),
-                meta_description = VALUES(meta_description)'
+                meta_description = VALUES(meta_description), lead = VALUES(lead)'
         );
         $stmt->execute([
             ':page_id' => $pageId,
@@ -49,6 +49,7 @@ final class PageTranslation
             ':title' => $data['title'] ?? null,
             ':meta_title' => $data['meta_title'] ?? null,
             ':meta_description' => $data['meta_description'] ?? null,
+            ':lead' => $data['lead'] ?? null,
         ]);
     }
 }

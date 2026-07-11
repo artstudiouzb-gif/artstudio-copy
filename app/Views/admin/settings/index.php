@@ -2,7 +2,7 @@
 
 use App\Core\Csrf;
 
-$pageTitle = 'Настройки дизайна';
+$pageTitle = 'Настройки';
 $activeNav = 'settings';
 require __DIR__ . '/../layout/header.php';
 
@@ -75,6 +75,28 @@ require __DIR__ . '/../layout/header.php';
         </div>
 
         <fieldset class="settings-group">
+            <legend>Брендинг панели управления</legend>
+            <div class="form-field">
+                <label for="admin_brand_name">Название панели</label>
+                <input type="text" id="admin_brand_name" name="admin_brand_name" maxlength="60"
+                       value="<?= htmlspecialchars($settings['admin_brand_name'] ?? '', ENT_QUOTES) ?>"
+                       placeholder="<?= \App\Core\AdminBrand::DEFAULT_NAME ?>">
+                <span class="form-hint">Показывается в шапке админки, заголовке вкладки и на странице входа. Пусто — «<?= \App\Core\AdminBrand::DEFAULT_NAME ?>».</span>
+            </div>
+            <?= \App\Core\AdminUi::imageField('admin_brand_logo', $settings['admin_brand_logo'] ?? '', [
+                'label' => 'Логотип панели',
+                'file' => 'admin_brand_logo_file',
+            ]) ?>
+            <span class="form-hint">Заменяет буквенный бейдж в шапке админки и на странице входа. Лучше всего — горизонтальный логотип на прозрачном фоне (SVG или PNG).</span>
+            <div class="form-field">
+                <label for="admin_brand_accent">Акцентный цвет панели</label>
+                <input type="color" id="admin_brand_accent" name="admin_brand_accent" style="width:64px;height:38px;padding:4px;"
+                       value="<?= htmlspecialchars(\App\Core\AdminBrand::accent(), ENT_QUOTES) ?>">
+                <span class="form-hint">Кнопки, ссылки и активные пункты меню админки. Стандартный — фиолетовый <?= \App\Core\AdminBrand::DEFAULT_ACCENT ?>; оттенки (hover, подсветка) вычисляются автоматически.</span>
+            </div>
+        </fieldset>
+
+        <fieldset class="settings-group">
             <legend>Вход в панель: код через Telegram</legend>
             <div class="form-field">
                 <label for="telegram_bot_token">Токен Telegram-бота (бесплатно, рекомендуется)</label>
@@ -91,6 +113,21 @@ require __DIR__ . '/../layout/header.php';
                 <input type="text" id="telegram_notify_chat_ids" name="telegram_notify_chat_ids" value="<?= htmlspecialchars($settings['telegram_notify_chat_ids'] ?? '', ENT_QUOTES) ?>" placeholder="123456789, -1001234567890" autocomplete="off" spellcheck="false">
                 <span class="form-hint">Каждая заявка с форм сайта мгновенно приходит сообщением от бота на эти chat_id (через запятую; отрицательный id — групповой чат, куда добавлен бот). Свой chat_id виден в «Профиле» после привязки Telegram. Пусто — уведомления выключены.</span>
             </div>
+        </fieldset>
+
+        <fieldset class="settings-group">
+            <legend>Push-уведомления в браузере</legend>
+            <div class="form-field form-field--checkbox">
+                <input type="checkbox" id="webpush_enabled" name="webpush_enabled" value="1" <?= ($settings['webpush_enabled'] ?? '') === '1' ? 'checked' : '' ?>>
+                <label for="webpush_enabled">Предлагать посетителям push-уведомления о новостях</label>
+            </div>
+            <span class="form-hint">
+                В блоке подписки футера появится кнопка «Уведомления о новостях».
+                При публикации новости уведомление рассылается воркером
+                <code>app/Console/push_worker.php</code> (Cron, как social_worker).
+                Ключи VAPID генерируются автоматически. Нужен HTTPS.
+                Подписчиков сейчас: <strong><?= \App\Models\WebPushSubscription::count() ?></strong>.
+            </span>
         </fieldset>
 
         <fieldset class="settings-group">
@@ -125,6 +162,19 @@ require __DIR__ . '/../layout/header.php';
             <div class="form-field">
                 <label for="pii_retention_days">Срок хранения ПДн (дней, 0 — бессрочно)</label>
                 <input type="number" id="pii_retention_days" name="pii_retention_days" min="0" value="<?= htmlspecialchars($settings['pii_retention_days'] ?? '0', ENT_QUOTES) ?>">
+            </div>
+            <div class="form-field form-field--checkbox">
+                <input type="checkbox" id="form_consent_enabled" name="form_consent_enabled" value="1" <?= ($settings['form_consent_enabled'] ?? '0') === '1' ? 'checked' : '' ?>>
+                <label for="form_consent_enabled">Требовать согласие на обработку персональных данных во всех публичных формах</label>
+            </div>
+            <div class="form-field">
+                <label for="form_consent_text">Текст согласия</label>
+                <input type="text" id="form_consent_text" name="form_consent_text" maxlength="500" value="<?= htmlspecialchars($settings['form_consent_text'] ?? 'Я согласен на обработку персональных данных', ENT_QUOTES) ?>">
+                <span class="form-hint">Ссылка на «Политику конфиденциальности» добавляется автоматически, если страница выбрана выше.</span>
+            </div>
+            <div class="form-field form-field--checkbox">
+                <input type="checkbox" id="captcha_enabled" name="captcha_enabled" value="1" <?= ($settings['captcha_enabled'] ?? '1') === '1' ? 'checked' : '' ?>>
+                <label for="captcha_enabled">Капча на публичных формах (код с картинки, без внешних сервисов)</label>
             </div>
         </fieldset>
 

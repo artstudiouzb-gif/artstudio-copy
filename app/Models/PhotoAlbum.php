@@ -75,18 +75,46 @@ final class PhotoAlbum
         return (int) Database::pdo()->lastInsertId();
     }
 
-    public static function update(int $id, string $title, string $description, string $coverUrl, bool $published): void
+    public static function update(int $id, string $title, string $description, string $coverUrl, bool $published, bool $featured = false): void
     {
         $stmt = Database::pdo()->prepare(
-            'UPDATE photo_albums SET title = :t, description = :d, cover_url = :c, is_published = :p WHERE id = :id'
+            'UPDATE photo_albums SET title = :t, description = :d, cover_url = :c, is_published = :p, is_featured = :f WHERE id = :id'
         );
         $stmt->execute([
             ':t' => mb_substr(trim($title), 0, 255),
             ':d' => trim($description),
             ':c' => mb_substr(trim($coverUrl), 0, 500),
             ':p' => $published ? 1 : 0,
+            ':f' => $featured ? 1 : 0,
             ':id' => $id,
         ]);
+    }
+
+    /**
+     * Альбомы для блока «Медиа» на главной: только помеченные «показать на
+     * главном». Если ни один не отмечен — откат на последние опубликованные.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function forHome(int $limit = 8): array
+    {
+        $limit = max(1, min(24, $limit));
+        $stmt = Database::pdo()->prepare(
+            'SELECT * FROM photo_albums WHERE is_published = 1 AND is_featured = 1
+             ORDER BY created_at DESC, id DESC LIMIT ' . $limit
+        );
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+        if (!empty($rows)) {
+            return $rows;
+        }
+        $stmt = Database::pdo()->prepare(
+            'SELECT * FROM photo_albums WHERE is_published = 1
+             ORDER BY created_at DESC, id DESC LIMIT ' . $limit
+        );
+        $stmt->execute();
+
+        return $stmt->fetchAll();
     }
 
     public static function delete(int $id): void

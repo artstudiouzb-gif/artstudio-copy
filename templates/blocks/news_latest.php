@@ -3,12 +3,13 @@
 $title = $data['title'] ?? '';
 $news = $data['news'] ?? [];
 $allUrl = $data['all_url'] ?? '/news';
+$lang = \App\Core\Locale::current();
 ?>
 <div class="block-news">
     <?php if ($title !== ''): ?>
         <div class="block-news__head">
             <h2 class="block-news__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></h2>
-            <a class="block-news__all" href="<?= htmlspecialchars($allUrl, ENT_QUOTES) ?>">Все новости →</a>
+            <a class="block-news__all" href="<?= htmlspecialchars($allUrl, ENT_QUOTES) ?>"><?= htmlspecialchars(t('Все новости'), ENT_QUOTES) ?> →</a>
         </div>
     <?php endif; ?>
     <?php if (empty($news)): ?>
@@ -25,7 +26,7 @@ $allUrl = $data['all_url'] ?? '/news';
                         <?php endif; ?>
                         <span class="news-card__body">
                             <?php if (!empty($item['published_at'])): ?>
-                                <time class="news-card__date"><?= htmlspecialchars(date('d.m.Y', strtotime((string) $item['published_at'])), ENT_QUOTES) ?></time>
+                                <time class="news-card__date" datetime="<?= htmlspecialchars(substr((string) $item['published_at'], 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars(\App\Core\DateFormatter::long((string) $item['published_at'], $lang), ENT_QUOTES) ?></time>
                             <?php endif; ?>
                             <span class="news-card__title"><?= htmlspecialchars($item['title'], ENT_QUOTES) ?></span>
                             <?php if (!empty($item['excerpt'])): ?>

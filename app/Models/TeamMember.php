@@ -50,7 +50,12 @@ final class TeamMember
             ':sort_order' => $data['sort_order'] ?? 0,
         ]);
 
-        return (int) Database::pdo()->lastInsertId();
+        // id читаем до сброса кэша: bustPageCache() делает запрос к settings,
+        // который обнуляет lastInsertId() (см. Project::create).
+        $id = (int) Database::pdo()->lastInsertId();
+        self::bustPageCache();
+
+        return $id;
     }
 
     public static function update(int $id, array $data): void
@@ -70,11 +75,18 @@ final class TeamMember
             ':sort_order' => $data['sort_order'] ?? 0,
             ':id' => $id,
         ]);
+        self::bustPageCache();
     }
 
     public static function delete(int $id): void
     {
         $stmt = Database::pdo()->prepare('DELETE FROM team_members WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
+    }
+
+    private static function bustPageCache(): void
+    {
+        \App\Core\Cache::forgetPrefix('page:');
     }
 }

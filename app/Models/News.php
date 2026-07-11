@@ -9,7 +9,7 @@ use App\Core\Video;
 
 final class News
 {
-    public const LAYOUTS = ['standard', 'gallery', 'video', 'side_image'];
+    public const LAYOUTS = ['standard', 'gallery', 'video', 'side_image', 'premium'];
 
     public static function normalizeLayout(mixed $layout): string
     {
@@ -90,6 +90,7 @@ final class News
         }
         $stmt = Database::pdo()->prepare('UPDATE news SET status = :s WHERE id = :id AND deleted_at IS NULL');
         $stmt->execute([':s' => $status, ':id' => $id]);
+        self::bustPageCache();
     }
 
     /** Полная копия новости с переводами и галереей (черновик, slug -copy). */
@@ -128,23 +129,41 @@ final class News
     {
         $stmt = Database::pdo()->prepare('UPDATE news SET deleted_at = NULL WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
     }
 
     public static function forceDelete(int $id): void
     {
         $stmt = Database::pdo()->prepare('DELETE FROM news WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
+    }
+
+    /**
+     * Сбрасывает кэш скомпилированных блоков страниц: динамические блоки
+     * (новости на главной и т.п.) кэшируются в составе HTML страницы, поэтому
+     * при изменении новостей их нужно пересобрать.
+     */
+    private static function bustPageCache(): void
+    {
+        \App\Core\Cache::forgetPrefix('page:');
     }
 
     /**
      * Опубликованные новости, локализованные под указанный язык.
      */
-    public static function published(int $limit = 20, int $offset = 0, ?string $lang = null): array
+    public static function published(int $limit = 20, int $offset = 0, ?string $lang = null, ?string $badge = null): array
     {
+        $where = "status = 'published' AND published_at <= NOW() AND deleted_at IS NULL";
+        if ($badge !== null && $badge !== '') {
+            $where .= ' AND badge = :badge';
+        }
         $stmt = Database::pdo()->prepare(
-            "SELECT * FROM news WHERE status = 'published' AND published_at <= NOW() AND deleted_at IS NULL
-             ORDER BY published_at DESC LIMIT :limit OFFSET :offset"
+            "SELECT * FROM news WHERE {$where} ORDER BY published_at DESC LIMIT :limit OFFSET :offset"
         );
+        if ($badge !== null && $badge !== '') {
+            $stmt->bindValue(':badge', $badge);
+        }
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
         $stmt->execute();
@@ -155,6 +174,37 @@ final class News
         }
 
         return array_map(static fn (array $row) => self::localize($row, $lang), $rows);
+    }
+
+    /** Количество опубликованных новостей (для пагинации), опционально по бейджу. */
+    public static function publishedCount(?string $badge = null): int
+    {
+        $where = "status = 'published' AND published_at <= NOW() AND deleted_at IS NULL";
+        if ($badge !== null && $badge !== '') {
+            $where .= ' AND badge = :badge';
+            $stmt = Database::pdo()->prepare("SELECT COUNT(*) FROM news WHERE {$where}");
+            $stmt->execute([':badge' => $badge]);
+
+            return (int) $stmt->fetchColumn();
+        }
+
+        return (int) Database::pdo()->query("SELECT COUNT(*) FROM news WHERE {$where}")->fetchColumn();
+    }
+
+    /**
+     * Список бейджей опубликованных новостей (для фильтра-рубрикатора на
+     * странице «Новости»; бейдж задаётся в админке у каждой новости).
+     *
+     * @return list<string>
+     */
+    public static function distinctBadges(): array
+    {
+        return Database::pdo()->query(
+            "SELECT DISTINCT badge FROM news
+             WHERE status = 'published' AND published_at <= NOW() AND deleted_at IS NULL
+               AND badge IS NOT NULL AND badge <> ''
+             ORDER BY badge"
+        )->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     public static function findById(int $id): ?array
@@ -210,6 +260,28 @@ final class News
         return $row;
     }
 
+    /**
+     * Языки с реальным контентом новости: язык по умолчанию + языки, где
+     * переведён заголовок или текст (roadmap 1.2 — hreflang и переключатель).
+     *
+     * @return string[]
+     */
+    public static function availableLangs(int $id): array
+    {
+        $langs = [Language::defaultCode()];
+
+        $stmt = Database::pdo()->prepare(
+            "SELECT lang FROM news_translations
+             WHERE news_id = :id AND (TRIM(COALESCE(title, '')) <> '' OR TRIM(COALESCE(content, '')) <> '')"
+        );
+        $stmt->execute([':id' => $id]);
+        foreach ($stmt->fetchAll(\PDO::FETCH_COLUMN) as $lang) {
+            $langs[] = (string) $lang;
+        }
+
+        return array_values(array_unique($langs));
+    }
+
     public static function slugExists(string $slug, ?int $excludeId = null): bool
     {
         $sql = 'SELECT COUNT(*) FROM news WHERE slug = :slug';
@@ -247,7 +319,12 @@ final class News
             ':author_id' => $data['author_id'],
         ]);
 
-        return (int) Database::pdo()->lastInsertId();
+        // id читаем до сброса кэша: bustPageCache() делает запрос к settings,
+        // который обнуляет lastInsertId() (см. Project::create).
+        $id = (int) Database::pdo()->lastInsertId();
+        self::bustPageCache();
+
+        return $id;
     }
 
     public static function update(int $id, array $data): void
@@ -275,6 +352,7 @@ final class News
             ':published_at' => $data['published_at'],
             ':id' => $id,
         ]);
+        self::bustPageCache();
     }
 
     public static function delete(int $id): void
@@ -282,5 +360,79 @@ final class News
         // Мягкое удаление: запись отправляется в корзину.
         $stmt = Database::pdo()->prepare('UPDATE news SET deleted_at = NOW() WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
+    }
+
+    /** Дополнительные поля детальной страницы (эскиз): бейдж, тезисы, мероприятие, документы. */
+    public static function updateExtras(int $id, array $data): void
+    {
+        $stmt = Database::pdo()->prepare(
+            'UPDATE news SET badge = :badge, press_release_url = :press_release_url,
+             key_points = :key_points, event_meta = :event_meta, docs = :docs,
+             source_note = :source_note WHERE id = :id'
+        );
+        $stmt->execute([
+            ':badge' => ($data['badge'] ?? '') !== '' ? $data['badge'] : null,
+            ':press_release_url' => ($data['press_release_url'] ?? '') !== '' ? $data['press_release_url'] : null,
+            ':key_points' => ($data['key_points'] ?? '') !== '' ? $data['key_points'] : null,
+            ':event_meta' => ($data['event_meta'] ?? '') !== '' ? $data['event_meta'] : null,
+            ':docs' => !empty($data['docs']) ? json_encode($data['docs'], JSON_UNESCAPED_UNICODE) : null,
+            ':source_note' => ($data['source_note'] ?? '') !== '' ? $data['source_note'] : null,
+            ':id' => $id,
+        ]);
+        self::bustPageCache();
+    }
+
+    /** Счётчик просмотров детальной страницы (без учёта повторов — простая метрика). */
+    public static function incrementViews(int $id): void
+    {
+        Database::pdo()->prepare('UPDATE news SET views = views + 1 WHERE id = :id')
+            ->execute([':id' => $id]);
+    }
+
+    /**
+     * Соседние опубликованные новости по дате публикации (для «предыдущая/следующая»).
+     *
+     * @return array{prev: ?array, next: ?array}
+     */
+    public static function adjacent(array $news, ?string $lang = null): array
+    {
+        $pub = (string) ($news['published_at'] ?? '');
+        $id = (int) $news['id'];
+        $pick = static function (string $op, string $order) use ($pub, $id): ?array {
+            $stmt = Database::pdo()->prepare(
+                "SELECT * FROM news WHERE status = 'published' AND deleted_at IS NULL
+                 AND (published_at {$op} :pub OR (published_at = :pub2 AND id {$op} :id))
+                 ORDER BY published_at {$order}, id {$order} LIMIT 1"
+            );
+            $stmt->execute([':pub' => $pub, ':pub2' => $pub, ':id' => $id]);
+            $row = $stmt->fetch();
+            return $row ?: null;
+        };
+        $prev = $pick('<', 'DESC');
+        $next = $pick('>', 'ASC');
+        if ($lang !== null) {
+            $prev = $prev ? self::localize($prev, $lang) : null;
+            $next = $next ? self::localize($next, $lang) : null;
+        }
+
+        return ['prev' => $prev, 'next' => $next];
+    }
+
+    /** Похожие новости: последние опубликованные, исключая текущую. */
+    public static function related(int $excludeId, int $limit = 4, ?string $lang = null): array
+    {
+        $limit = max(1, min(12, $limit));
+        $stmt = Database::pdo()->prepare(
+            "SELECT * FROM news WHERE status = 'published' AND deleted_at IS NULL AND id <> :id
+             ORDER BY published_at DESC, id DESC LIMIT {$limit}"
+        );
+        $stmt->execute([':id' => $excludeId]);
+        $rows = $stmt->fetchAll() ?: [];
+        if ($lang !== null) {
+            $rows = array_map(static fn (array $r): array => self::localize($r, $lang), $rows);
+        }
+
+        return $rows;
     }
 }

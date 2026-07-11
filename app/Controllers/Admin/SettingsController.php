@@ -53,6 +53,28 @@ final class SettingsController
         Setting::set('privacy_policy_page_id', $privacyPageId > 0 ? (string) $privacyPageId : '');
         Setting::set('pii_retention_days', (string) SettingsValidator::nonNegativeInt((string) ($_POST['pii_retention_days'] ?? ''), 0));
 
+        // Согласие на обработку персональных данных в публичных формах.
+        Setting::set('form_consent_enabled', !empty($_POST['form_consent_enabled']) ? '1' : '0');
+        Setting::set('form_consent_text', mb_substr(trim((string) ($_POST['form_consent_text'] ?? '')), 0, 500));
+
+        // Капча на публичных формах (включена по умолчанию).
+        Setting::set('captcha_enabled', !empty($_POST['captcha_enabled']) ? '1' : '0');
+
+        // --- Брендинг панели управления (white-label) ---
+        Setting::set('admin_brand_name', mb_substr(trim((string) ($_POST['admin_brand_name'] ?? '')), 0, 60));
+        $brandLogo = ImageField::resolve('admin_brand_logo_file', 'admin_brand_logo', Setting::get('admin_brand_logo'), Auth::id());
+        Setting::set('admin_brand_logo', $brandLogo ?? '');
+        Setting::set('admin_brand_accent', SettingsValidator::hexColor(
+            (string) ($_POST['admin_brand_accent'] ?? ''),
+            \App\Core\AdminBrand::DEFAULT_ACCENT
+        ));
+
+        // --- Webpush-уведомления о новостях ---
+        Setting::set('webpush_enabled', !empty($_POST['webpush_enabled']) ? '1' : '0');
+        if (!empty($_POST['webpush_enabled'])) {
+            \App\Core\WebPush::ensureKeys(); // пара VAPID создаётся один раз
+        }
+
         // --- Favicon / PWA / Theme Color ---
         $favicon = ImageField::resolve('favicon_file', 'favicon_url', Setting::get('favicon_url'), Auth::id());
         Setting::set('favicon_url', $favicon ?? '');
