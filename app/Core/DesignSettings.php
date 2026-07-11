@@ -85,9 +85,9 @@ final class DesignSettings
         ],
         'container' => [
             'label' => 'Ширина контейнера',
-            'hint' => 'Максимальная ширина основного содержимого.',
+            'hint' => 'Максимальная ширина основного содержимого. Ниже можно задать свою точную ширину.',
             'group' => 'Общие',
-            'choices' => ['narrow' => 'Узкий', 'standard' => 'Стандарт', 'wide' => 'Широкий'],
+            'choices' => ['narrow' => 'Узкий', 'standard' => 'Стандарт', 'wide' => 'Широкий', 'ultra' => 'Очень широкий', 'full' => 'На всю ширину'],
             'default' => 'standard',
         ],
         'radius' => [
@@ -238,12 +238,40 @@ final class DesignSettings
     }
 
     /** Сохраняет набор значений (только известные опции). @param array<string,mixed> $input */
+    /**
+     * Своя ширина контейнера (design_container_custom): '' если не задана/
+     * невалидна. Принимает 640–2400 (px), px/rem/vw/% с единицей, или число.
+     */
+    public static function containerCustom(): string
+    {
+        $raw = trim((string) Setting::get('design_container_custom', ''));
+        return self::normalizeWidth($raw);
+    }
+
+    /** Нормализует пользовательскую ширину или возвращает '' при невалидной. */
+    public static function normalizeWidth(string $raw): string
+    {
+        if ($raw === '') {
+            return '';
+        }
+        if (preg_match('/^\d{2,4}(px|rem|vw|%)$/', $raw)) {
+            return $raw;
+        }
+        if (preg_match('/^\d{3,4}$/', $raw)) {
+            $n = (int) $raw;
+            return ($n >= 640 && $n <= 2400) ? $n . 'px' : '';
+        }
+        return '';
+    }
+
     public static function save(array $input): void
     {
         foreach (self::OPTIONS as $key => $opt) {
             $val = self::sanitize($key, (string) ($input[$key] ?? ''));
             Setting::set('design_' . $key, (string) $val);
         }
+        // Своя ширина контейнера — отдельное свободное поле (не из choices).
+        Setting::set('design_container_custom', self::normalizeWidth(trim((string) ($input['container_custom'] ?? ''))));
 
         // Материализация палитры/шрифта в реальные настройки сайта
         // (color_primary/color_accent/font_family, их читает фронтенд).
@@ -408,7 +436,12 @@ final class DesignSettings
      */
     public static function cssVariables(array $v): string
     {
-        $container = ['narrow' => '1080px', 'standard' => '1200px', 'wide' => '1360px'][$v['container']] ?? '1200px';
+        $container = ['narrow' => '1080px', 'standard' => '1200px', 'wide' => '1360px', 'ultra' => '1560px', 'full' => 'none'][$v['container']] ?? '1200px';
+        // Своя точная ширина имеет приоритет над пресетом (число трактуем как px).
+        $custom = self::containerCustom();
+        if ($custom !== '') {
+            $container = $custom;
+        }
         $radius = ['none' => '0px', 'small' => '8px', 'medium' => '14px', 'large' => '22px'][$v['radius']] ?? '14px';
         $gap = ['xs' => '8px', 'sm' => '16px', 'md' => '24px', 'lg' => '32px'][$v['card_gap']] ?? '24px';
         $section = ['compact' => '28px', 'standard' => '46px', 'spacious' => '72px'][$v['density']] ?? '46px';

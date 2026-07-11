@@ -115,6 +115,19 @@ foreach ($options as $key => $opt) {
     <?php endforeach; ?>
 
     <section class="design-section">
+        <h2 class="design-section__title">Своя ширина контейнера</h2>
+        <div class="design-opt">
+            <div class="design-opt__label">
+                <span>Точная ширина</span>
+                <small>Перекрывает выбор «Ширина контейнера» выше. Напр. <code>1440px</code>, <code>90%</code> или число <code>1440</code> (px). Пусто — использовать пресет.</small>
+            </div>
+            <div class="design-opt__choices">
+                <input type="text" name="container_custom" value="<?= htmlspecialchars((string) \App\Models\Setting::get('design_container_custom', ''), ENT_QUOTES) ?>" placeholder="напр. 1440px" style="max-width:220px;">
+            </div>
+        </div>
+    </section>
+
+    <section class="design-section">
         <h2 class="design-section__title">Google-шрифты</h2>
         <p class="form-hint" style="margin:0 0 12px;">
             Отдельные шрифты для заголовков и текста из каталога Google Fonts

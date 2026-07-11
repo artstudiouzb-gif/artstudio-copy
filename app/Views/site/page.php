@@ -24,6 +24,9 @@ if (empty($page['is_home']) && !$hideChrome) {
     // hero (поверх фона, сверху), а не отдельной серой полосой над ним.
     $firstIsHero = (bool) preg_match('/^\s*<section\b[^>]*\bcms-block--hero\b/', $content);
     if ($firstIsHero) {
+        // Помечаем первый hero как «шапку страницы» — CSS убирает отступ между
+        // шапкой сайта и hero (герой встаёт вплотную под меню).
+        $content = preg_replace('/(class="[^"]*\bcms-block--hero\b)/', '$1 cms-block--page-hero', $content, 1);
         $crumbsClass = 'content-crumbs--on-hero';
         ob_start();
         require __DIR__ . '/_crumbs.php';
