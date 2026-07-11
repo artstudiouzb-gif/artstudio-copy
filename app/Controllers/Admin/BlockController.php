@@ -334,6 +334,13 @@ final class BlockController
         return '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . urlencode((string) $block['lang']);
     }
 
+    /** Валидный #RRGGBB в нижнем регистре или пустая строка (значение по умолчанию). */
+    private static function hexOrEmpty(mixed $v): string
+    {
+        $v = trim((string) $v);
+        return preg_match('/^#[0-9a-fA-F]{6}$/', $v) ? strtolower($v) : '';
+    }
+
     private function collectData(string $type, string $locale = 'ru'): array
     {
         switch ($type) {
@@ -472,6 +479,9 @@ final class BlockController
                 }
                 return [
                     'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    // Галочка «по умолчанию» сбрасывает цвет (color-input всегда шлёт значение).
+                    'card_bg' => empty($_POST['card_bg_off']) ? self::hexOrEmpty($_POST['card_bg'] ?? '') : '',
+                    'text_color' => empty($_POST['text_color_off']) ? self::hexOrEmpty($_POST['text_color'] ?? '') : '',
                     'items' => $items,
                 ];
             case 'team_list':
@@ -581,6 +591,8 @@ final class BlockController
                     'overlay_color' => $hexColor(trim((string) ($_POST['overlay_color'] ?? '')), '#0b1a30'),
                     'overlay_opacity' => $pct($_POST['overlay_opacity'] ?? null, 55),
                     'text_position' => in_array($_POST['text_position'] ?? 'left', ['left', 'center', 'right'], true) ? $_POST['text_position'] : 'left',
+                    'text_color' => empty($_POST['text_color_off']) ? self::hexOrEmpty($_POST['text_color'] ?? '') : '',
+                    'button_color' => empty($_POST['button_color_off']) ? self::hexOrEmpty($_POST['button_color'] ?? '') : '',
                     'panel_enabled' => !empty($_POST['panel_enabled']),
                     'panel_color' => $hexColor(trim((string) ($_POST['panel_color'] ?? '')), '#0b1a30'),
                     'panel_opacity' => $pct($_POST['panel_opacity'] ?? null, 40),

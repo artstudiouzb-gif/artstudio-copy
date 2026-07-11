@@ -43,6 +43,16 @@ test('Hero: позиция текста и подложка отражаются
     assert_true(str_contains($html, 'rgba(0,0,0, 0.5)'), 'подложка rgba из цвета и прозрачности');
 });
 
+test('Hero: цвет текста и кнопок отдаются CSS-переменными', function () {
+    $html = render_hero([
+        'title' => 'X', 'bg_type' => 'image', 'image' => '/x.jpg',
+        'text_color' => '#112233', 'button_color' => '#aabbcc',
+        'button_text' => 'Кнопка', 'button_url' => '/o-nas',
+    ]);
+    assert_true(str_contains($html, '--hero-text:#112233'), 'переменная цвета текста');
+    assert_true(str_contains($html, '--hero-btn:#aabbcc'), 'переменная цвета кнопок');
+});
+
 test('Hero: без bg_type определяет тип по заполненным полям (обратная совместимость)', function () {
     $html = render_hero(['title' => 'X', 'image' => '/uploads/public/x.jpg']);
     assert_true(str_contains($html, 'block-hero--media'), 'старый блок с картинкой = медиа-герой');

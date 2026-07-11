@@ -113,12 +113,14 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 }
 
 /* --- Полоса статистики (counters): белая карта с плитками и кружком-иконкой --- */
-.block-counters { background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: 14px; padding: clamp(20px, 3vw, 34px); box-shadow: 0 10px 30px rgba(19,42,92,.06); }
+.block-counters { background: var(--counters-bg, var(--gov-surface)); border: 1px solid var(--gov-border); border-radius: 14px; padding: clamp(20px, 3vw, 34px); box-shadow: 0 10px 30px rgba(19,42,92,.06); }
+.block-counters__title { color: var(--counters-text, var(--gov-navy)); }
 .block-counters__grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0; }
 .counter { border: 0; border-right: 1px solid var(--gov-border); border-radius: 0; padding: 6px 26px; box-shadow: none; background: transparent; flex-direction: row; align-items: center; gap: 16px; }
 .counter:last-child { border-right: 0; }
-.counter__value, .counter__suffix { color: var(--gov-navy); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: clamp(28px, 3.2vw, 40px); }
-.counter__label { color: var(--gov-muted); font-size: .9rem; margin: 0; }
+.counter__value, .counter__suffix { color: var(--counters-text, var(--gov-navy)); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: clamp(28px, 3.2vw, 40px); }
+.counter__label { color: var(--counters-text, var(--gov-muted)); font-size: .9rem; margin: 0; }
+.block-counters[style*="--counters-text"] .counter__label { opacity: .78; }
 @media (max-width: 720px) { .counter { border-right: 0; border-bottom: 1px solid var(--gov-border); padding: 14px 0; } .counter:last-child { border-bottom: 0; } }
 
 /* --- Секции: серифные заголовки с teal-акцентом --- */
@@ -128,8 +130,8 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 
 /* --- Hero: плоский, светлый; серифный титул --- */
 .block-hero { background: var(--gov-surface); border: 1px solid var(--gov-border); }
-.block-hero__title { color: var(--gov-navy); }
-.block-hero__subtitle { color: var(--gov-muted); }
+.block-hero__title { color: var(--hero-text, var(--gov-navy)); }
+.block-hero__subtitle { color: var(--hero-text, var(--gov-muted)); }
 
 /* --- Сетка категорий: активная плитка teal --- */
 .cat-tile.is-active { background: color-mix(in srgb, var(--gov-teal) 10%, var(--gov-surface)); border-color: var(--gov-teal); }
@@ -175,11 +177,12 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .block-hero--media .block-hero__text { max-width: 620px; }
 .block-hero__eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--gov-teal); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
 .block-hero__eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--gov-teal); }
-.block-hero--media .block-hero__title { color: #fff; font-size: clamp(2.2rem, 4.6vw, 3.7rem); line-height: 1.12; margin: 0 0 20px; }
-.block-hero--media .block-hero__subtitle { color: rgba(255,255,255,.85); font-size: clamp(1.02rem, 1.5vw, 1.18rem); max-width: 520px; }
+.block-hero--media .block-hero__title { color: var(--hero-text, #fff); font-size: clamp(2.2rem, 4.6vw, 3.7rem); line-height: 1.12; margin: 0 0 20px; }
+.block-hero--media .block-hero__subtitle { color: var(--hero-text, rgba(255,255,255,.85)); font-size: clamp(1.02rem, 1.5vw, 1.18rem); max-width: 520px; }
 .block-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 30px; }
 .block-hero__button { display: inline-block; padding: 14px 26px; background: var(--gov-navy); color: #fff; text-transform: uppercase; font-size: 13px; letter-spacing: .06em; font-weight: 700; border-radius: 4px; text-decoration: none; }
-.block-hero--media .block-hero__button { background: #16406e; }
+.block-hero--media .block-hero__button { background: var(--hero-btn, #16406e); }
+.block-hero:not(.block-hero--media) .block-hero__button { background: var(--hero-btn, var(--gov-navy)); }
 .block-hero__button--ghost { background: transparent; border: 1px solid rgba(255,255,255,.5); }
 .block-hero__button--ghost:hover { background: rgba(255,255,255,.1); }
 .block-hero__play { display: inline-flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
@@ -207,15 +210,23 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 
 @media (max-width: 720px) { .block-hero__scrim { background: linear-gradient(180deg, rgba(11,26,48,.7), rgba(11,26,48,.9)); } }
 
-/* Полоса статистики — белая карта, «наезжает» на герой; иконка в кружке. */
-.cms-block--hero + .cms-block--counters { padding-top: 0 !important; }
-.cms-block--hero + .cms-block--counters .block-counters { margin-top: -56px; position: relative; z-index: 3; }
+/* Полоса статистики — белая карта, «наплывает» на нижний край фона hero.
+   Работает на любой странице, где блок счётчиков идёт сразу за hero. */
+.cms-block--hero:has(+ .cms-block--counters) { padding-bottom: 0; }
+/* Запас снизу внутри hero, чтобы карта наезжала на фон, а не на текст/кнопки. */
+.cms-block--hero:has(+ .cms-block--counters) .block-hero--media { padding-bottom: clamp(80px, 9vw, 130px); }
+.cms-block--hero + .cms-block--counters { padding-top: 0 !important; position: relative; z-index: 3; }
+.cms-block--hero + .cms-block--counters .block-counters { margin-top: clamp(-120px, -9vw, -80px); position: relative; z-index: 3; }
 .counter { flex-direction: row; align-items: center; gap: 16px; }
-.counter__icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0; background: color-mix(in srgb, var(--gov-navy) 7%, transparent); color: var(--gov-navy); }
+.counter__icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0; background: color-mix(in srgb, var(--counters-text, var(--gov-navy)) 8%, transparent); color: var(--counters-text, var(--gov-navy)); }
 .counter__icon svg { width: 26px; height: 26px; }
 .counter__num { display: flex; align-items: baseline; gap: 4px; }
 .counter__body { display: flex; flex-direction: column; gap: 2px; }
-@media (max-width: 720px) { .cms-block--hero + .cms-block--counters .block-counters { margin-top: 0; } }
+@media (max-width: 720px) {
+    .cms-block--hero:has(+ .cms-block--counters) .block-hero--media { padding-bottom: 0; }
+    .cms-block--hero + .cms-block--counters { padding-top: var(--space-premium) !important; }
+    .cms-block--hero + .cms-block--counters .block-counters { margin-top: 0; }
+}
 
 /* Заголовок секции: серифный + ссылка «Все …». */
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }

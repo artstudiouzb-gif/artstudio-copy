@@ -33,6 +33,13 @@ $panelOn = !empty($data['panel_enabled']);
 $panelColor = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['panel_color'] ?? '')) ? $data['panel_color'] : '#0b1a30';
 $panelOpacity = max(0, min(100, (int) ($data['panel_opacity'] ?? 40))) / 100;
 $textPos = in_array($data['text_position'] ?? 'left', ['left', 'center', 'right'], true) ? $data['text_position'] : 'left';
+$heroText = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['text_color'] ?? '')) ? $data['text_color'] : '';
+$heroBtn = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['button_color'] ?? '')) ? $data['button_color'] : '';
+
+// Инлайн-стиль контейнера текста: подложка + переопределения цветов через CSS-переменные.
+$textStyle = ($panelOn ? 'background: rgba(' . $hex2rgb($panelColor) . ', ' . $panelOpacity . ');' : '')
+    . ($heroText !== '' ? '--hero-text:' . $heroText . ';' : '')
+    . ($heroBtn !== '' ? '--hero-btn:' . $heroBtn . ';' : '');
 
 $btnText = trim((string) ($data['button_text'] ?? ''));
 $btnUrl = trim((string) ($data['button_url'] ?? ''));
@@ -58,7 +65,7 @@ $heroHeight = ($data['height'] ?? 'regular') === 'full' ? 'full' : 'regular';
     <?php endif; ?>
     <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true" style="background: rgba(<?= $hex2rgb($ovColor) ?>, <?= $ovOpacity ?>);"></div><?php endif; ?>
     <div class="block-hero__inner">
-        <div class="block-hero__text<?= $panelOn ? ' block-hero__text--panel' : '' ?>"<?= $panelOn ? ' style="background: rgba(' . $hex2rgb($panelColor) . ', ' . $panelOpacity . ');"' : '' ?>>
+        <div class="block-hero__text<?= $panelOn ? ' block-hero__text--panel' : '' ?>"<?= $textStyle !== '' ? ' style="' . $textStyle . '"' : '' ?>>
             <?php if ($eyebrow !== ''): ?><span class="block-hero__eyebrow"><?= htmlspecialchars($eyebrow, ENT_QUOTES) ?></span><?php endif; ?>
             <?php if ($title !== ''): ?><h1 class="block-hero__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></h1><?php endif; ?>
             <?php if ($subtitle !== ''): ?><p class="block-hero__subtitle"><?= htmlspecialchars($subtitle, ENT_QUOTES) ?></p><?php endif; ?>
