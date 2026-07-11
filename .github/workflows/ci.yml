@@ -67,9 +67,6 @@ jobs:
   static-analysis:
     name: Static analysis (PHPStan, advisory)
     runs-on: ubuntu-latest
-    # Пока без базлайна — задача информативная и НЕ блокирует пайплайн.
-    # Когда ошибки будут разобраны, снимите continue-on-error и поднимите level.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -81,5 +78,9 @@ jobs:
           tools: phpstan
           coverage: none
 
-      - name: PHPStan
-        run: phpstan analyse --no-progress --error-format=github
+      # Пока без базлайна — шаг информативный: находки видны в логе, но НЕ роняют
+      # пайплайн (иначе постоянный красный крест приучает игнорировать CI).
+      # Когда находки разберут и заведут baseline — уберите «|| true» и включите
+      # блокировку.
+      - name: PHPStan (advisory, non-blocking)
+        run: phpstan analyse --no-progress --error-format=table || true
