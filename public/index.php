@@ -214,6 +214,11 @@ $router->post('/admin/albums/{id}/update', [\App\Controllers\Admin\AlbumControll
 $router->post('/admin/albums/{id}/delete', [\App\Controllers\Admin\AlbumController::class, 'destroy']);
 $router->post('/admin/albums/{id}/images/add', [\App\Controllers\Admin\AlbumController::class, 'addImage']);
 $router->post('/admin/albums/{id}/images/{imageId}/delete', [\App\Controllers\Admin\AlbumController::class, 'deleteImage']);
+$router->get('/admin/videos', [\App\Controllers\Admin\VideoController::class, 'index']);
+$router->post('/admin/videos/create', [\App\Controllers\Admin\VideoController::class, 'store']);
+$router->get('/admin/videos/{id}/edit', [\App\Controllers\Admin\VideoController::class, 'edit']);
+$router->post('/admin/videos/{id}/update', [\App\Controllers\Admin\VideoController::class, 'update']);
+$router->post('/admin/videos/{id}/delete', [\App\Controllers\Admin\VideoController::class, 'destroy']);
 $router->get('/admin/redirects', [\App\Controllers\Admin\RedirectController::class, 'index']);
 $router->post('/admin/redirects/create', [\App\Controllers\Admin\RedirectController::class, 'store']);
 $router->post('/admin/redirects/import', [\App\Controllers\Admin\RedirectController::class, 'import']);

@@ -536,6 +536,23 @@ CREATE TABLE IF NOT EXISTS photo_album_images (
     CONSTRAINT fk_album_images FOREIGN KEY (album_id) REFERENCES photo_albums (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Видеозаписи: обложка + ссылка на видео (YouTube/внешнее). Блок «Медиа» на
+-- главной собирает отмеченные (is_featured) автоматически.
+CREATE TABLE IF NOT EXISTS videos (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title        VARCHAR(255) NOT NULL,
+    slug         VARCHAR(255) NOT NULL,
+    description  TEXT NULL,
+    cover_url    VARCHAR(500) NOT NULL DEFAULT '',
+    video_url    VARCHAR(500) NOT NULL DEFAULT '',
+    duration     VARCHAR(20) NOT NULL DEFAULT '',
+    is_published TINYINT(1) NOT NULL DEFAULT 1,
+    is_featured  TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'показывать на главной (блок Медиа)',
+    sort_order   INT NOT NULL DEFAULT 0,
+    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_videos_slug (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ---------------------------------------------------------------------------
 -- Подписчики email-дайджеста новостей
 -- ---------------------------------------------------------------------------
@@ -803,7 +820,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_10_social_telegram.sql'),
     ('2026_07_10_webpush.sql'),
     ('2026_07_11_pages_lead.sql'),
-    ('2026_07_11_featured_home.sql')
+    ('2026_07_11_featured_home.sql'),
+    ('2026_07_12_videos.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;
