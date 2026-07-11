@@ -1,0 +1,13 @@
+parameters:
+    level: 3
+    paths:
+        - app
+        - public/index.php
+    excludePaths:
+        - tests/*
+    # Проект без Composer/vendor: классы грузятся собственным автолоадером,
+    # поэтому подсказываем PHPStan, где искать исходники.
+    scanDirectories:
+        - app
+    treatPhpDocTypesAsCertain: false
+    reportUnmatchedIgnoredErrors: false
