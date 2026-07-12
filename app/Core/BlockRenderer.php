@@ -388,6 +388,23 @@ final class BlockRenderer
             }
         }
 
+        // media_gallery с источником «Видео»: карточки собираются из
+        // опубликованных видео, помеченных «показать на главном».
+        if ($type === 'media_gallery' && ($data['source'] ?? 'manual') === 'videos') {
+            $limit = (int) ($data['limit'] ?? 8);
+            $items = [];
+            foreach (\App\Models\Video::forHome($limit) as $v) {
+                $items[] = [
+                    'kind' => 'video',
+                    'image' => (string) ($v['cover_url'] ?? ''),
+                    'title' => (string) $v['title'],
+                    'meta' => (string) ($v['duration'] ?? ''),
+                    'url' => (string) ($v['video_url'] ?? ''),
+                ];
+            }
+            $data['items'] = $items;
+        }
+
         return $data;
     }
 

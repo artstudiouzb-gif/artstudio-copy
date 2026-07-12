@@ -519,14 +519,21 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <div class="form-field"><label for="all_text">Ссылка «Все …» — текст</label><input type="text" id="all_text" name="all_text" value="<?= htmlspecialchars($data['all_text'] ?? '', ENT_QUOTES) ?>" placeholder="Все направления"></div>
             <div class="form-field"><label for="all_url">Ссылка «Все …» — URL</label><input type="text" id="all_url" name="all_url" value="<?= htmlspecialchars($data['all_url'] ?? '', ENT_QUOTES) ?>"></div>
             <?php if ($type === 'image_cards' || $type === 'media_gallery'): ?>
-                <?php $srcVal = $data['source'] ?? 'manual'; $srcAuto = $type === 'image_cards' ? 'projects' : 'albums'; $srcAutoLabel = $type === 'image_cards' ? 'Из раздела «Проекты» (отмеченные «на главной»)' : 'Из фотоальбомов (отмеченные «на главной»)'; ?>
+                <?php
+                $srcVal = $data['source'] ?? 'manual';
+                $srcOptions = $type === 'image_cards'
+                    ? ['projects' => 'Из раздела «Проекты» (отмеченные «на главной»)']
+                    : ['albums' => 'Из фотоальбомов (отмеченные «на главной»)', 'videos' => 'Из раздела «Видео» (отмеченные «на главной»)'];
+                ?>
                 <div class="form-field">
                     <label for="source">Источник данных</label>
                     <select id="source" name="source">
-                        <option value="manual" <?= $srcVal !== $srcAuto ? 'selected' : '' ?>>Ручной список (ниже)</option>
-                        <option value="<?= $srcAuto ?>" <?= $srcVal === $srcAuto ? 'selected' : '' ?>><?= htmlspecialchars($srcAutoLabel, ENT_QUOTES) ?></option>
+                        <option value="manual" <?= !isset($srcOptions[$srcVal]) ? 'selected' : '' ?>>Ручной список (ниже)</option>
+                        <?php foreach ($srcOptions as $val => $label): ?>
+                            <option value="<?= $val ?>" <?= $srcVal === $val ? 'selected' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES) ?></option>
+                        <?php endforeach; ?>
                     </select>
-                    <span class="form-hint">При выборе автоматического источника карточки собираются из отмеченных записей, а список ниже игнорируется. Отмечайте записи галочкой «Показать на главной» в разделе <?= $type === 'image_cards' ? '«Проекты»' : '«Фотоальбомы»' ?>.</span>
+                    <span class="form-hint">При выборе автоматического источника карточки собираются из отмеченных записей, а список ниже игнорируется. Отмечайте записи галочкой «Показать на главной» в соответствующем разделе.</span>
                 </div>
                 <div class="form-field"><label for="limit">Сколько карточек показывать</label><input type="number" id="limit" name="limit" min="2" max="24" value="<?= (int) ($data['limit'] ?? ($type === 'image_cards' ? 6 : 8)) ?>"></div>
             <?php endif; ?>

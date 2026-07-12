@@ -650,8 +650,8 @@ final class BlockController
                 $source = 'manual';
                 if ($type === 'image_cards' && ($_POST['source'] ?? '') === 'projects') {
                     $source = 'projects';
-                } elseif ($type === 'media_gallery' && ($_POST['source'] ?? '') === 'albums') {
-                    $source = 'albums';
+                } elseif ($type === 'media_gallery' && in_array($_POST['source'] ?? '', ['albums', 'videos'], true)) {
+                    $source = (string) $_POST['source'];
                 }
                 return [
                     'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),

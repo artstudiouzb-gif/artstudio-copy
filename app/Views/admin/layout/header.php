@@ -62,6 +62,7 @@ try {
 
 $navTools = [
     'albums' => ['/admin/albums', 'Фотоальбомы'],
+    'videos' => ['/admin/videos', 'Видео'],
     'forms' => ['/admin/forms', 'Формы'],
     'files' => ['/admin/files', 'Файлы'],
     'trash' => ['/admin/trash', 'Корзина'],
