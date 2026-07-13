@@ -22,7 +22,7 @@ foreach ($fields as $f) {
 require __DIR__ . '/_header.php';
 
 $crumbs = [
-    ['label' => 'Главная', 'url' => Locale::url('/')],
+    ['label' => t('Главная'), 'url' => Locale::url('/')],
     ['label' => (string) $type['name'], 'url' => Locale::url('catalog/' . $type['slug'])],
     ['label' => (string) $entry['title']],
 ];
@@ -90,7 +90,7 @@ $sideFields = array_values(array_filter($fields, static fn ($f) => !in_array($f[
 $schemaBase = rtrim((string) \App\Core\Config::get('app.url', ''), '/');
 $schemaUrl = static fn (string $p): string => $schemaBase . \App\Core\Locale::url($p);
 echo \App\Core\SchemaOrg::render(\App\Core\SchemaOrg::breadcrumbs([
-    ['Главная', $schemaUrl('/')],
+    [t('Главная'), $schemaUrl('/')],
     [(string) $type['name'], $schemaUrl('catalog/' . $type['slug'])],
     [(string) $entry['title'], ''],
 ])), "\n";

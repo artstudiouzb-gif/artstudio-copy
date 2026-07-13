@@ -10,8 +10,8 @@ $ogImage = trim((string) ($project['cover_image'] ?? ''));
 require __DIR__ . '/_header.php';
 
 $crumbs = [
-    ['label' => 'Главная', 'url' => Locale::url('/')],
-    ['label' => 'Проекты', 'url' => Locale::url('projects')],
+    ['label' => t('Главная'), 'url' => Locale::url('/')],
+    ['label' => t('Проекты'), 'url' => Locale::url('projects')],
     ['label' => (string) $project['title']],
 ];
 require __DIR__ . '/_crumbs.php';

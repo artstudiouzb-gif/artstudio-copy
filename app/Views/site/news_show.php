@@ -28,8 +28,8 @@ AssetCollector::requireJs('news');
 require __DIR__ . '/_header.php';
 
 $crumbs = [
-    ['label' => 'Главная', 'url' => Locale::url('/')],
-    ['label' => 'Новости', 'url' => Locale::url('news')],
+    ['label' => t('Главная'), 'url' => Locale::url('/')],
+    ['label' => t('Новости'), 'url' => Locale::url('news')],
     ['label' => (string) $news['title']],
 ];
 require __DIR__ . '/_crumbs.php';

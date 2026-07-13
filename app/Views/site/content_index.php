@@ -18,7 +18,7 @@ $metaDescription = (string) ($type['description'] ?? '');
 require __DIR__ . '/_header.php';
 
 $crumbs = [
-    ['label' => 'Главная', 'url' => Locale::url('/')],
+    ['label' => t('Главная'), 'url' => Locale::url('/')],
     ['label' => (string) $type['name']],
 ];
 require __DIR__ . '/_crumbs.php';
