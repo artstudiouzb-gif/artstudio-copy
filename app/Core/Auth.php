@@ -18,7 +18,7 @@ final class Auth
      * Другие методы 2FA (TOTP, backup-коды) для админки отключены.
      *
      * Статусы: needs_code — код отправлен, ждём подтверждения;
-     * ok — вход выполнен (шлюз не настроен или у пользователя нет телефона);
+     * setup_required — пароль верен, но второй фактор ещё не настроен;
      * send_failed — шлюз не принял сообщение; invalid/locked — как раньше.
      *
      * @return array{status: string, retry_after?: int}
@@ -44,15 +44,18 @@ final class Auth
         session_regenerate_id(true);
 
         if (!self::hasCodeChannel($user)) {
-            // Ни бот, ни шлюз не доступны этому пользователю — входим по
-            // паролю. Фиксируем в security-логе, чтобы это было видно.
-            Logger::security('Вход без кода подтверждения (Telegram-доставка не настроена)', [
+            // Разрешаем только ограниченную onboarding-сессию: middleware во
+            // front controller пропустит её лишь в профиль/настройки, пока
+            // пользователь не подключит Telegram. Админка не должна тихо
+            // деградировать до одного пароля.
+            self::establishSession($user);
+            $_SESSION['2fa_setup_required'] = true;
+            Logger::security('Вход ограничен до настройки второго фактора', [
                 'user' => (string) $user['username'],
                 'ip' => $ip,
             ]);
-            self::establishSession($user);
 
-            return ['status' => 'ok'];
+            return ['status' => 'setup_required'];
         }
 
         $_SESSION['pending_user_id'] = (int) $user['id'];
@@ -287,6 +290,16 @@ final class Auth
     public static function role(): string
     {
         return (string) ($_SESSION['role'] ?? 'editor');
+    }
+
+    public static function requiresTwoFactorSetup(): bool
+    {
+        return !empty($_SESSION['2fa_setup_required']);
+    }
+
+    public static function completeTwoFactorSetup(): void
+    {
+        unset($_SESSION['2fa_setup_required']);
     }
 
     /**

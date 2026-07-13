@@ -36,6 +36,9 @@ final class WordPressImporter
     public static function importAll(string $baseUrl, array $opts = []): array
     {
         $base = rtrim($baseUrl, '/');
+        if (!UrlGuard::isSafeRemote($base)) {
+            throw new \InvalidArgumentException('Адрес WordPress небезопасен или указывает на внутреннюю сеть.');
+        }
         $perPage = max(1, min(100, (int) ($opts['perPage'] ?? 20)));
         $limit = (int) ($opts['limit'] ?? 0); // 0 = все
         $status = ($opts['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
@@ -181,7 +184,7 @@ final class WordPressImporter
             // Нормализуем (снимаем Photon-CDN и query) — так внутренние картинки,
             // завёрнутые в i0.wp.com, распознаются как «свои» и тянутся в оригинале.
             $abs = self::normalizeImageUrl(self::absoluteUrl($src, $base));
-            if ($base !== '' && !str_starts_with($abs, $base)) {
+            if ($base !== '' && !self::sameOrigin($abs, $base)) {
                 continue; // внешние картинки не тянем
             }
             $cached = isset(self::$imageCache[$abs]);
@@ -353,7 +356,7 @@ final class WordPressImporter
                     $got = @copy($local, $tmp); // копия: оригинал в папке не трогаем
                 }
             }
-            if (!$got) {
+            if (!$got && UrlGuard::isSafeRemote($url)) {
                 $got = self::download($url, $tmp);
             }
             if (!$got) {
@@ -382,10 +385,14 @@ final class WordPressImporter
         }
     }
 
-    /** Скачивание с follow-редиректов (WP-медиа иногда редиректит). */
+    /** Скачивание без автоматических редиректов: иначе новый Location мог бы
+     * увести запрос на loopback/приватную сеть после первичной SSRF-проверки. */
     private static function download(string $url, string $dest): bool
     {
         if (!function_exists('curl_init')) {
+            if (!UrlGuard::isSafeRemote($url)) {
+                return false;
+            }
             $data = @file_get_contents($url);
             return $data !== false && file_put_contents($dest, $data) !== false;
         }
@@ -396,8 +403,8 @@ final class WordPressImporter
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_FILE => $fh,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => 5,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
             CURLOPT_TIMEOUT => 60,
             CURLOPT_CONNECTTIMEOUT => 15,
             CURLOPT_USERAGENT => 'ArtStudio-WP-Import/1.0',
@@ -408,6 +415,23 @@ final class WordPressImporter
         fclose($fh);
 
         return $ok !== false && $status >= 200 && $status < 300 && filesize($dest) > 0;
+    }
+
+    private static function sameOrigin(string $url, string $base): bool
+    {
+        $a = parse_url($url);
+        $b = parse_url($base);
+        if (!is_array($a) || !is_array($b)) {
+            return false;
+        }
+        $schemeA = strtolower((string) ($a['scheme'] ?? ''));
+        $schemeB = strtolower((string) ($b['scheme'] ?? ''));
+        $hostA = strtolower((string) ($a['host'] ?? ''));
+        $hostB = strtolower((string) ($b['host'] ?? ''));
+        $portA = (int) ($a['port'] ?? ($schemeA === 'https' ? 443 : 80));
+        $portB = (int) ($b['port'] ?? ($schemeB === 'https' ? 443 : 80));
+
+        return $schemeA === $schemeB && $hostA !== '' && $hostA === $hostB && $portA === $portB;
     }
 
     /** Сопоставляет URL картинки локальному файлу в папке wp-content/uploads. */

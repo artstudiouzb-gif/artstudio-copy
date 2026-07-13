@@ -46,6 +46,10 @@ final class AuthController
                 \App\Models\AuditLog::auth('login', (int) ($_SESSION['user_id'] ?? 0) ?: null, $username);
                 header('Location: /admin');
                 exit;
+            case 'setup_required':
+                \App\Core\Flash::error('Для доступа к панели сначала настройте код входа через Telegram.');
+                header('Location: /admin/profile');
+                exit;
             case 'needs_code':
                 \App\Models\AuditLog::auth('login.pending-2fa', (int) ($_SESSION['pending_user_id'] ?? 0) ?: null, $username);
                 header('Location: /admin/login/2fa');

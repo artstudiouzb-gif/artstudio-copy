@@ -139,9 +139,9 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                 <?php if ($dateLong !== ''): ?>
                     <span class="newsdetail__meta-item"><?= $eventIcons[0] ?><time datetime="<?= htmlspecialchars(substr($date, 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars($dateLong, ENT_QUOTES) ?></time></span>
                 <?php endif; ?>
-                <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><?= $readMin ?> мин чтения</span>
+                <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><?= $readMin ?> <?= htmlspecialchars(t('мин чтения'), ENT_QUOTES) ?></span>
                 <?php if ($views > 0): ?>
-                    <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><?= number_format($views, 0, '', ' ') ?> просмотров</span>
+                    <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><?= number_format($views, 0, '', ' ') ?> <?= htmlspecialchars(t('просмотров'), ENT_QUOTES) ?></span>
                 <?php endif; ?>
             </div>
             <?php if (!empty($news['source_note'])): ?>
@@ -169,9 +169,9 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                 <?php if ($dateLong !== ''): ?>
                     <span class="newsdetail__meta-item"><?= $eventIcons[0] ?><time datetime="<?= htmlspecialchars(substr($date, 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars($dateLong, ENT_QUOTES) ?></time></span>
                 <?php endif; ?>
-                <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><?= $readMin ?> мин чтения</span>
+                <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><?= $readMin ?> <?= htmlspecialchars(t('мин чтения'), ENT_QUOTES) ?></span>
                 <?php if ($views > 0): ?>
-                    <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><?= number_format($views, 0, '', ' ') ?> просмотров</span>
+                    <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><?= number_format($views, 0, '', ' ') ?> <?= htmlspecialchars(t('просмотров'), ENT_QUOTES) ?></span>
                 <?php endif; ?>
             </div>
             <?php if (!empty($news['source_note'])): ?>
@@ -213,9 +213,9 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                         <img class="newsdetail-gallery__slide<?= $i === 0 ? ' is-active' : '' ?>" src="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($s['alt'], ENT_QUOTES) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>">
                     <?php endforeach; ?>
                     <?php if (count($heroSlides) > 1): ?>
-                        <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--prev" data-ndg-prev aria-label="Предыдущее фото">‹</button>
-                        <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--next" data-ndg-next aria-label="Следующее фото">›</button>
-                        <span class="newsdetail-gallery__counter"><span data-ndg-current>1</span> из <?= count($heroSlides) ?></span>
+                        <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--prev" data-ndg-prev aria-label="<?= htmlspecialchars(t('Предыдущее фото'), ENT_QUOTES) ?>">‹</button>
+                        <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--next" data-ndg-next aria-label="<?= htmlspecialchars(t('Следующее фото'), ENT_QUOTES) ?>">›</button>
+                        <span class="newsdetail-gallery__counter"><span data-ndg-current>1</span> <?= htmlspecialchars(t('из'), ENT_QUOTES) ?> <?= count($heroSlides) ?></span>
                     <?php endif; ?>
                 </div>
                 <?php if (count($heroSlides) > 1): ?>
@@ -299,9 +299,9 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                     <?= \App\Core\Csrf::field() ?>
                     <input type="text" name="website" value="" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
                     <div class="newsdetail-subscribe__row">
-                        <label class="visually-hidden" for="nd-sub-email">Ваш e-mail</label>
-                        <input id="nd-sub-email" type="email" name="email" required placeholder="Ваш e-mail" autocomplete="email">
-                        <button type="submit" aria-label="Подписаться">→</button>
+                        <label class="visually-hidden" for="nd-sub-email"><?= htmlspecialchars(t('Ваш e-mail'), ENT_QUOTES) ?></label>
+                        <input id="nd-sub-email" type="email" name="email" required placeholder="<?= htmlspecialchars(t('Ваш e-mail'), ENT_QUOTES) ?>" autocomplete="email">
+                        <button type="submit" aria-label="<?= htmlspecialchars(t('Подписаться'), ENT_QUOTES) ?>">→</button>
                     </div>
                     <?php if (Setting::get('form_consent_enabled', '0') === '1'): ?>
                         <label class="newsdetail-subscribe__consent">
@@ -323,7 +323,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
         <section class="newsdetail-photos">
             <div class="section-head">
                 <h2 class="section-head__title"><?= htmlspecialchars(t('Фотогалерея'), ENT_QUOTES) ?></h2>
-                <a class="newsdetail__btn newsdetail__btn--ghost" href="<?= htmlspecialchars(Locale::url('news/' . $news['slug'] . '/photos.zip', $lang), ENT_QUOTES) ?>">Скачать все фото <?= $dlIcon ?></a>
+                <a class="newsdetail__btn newsdetail__btn--ghost" href="<?= htmlspecialchars(Locale::url('news/' . $news['slug'] . '/photos.zip', $lang), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Скачать все фото'), ENT_QUOTES) ?> <?= $dlIcon ?></a>
             </div>
             <div class="newsdetail-photos__grid">
                 <?php foreach (array_slice($slides, 0, 8) as $s): ?>
@@ -336,7 +336,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
     <?php if (!empty($related)): ?>
         <section class="newsdetail-related">
             <div class="section-head">
-                <h2 class="section-head__title">Другие новости по теме</h2>
+                <h2 class="section-head__title"><?= htmlspecialchars(t('Другие новости по теме'), ENT_QUOTES) ?></h2>
                 <a class="section-head__all" href="<?= htmlspecialchars(Locale::url('news'), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Все новости'), ENT_QUOTES) ?> →</a>
             </div>
             <div class="newsdetail-related__grid">
@@ -354,10 +354,10 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
     <?php endif; ?>
 
     <?php if ($prevNews !== null || $nextNews !== null || ($isPremium && !empty($toc))): ?>
-        <nav class="newsdetail-adjacent<?= $isPremium && !empty($toc) ? ' newsdetail-adjacent--with-toc' : '' ?>" aria-label="Соседние новости">
+        <nav class="newsdetail-adjacent<?= $isPremium && !empty($toc) ? ' newsdetail-adjacent--with-toc' : '' ?>" aria-label="<?= htmlspecialchars(t('Соседние новости'), ENT_QUOTES) ?>">
             <?php if ($isPremium && !empty($toc)): ?>
                 <div class="newsdetail-toc">
-                    <span class="newsdetail-toc__title">Навигация по статье</span>
+                    <span class="newsdetail-toc__title"><?= htmlspecialchars(t('Навигация по статье'), ENT_QUOTES) ?></span>
                     <ol class="newsdetail-toc__list">
                         <?php foreach ($toc as $i => $item): ?>
                             <li><a href="#<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>"><span class="newsdetail-toc__num"><?= str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) ?></span><?= htmlspecialchars($item['label'], ENT_QUOTES) ?></a></li>
@@ -371,7 +371,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                     <span class="adjnews__arrow">←</span>
                     <span class="adjnews__media<?= $pc === null ? ' adjnews__media--empty' : '' ?>"<?= $pc !== null ? ' style="background-image:url(\'' . htmlspecialchars($pc, ENT_QUOTES) . '\')"' : '' ?>></span>
                     <span class="adjnews__body">
-                        <span class="adjnews__label">Предыдущая новость</span>
+                        <span class="adjnews__label"><?= htmlspecialchars(t('Предыдущая новость'), ENT_QUOTES) ?></span>
                         <?php if (!empty($prevNews['published_at'])): ?><time class="adjnews__date"><?= htmlspecialchars(DateFormatter::long((string) $prevNews['published_at'], $lang), ENT_QUOTES) ?></time><?php endif; ?>
                         <span class="adjnews__title"><?= htmlspecialchars((string) $prevNews['title'], ENT_QUOTES) ?></span>
                     </span>
@@ -382,7 +382,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                 <a class="adjnews adjnews--next" href="<?= htmlspecialchars(Locale::url('news/' . $nextNews['slug'], $lang), ENT_QUOTES) ?>">
                     <span class="adjnews__media<?= $nc === null ? ' adjnews__media--empty' : '' ?>"<?= $nc !== null ? ' style="background-image:url(\'' . htmlspecialchars($nc, ENT_QUOTES) . '\')"' : '' ?>></span>
                     <span class="adjnews__body">
-                        <span class="adjnews__label">Следующая новость</span>
+                        <span class="adjnews__label"><?= htmlspecialchars(t('Следующая новость'), ENT_QUOTES) ?></span>
                         <?php if (!empty($nextNews['published_at'])): ?><time class="adjnews__date"><?= htmlspecialchars(DateFormatter::long((string) $nextNews['published_at'], $lang), ENT_QUOTES) ?></time><?php endif; ?>
                         <span class="adjnews__title"><?= htmlspecialchars((string) $nextNews['title'], ENT_QUOTES) ?></span>
                     </span>

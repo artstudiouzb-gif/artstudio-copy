@@ -30,7 +30,7 @@ test('TelegramGateway: buildPayload и маскировка номера в ло
 
 // --- БД + сессия: полный поток входа ---
 
-test('Вход без настроенного шлюза: сразу ok, сессия установлена (БД)', function () {
+test('Вход без второго фактора: только ограниченная setup-сессия (БД)', function () {
     ensure_test_db();
     @session_start();
     $_SESSION = [];
@@ -41,8 +41,9 @@ test('Вход без настроенного шлюза: сразу ok, сес
     $uid = User::create($login, $login . '@test.local', 'Str0ng-Pass-2026!', 'admin');
 
     $res = Auth::attemptLogin($login, 'Str0ng-Pass-2026!');
-    assert_same('ok', $res['status']);
+    assert_same('setup_required', $res['status']);
     assert_same($uid, (int) ($_SESSION['user_id'] ?? 0));
+    assert_true(Auth::requiresTwoFactorSetup(), 'полная админка остаётся закрытой');
 
     Auth::logout();
     @session_start();

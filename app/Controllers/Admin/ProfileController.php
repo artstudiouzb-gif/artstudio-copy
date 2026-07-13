@@ -75,6 +75,7 @@ final class ProfileController
         }
 
         User::updateTelegramChatId((int) Auth::id(), $chatId);
+        Auth::completeTwoFactorSetup();
         unset($_SESSION['tg_link_code']);
         \App\Core\Logger::security('Привязан Telegram для кодов входа', [
             'user' => (string) ($_SESSION['username'] ?? ''),
@@ -212,6 +213,7 @@ final class ProfileController
                 exit;
             }
             User::updatePhone($userId, $phone);
+            Auth::completeTwoFactorSetup();
             Flash::success('Телефон сохранён. Коды входа будут приходить в Telegram (Verification Codes).');
         }
 

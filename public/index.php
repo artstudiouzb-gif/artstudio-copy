@@ -338,4 +338,23 @@ $router->get('/{slug}', [SitePageController::class, 'show']);
 // панели (кто/что/когда/откуда; тело запроса не сохраняется).
 \App\Models\AuditLog::record();
 
+// Onboarding второго фактора: после корректного пароля пользователь без
+// Telegram получает ограниченную сессию и может открыть только профиль,
+// настройки доставки кода и выход. Остальная админка остаётся закрытой.
+$guardPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+if (\App\Core\Auth::check() && \App\Core\Auth::requiresTwoFactorSetup()) {
+    $allowedSetupPaths = ['/admin/profile', '/admin/settings', '/admin/logout'];
+    $allowed = false;
+    foreach ($allowedSetupPaths as $allowedPath) {
+        if ($guardPath === $allowedPath || str_starts_with($guardPath, $allowedPath . '/')) {
+            $allowed = true;
+            break;
+        }
+    }
+    if (!$allowed && str_starts_with($guardPath, '/admin')) {
+        header('Location: /admin/profile');
+        exit;
+    }
+}
+
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

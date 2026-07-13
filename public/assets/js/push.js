@@ -8,6 +8,9 @@
     }
     var host = document.querySelector('[data-push-optin]') || document.querySelector('.site-footer__subscribe') || document.querySelector('.site-footer');
     if (!host || Notification.permission === 'denied') { return; }
+    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+    if (!csrfToken) { return; }
 
     function urlB64ToUint8Array(base64String) {
         var padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -41,7 +44,7 @@
                         // Отписка.
                         return fetch('/push/unsubscribe', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
                             body: JSON.stringify({ endpoint: current.endpoint })
                         }).then(function () { return current.unsubscribe(); }).then(function () { setState(false); });
                     }
@@ -56,7 +59,7 @@
                         }).then(function (sub) {
                             return fetch('/push/subscribe', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
                                 body: JSON.stringify(sub.toJSON())
                             }).then(function () { setState(true); });
                         });

@@ -61,7 +61,9 @@ if ($source === '') {
 }
 
 // Инициализация БД из конфигурации приложения.
-Database::init((array) Config::get('database'));
+// bootstrap.php уже подключает БД в установленном приложении. Повторная
+// инициализация безопасна; используем тот же ключ, что и config.example.php.
+Database::init((array) Config::get('db'));
 
 // Автор по умолчанию — первый администратор.
 if ($opts['authorId'] === null) {

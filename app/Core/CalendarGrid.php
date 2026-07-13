@@ -11,11 +11,16 @@ namespace App\Core;
 final class CalendarGrid
 {
     private const MONTHS = [
-        1 => 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+        'ru' => [1 => 'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        'uz' => [1 => 'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'],
+        'en' => [1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     ];
 
-    public const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    private const WEEKDAYS = [
+        'ru' => ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+        'uz' => ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'],
+        'en' => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    ];
 
     /**
      * Разбирает параметр месяца «YYYY-MM»; при мусоре — текущий месяц.
@@ -62,9 +67,16 @@ final class CalendarGrid
     }
 
     /** «Июль 2026». */
-    public static function label(int $year, int $month): string
+    public static function label(int $year, int $month, string $lang = 'ru'): string
     {
-        return (self::MONTHS[$month] ?? '') . ' ' . $year;
+        $months = self::MONTHS[$lang] ?? self::MONTHS['ru'];
+        return ($months[$month] ?? '') . ' ' . $year;
+    }
+
+    /** @return list<string> */
+    public static function weekdays(string $lang = 'ru'): array
+    {
+        return self::WEEKDAYS[$lang] ?? self::WEEKDAYS['ru'];
     }
 
     /** «YYYY-MM» соседнего месяца: $delta = -1 (пред.) или +1 (след.). */

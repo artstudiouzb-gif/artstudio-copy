@@ -10,15 +10,16 @@ use App\Core\Locale;
 /** @var string $prevMonth */
 /** @var string $nextMonth */
 /** @var string $today */
+/** @var array $weekdays */
 
-$metaTitle = 'Календарь мероприятий';
+$metaTitle = t('Календарь мероприятий');
 $metaDescription = (string) ($type['description'] ?? '');
 require __DIR__ . '/_header.php';
 
 $crumbs = [
     ['label' => t('Главная'), 'url' => Locale::url('/')],
-    ['label' => 'Мероприятия', 'url' => Locale::url('catalog/' . $type['slug'])],
-    ['label' => 'Календарь'],
+    ['label' => t('Мероприятия'), 'url' => Locale::url('catalog/' . $type['slug'])],
+    ['label' => t('Календарь')],
 ];
 require __DIR__ . '/_crumbs.php';
 
@@ -27,24 +28,24 @@ $entryUrl = static fn (array $e): string => Locale::url('catalog/' . $type['slug
 ?>
 <div class="listing">
     <div class="listing__head">
-        <h1 class="listing__title">Календарь мероприятий</h1>
+        <h1 class="listing__title"><?= htmlspecialchars(t('Календарь мероприятий'), ENT_QUOTES) ?></h1>
         <?php if (!empty($type['description'])): ?>
             <p class="listing__lead"><?= htmlspecialchars((string) $type['description'], ENT_QUOTES) ?></p>
         <?php endif; ?>
     </div>
 
     <div class="gcal-nav">
-        <a class="gcal-nav__btn" href="<?= htmlspecialchars($calUrl . '?m=' . $prevMonth, ENT_QUOTES) ?>" aria-label="Предыдущий месяц">←</a>
+        <a class="gcal-nav__btn" href="<?= htmlspecialchars($calUrl . '?m=' . $prevMonth, ENT_QUOTES) ?>" aria-label="<?= htmlspecialchars(t('Предыдущий месяц'), ENT_QUOTES) ?>">←</a>
         <strong class="gcal-nav__label"><?= htmlspecialchars($calLabel, ENT_QUOTES) ?></strong>
-        <a class="gcal-nav__btn" href="<?= htmlspecialchars($calUrl . '?m=' . $nextMonth, ENT_QUOTES) ?>" aria-label="Следующий месяц">→</a>
-        <a class="gcal-nav__all" href="<?= htmlspecialchars(Locale::url('catalog/' . $type['slug']), ENT_QUOTES) ?>">Списком →</a>
+        <a class="gcal-nav__btn" href="<?= htmlspecialchars($calUrl . '?m=' . $nextMonth, ENT_QUOTES) ?>" aria-label="<?= htmlspecialchars(t('Следующий месяц'), ENT_QUOTES) ?>">→</a>
+        <a class="gcal-nav__all" href="<?= htmlspecialchars(Locale::url('catalog/' . $type['slug']), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Списком'), ENT_QUOTES) ?> →</a>
     </div>
 
     <div class="gcal-scroll">
         <table class="gcal" aria-label="Календарь на <?= htmlspecialchars($calLabel, ENT_QUOTES) ?>">
             <thead>
                 <tr>
-                    <?php foreach (CalendarGrid::WEEKDAYS as $wd): ?>
+                    <?php foreach ($weekdays as $wd): ?>
                         <th scope="col"><?= $wd ?></th>
                     <?php endforeach; ?>
                 </tr>
@@ -75,7 +76,7 @@ $entryUrl = static fn (array $e): string => Locale::url('catalog/' . $type['slug
 
     <?php if ($byDate !== []): ?>
         <section class="gcal-list">
-            <h2 class="gcal-list__title">Мероприятия месяца</h2>
+            <h2 class="gcal-list__title"><?= htmlspecialchars(t('Мероприятия месяца'), ENT_QUOTES) ?></h2>
             <ul class="gcal-list__items">
                 <?php foreach ($byDate as $date => $events): ?>
                     <?php foreach ($events as $event): ?>
@@ -94,7 +95,7 @@ $entryUrl = static fn (array $e): string => Locale::url('catalog/' . $type['slug
             </ul>
         </section>
     <?php else: ?>
-        <p class="listing__empty">В этом месяце мероприятий нет.</p>
+        <p class="listing__empty"><?= htmlspecialchars(t('В этом месяце мероприятий нет.'), ENT_QUOTES) ?></p>
     <?php endif; ?>
 </div>
 <?php require __DIR__ . '/_footer.php'; ?>

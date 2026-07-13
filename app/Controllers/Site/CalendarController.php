@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Site;
 
 use App\Core\CalendarGrid;
+use App\Core\Locale;
 use App\Core\View;
 use App\Models\ContentEntry;
 use App\Models\ContentType;
@@ -37,7 +38,8 @@ final class CalendarController
             'type' => $type,
             'weeks' => CalendarGrid::build($year, $month),
             'byDate' => $byDate,
-            'calLabel' => CalendarGrid::label($year, $month),
+            'calLabel' => CalendarGrid::label($year, $month, Locale::current()),
+            'weekdays' => CalendarGrid::weekdays(Locale::current()),
             'prevMonth' => CalendarGrid::shiftMonth($year, $month, -1),
             'nextMonth' => CalendarGrid::shiftMonth($year, $month, 1),
             'today' => date('Y-m-d'),

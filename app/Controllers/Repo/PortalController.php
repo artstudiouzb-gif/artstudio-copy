@@ -58,7 +58,11 @@ final class PortalController
         }
 
         // Мягкий лимит на частоту скачиваний с одной сессии/IP (анти-выкачивание).
-        RateLimiter::throttle('repo_download', (string) RepoAuth::id(), 120, 5);
+        if (!RateLimiter::throttle('repo_download', (string) RepoAuth::id(), 120, 5)) {
+            http_response_code(429);
+            header('Retry-After: 300');
+            exit('Слишком много скачиваний. Повторите позже.');
+        }
 
         $expectedBase = realpath(RepoFile::basePath());
         $fullPath = $expectedBase !== false ? realpath($expectedBase . '/' . $file['stored_name']) : false;

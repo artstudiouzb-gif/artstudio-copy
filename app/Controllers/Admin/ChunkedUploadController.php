@@ -42,7 +42,7 @@ final class ChunkedUploadController
         $name = (string) ($_POST['name'] ?? '');
         $accessType = ($_POST['access_type'] ?? 'public') === 'protected' ? 'protected' : 'public';
 
-        if (strlen($uploadId) < 8 || $index < 0 || $total < 1 || $index >= $total || $name === '') {
+        if (strlen($uploadId) !== 32 || $index < 0 || $total < 1 || $index >= $total || $name === '') {
             $this->json(['ok' => false, 'error' => 'Некорректные параметры чанка'], 400);
         }
 
@@ -51,15 +51,38 @@ final class ChunkedUploadController
             $this->json(['ok' => false, 'error' => 'Чанк не получен'], 400);
         }
 
-        $dir = APP_ROOT . '/storage/cache/chunks';
+        // Изолируем временные файлы по пользователю: клиентский upload_id не
+        // должен позволять одной сессии пересечься с загрузкой другой.
+        $dir = APP_ROOT . '/storage/cache/chunks/user-' . (int) Auth::id();
         if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
             $this->json(['ok' => false, 'error' => 'Нет каталога для сборки'], 500);
         }
         $partPath = $dir . '/' . $uploadId . '.part';
+        $metaPath = $dir . '/' . $uploadId . '.json';
+        $lockPath = $dir . '/' . $uploadId . '.lock';
 
-        // Первый чанк начинает файл заново.
-        if ($index === 0 && is_file($partPath)) {
+        $lock = fopen($lockPath, 'c');
+        if ($lock === false || !flock($lock, LOCK_EX)) {
+            if (is_resource($lock)) { fclose($lock); }
+            $this->json(['ok' => false, 'error' => 'Не удалось заблокировать загрузку'], 503);
+        }
+
+        // Сервер хранит ожидаемый индекс и не допускает пропуски/повторы.
+        $meta = is_file($metaPath)
+            ? json_decode((string) file_get_contents($metaPath), true)
+            : null;
+        if ($index === 0) {
             @unlink($partPath);
+            $meta = ['next' => 0, 'total' => $total, 'name' => $name, 'access' => $accessType];
+        }
+        if (!is_array($meta)
+            || (int) ($meta['next'] ?? -1) !== $index
+            || (int) ($meta['total'] ?? 0) !== $total
+            || (string) ($meta['name'] ?? '') !== $name
+            || (string) ($meta['access'] ?? '') !== $accessType) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+            $this->json(['ok' => false, 'error' => 'Нарушен порядок или состав чанков'], 409);
         }
 
         // Дописываем чанк в общий файл.
@@ -71,15 +94,22 @@ final class ChunkedUploadController
         stream_copy_to_stream($in, $out);
         fclose($in);
         fclose($out);
+        $meta['next'] = $index + 1;
+        file_put_contents($metaPath, json_encode($meta, JSON_UNESCAPED_UNICODE), LOCK_EX);
 
         // Ограничение суммарного размера на лету (защита от переполнения).
         if (filesize($partPath) > self::MAX_ASSEMBLED_BYTES) {
             @unlink($partPath);
+            @unlink($metaPath);
+            flock($lock, LOCK_UN);
+            fclose($lock);
             $this->json(['ok' => false, 'error' => 'Файл превышает максимальный размер 200 МБ'], 413);
         }
 
         // Не последний чанк — подтверждаем приём и ждём следующий.
         if ($index < $total - 1) {
+            flock($lock, LOCK_UN);
+            fclose($lock);
             $this->json(['ok' => true, 'received' => $index]);
         }
 
@@ -96,6 +126,9 @@ final class ChunkedUploadController
             );
         } catch (\Throwable $e) {
             @unlink($partPath);
+            @unlink($metaPath);
+            flock($lock, LOCK_UN);
+            fclose($lock);
             $this->json(['ok' => false, 'error' => $e->getMessage()], 400);
         }
 
@@ -103,6 +136,10 @@ final class ChunkedUploadController
         if (is_file($partPath)) {
             @unlink($partPath);
         }
+        @unlink($metaPath);
+        flock($lock, LOCK_UN);
+        fclose($lock);
+        @unlink($lockPath);
 
         $this->json(['ok' => true, 'done' => true, 'file_id' => (int) $file['id'], 'name' => $file['original_name']]);
     }

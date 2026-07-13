@@ -35,6 +35,9 @@ test('CalendarGrid: parseMonth, label и переходы между месяц�
     assert_same([(int) date('Y'), (int) date('n')], CalendarGrid::parseMonth('2026-13'));
 
     assert_same('Июль 2026', CalendarGrid::label(2026, 7));
+    assert_same('Iyul 2026', CalendarGrid::label(2026, 7, 'uz'));
+    assert_same('July 2026', CalendarGrid::label(2026, 7, 'en'));
+    assert_same(['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'], CalendarGrid::weekdays('uz'));
     assert_same('2026-06', CalendarGrid::shiftMonth(2026, 7, -1));
     assert_same('2026-08', CalendarGrid::shiftMonth(2026, 7, 1));
     // Через границу года.

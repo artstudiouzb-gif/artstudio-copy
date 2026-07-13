@@ -49,9 +49,9 @@ $qs = static function (array $overrides) use ($q, $sort): string {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="17" height="17" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
             <input type="search" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES) ?>" placeholder="<?= htmlspecialchars(t('Поиск в разделе'), ENT_QUOTES) ?>" aria-label="<?= htmlspecialchars(t('Поиск в разделе'), ENT_QUOTES) ?>">
         </div>
-        <select class="catlist-toolbar__sort" name="sort" data-auto-submit aria-label="Сортировка">
+        <select class="catlist-toolbar__sort" name="sort" data-auto-submit aria-label="<?= htmlspecialchars(t('Сортировка'), ENT_QUOTES) ?>">
             <option value="new" <?= $sort === 'new' ? 'selected' : '' ?>>Сначала новые</option>
-            <option value="old" <?= $sort === 'old' ? 'selected' : '' ?>>Сначала старые</option>
+            <option value="old" <?= $sort === 'old' ? 'selected' : '' ?>><?= htmlspecialchars(t('Сначала старые'), ENT_QUOTES) ?></option>
             <option value="title" <?= $sort === 'title' ? 'selected' : '' ?>><?= htmlspecialchars(t('По алфавиту'), ENT_QUOTES) ?></option>
         </select>
         <button class="catlist-toolbar__btn" type="submit"><?= htmlspecialchars(t('Найти'), ENT_QUOTES) ?></button>

@@ -10,10 +10,10 @@ $metaDescription = mb_substr(trim((string) ($album['description'] ?? '')), 0, 16
 require __DIR__ . '/_header.php';
 ?>
 <div class="content-list">
-    <nav class="content-crumbs" aria-label="Хлебные крошки">
-        <a href="<?= htmlspecialchars(Locale::url('/'), ENT_QUOTES) ?>">Главная</a>
+    <nav class="content-crumbs" aria-label="<?= htmlspecialchars(t('Хлебные крошки'), ENT_QUOTES) ?>">
+        <a href="<?= htmlspecialchars(Locale::url('/'), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Главная'), ENT_QUOTES) ?></a>
         <span>/</span>
-        <a href="<?= htmlspecialchars(Locale::url('albums'), ENT_QUOTES) ?>">Фотоальбомы</a>
+        <a href="<?= htmlspecialchars(Locale::url('albums'), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Фотоальбомы'), ENT_QUOTES) ?></a>
         <span>/</span>
         <span><?= htmlspecialchars((string) $album['title'], ENT_QUOTES) ?></span>
     </nav>
@@ -26,7 +26,7 @@ require __DIR__ . '/_header.php';
     </header>
 
     <?php if (empty($images)): ?>
-        <p class="content-list__empty">В альбоме пока нет фотографий.</p>
+        <p class="content-list__empty"><?= htmlspecialchars(t('В альбоме пока нет фотографий.'), ENT_QUOTES) ?></p>
     <?php else: ?>
         <div class="album-photos">
             <?php foreach ($images as $img): ?>

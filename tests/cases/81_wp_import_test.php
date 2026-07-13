@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 use App\Core\WordPressImporter;
 
+test('WP import: приватный/loopback источник блокируется до сетевого запроса', function () {
+    $blocked = false;
+    try {
+        WordPressImporter::importAll('http://127.0.0.1');
+    } catch (InvalidArgumentException) {
+        $blocked = true;
+    }
+    assert_true($blocked, 'SSRF-адрес отклонён');
+});
+
 // Импорт из WordPress: чистые преобразования (без сети/БД).
 
 test('mapPost извлекает поля поста WP REST', function () {

@@ -149,8 +149,15 @@ final class RepoFile
         // общий SVG-путь не требуется — SVG в репозиторий не принимаем).
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mime = (string) $finfo->file($destination);
-        if ($mime === '') {
-            $mime = self::ALLOWED[$extension];
+        $expectedMime = self::ALLOWED[$extension];
+        $compatible = $mime === $expectedMime
+            || ($extension === 'csv' && in_array($mime, ['text/plain', 'application/csv'], true))
+            || ($extension === 'rtf' && $mime === 'text/rtf')
+            || (in_array($extension, ['docx', 'xlsx', 'pptx', 'odt', 'ods', 'odp'], true)
+                && $mime === 'application/zip');
+        if (!$compatible) {
+            @unlink($destination);
+            throw new RuntimeException('Содержимое файла не соответствует расширению.');
         }
 
         $stmt = Database::pdo()->prepare(

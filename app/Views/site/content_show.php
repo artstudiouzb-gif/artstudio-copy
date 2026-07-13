@@ -38,7 +38,7 @@ $sideFields = array_values(array_filter($fields, static fn ($f) => !in_array($f[
     <header class="catdetail__head">
         <span class="catdetail__eyebrow"><?= htmlspecialchars((string) $type['name'], ENT_QUOTES) ?></span>
         <h1 class="catdetail__title"><?= htmlspecialchars((string) $entry['title'], ENT_QUOTES) ?></h1>
-        <time class="catdetail__date">Опубликовано <?= htmlspecialchars(date('d.m.Y', strtotime((string) $entry['created_at'])), ENT_QUOTES) ?></time>
+        <time class="catdetail__date"><?= htmlspecialchars(t('Опубликовано'), ENT_QUOTES) ?> <?= htmlspecialchars(date('d.m.Y', strtotime((string) $entry['created_at'])), ENT_QUOTES) ?></time>
     </header>
 
     <div class="catdetail__grid">
@@ -52,12 +52,12 @@ $sideFields = array_values(array_filter($fields, static fn ($f) => !in_array($f[
                     <div class="catdetail__text"><?= $val ?></div>
                 </section>
             <?php endforeach; ?>
-            <?php if (!$hasMain): ?><p class="catdetail__empty">Описание не заполнено.</p><?php endif; ?>
+            <?php if (!$hasMain): ?><p class="catdetail__empty"><?= htmlspecialchars(t('Описание не заполнено.'), ENT_QUOTES) ?></p><?php endif; ?>
         </div>
 
         <aside class="catdetail__aside">
             <div class="catdetail__card">
-                <h2 class="catdetail__card-title">Сведения</h2>
+                <h2 class="catdetail__card-title"><?= htmlspecialchars(t('Сведения'), ENT_QUOTES) ?></h2>
                 <dl class="catdetail__facts">
                     <?php foreach ($sideFields as $f): ?>
                         <?php
@@ -80,7 +80,7 @@ $sideFields = array_values(array_filter($fields, static fn ($f) => !in_array($f[
                         </a>
                     <?php endif; ?>
                 <?php endforeach; ?>
-                <a class="catdetail__back" href="<?= htmlspecialchars(Locale::url('catalog/' . $type['slug']), ENT_QUOTES) ?>">← Ко всем записям раздела</a>
+                <a class="catdetail__back" href="<?= htmlspecialchars(Locale::url('catalog/' . $type['slug']), ENT_QUOTES) ?>">← <?= htmlspecialchars(t('Ко всем записям раздела'), ENT_QUOTES) ?></a>
             </div>
         </aside>
     </div>

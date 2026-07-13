@@ -4,23 +4,23 @@ use App\Core\Locale;
 
 /** @var array $albums */
 
-$metaTitle = 'Фотоальбомы';
+$metaTitle = t('Фотоальбомы');
 $metaDescription = 'Фотогалереи и альбомы мероприятий';
 require __DIR__ . '/_header.php';
 ?>
 <div class="content-list">
-    <nav class="content-crumbs" aria-label="Хлебные крошки">
-        <a href="<?= htmlspecialchars(Locale::url('/'), ENT_QUOTES) ?>">Главная</a>
+    <nav class="content-crumbs" aria-label="<?= htmlspecialchars(t('Хлебные крошки'), ENT_QUOTES) ?>">
+        <a href="<?= htmlspecialchars(Locale::url('/'), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Главная'), ENT_QUOTES) ?></a>
         <span>/</span>
-        <span>Фотоальбомы</span>
+        <span><?= htmlspecialchars(t('Фотоальбомы'), ENT_QUOTES) ?></span>
     </nav>
 
     <header class="content-list__head">
-        <h1>Фотоальбомы</h1>
+        <h1><?= htmlspecialchars(t('Фотоальбомы'), ENT_QUOTES) ?></h1>
     </header>
 
     <?php if (empty($albums)): ?>
-        <p class="content-list__empty">Альбомов пока нет.</p>
+        <p class="content-list__empty"><?= htmlspecialchars(t('Альбомов пока нет.'), ENT_QUOTES) ?></p>
     <?php else: ?>
         <div class="albums-grid">
             <?php foreach ($albums as $album): ?>
@@ -32,7 +32,7 @@ require __DIR__ . '/_header.php';
                     <?php endif; ?>
                     <span class="album-card__body">
                         <span class="album-card__title"><?= htmlspecialchars((string) $album['title'], ENT_QUOTES) ?></span>
-                        <span class="album-card__meta"><?= (int) $album['images_count'] ?> фото</span>
+                        <span class="album-card__meta"><?= (int) $album['images_count'] ?> <?= htmlspecialchars(t('фото'), ENT_QUOTES) ?></span>
                     </span>
                 </a>
             <?php endforeach; ?>
