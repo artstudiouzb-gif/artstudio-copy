@@ -86,9 +86,10 @@ $renderMenuIcon = static function (mixed $svg): string {
     return $svg !== '' ? '<span class="site-menu__icon" aria-hidden="true">' . $svg . '</span>' : '';
 };
 $menuHtml = '';
+$et = static fn (string $text): string => htmlspecialchars(t($text), ENT_QUOTES);
 $menuItems = MenuItem::activeForLang($currentLang);
 if (!empty($menuItems)) {
-    $menuHtml = '<nav class="site-menu" aria-label="Основное меню">';
+    $menuHtml = '<nav class="site-menu" aria-label="' . $et('Основное меню') . '">';
     foreach ($menuItems as $mi) {
         // Пункт-разделитель: визуальная черта/зазор без ссылки.
         if (!empty($mi['is_divider'])) {
@@ -116,7 +117,7 @@ if (!empty($menuItems)) {
         $menuHtml .= '<div class="site-menu__item site-menu__item--has-children">';
         $menuHtml .= '<a class="site-menu__link" href="' . htmlspecialchars($url, ENT_QUOTES) . '">'
             . $label . '</a>';
-        $menuHtml .= '<button type="button" class="site-menu__toggle" aria-expanded="false" aria-label="Открыть подменю">▾</button>';
+        $menuHtml .= '<button type="button" class="site-menu__toggle" aria-expanded="false" aria-label="' . $et('Открыть подменю') . '">▾</button>';
         $menuHtml .= '<div class="site-submenu">';
         foreach ($children as $child) {
             $childUrl = MenuItem::resolveUrl($child, $currentLang);
@@ -183,7 +184,7 @@ if ($hcfg['cta']['enabled'] && $hcfg['cta']['text'] !== '') {
 // --- Переключатель темы (показываем, если тема не фиксирована как auto) ---
 $themeToggle = '';
 if ($defaultTheme !== 'auto') {
-    $themeToggle = '<button type="button" class="site-theme-toggle" aria-label="Сменить тему" title="Светлая/тёмная тема">◐</button>';
+    $themeToggle = '<button type="button" class="site-theme-toggle" aria-label="' . $et('Сменить тему') . '" title="' . $et('Светлая/тёмная тема') . '">◐</button>';
 }
 
 // --- Версия для слабовидящих: состояние из cookie (без JS-мигания) ---
@@ -196,17 +197,17 @@ $a11y = [
     'size' => in_array($a11yParts[1] ?? '', $a11ySizes, true) ? $a11yParts[1] : 'm',
     'images' => ($a11yParts[2] ?? '') === 'off' ? 'off' : 'on',
 ];
-$a11yToggle = '<button type="button" class="a11y-toggle" aria-label="Версия для слабовидящих" title="Версия для слабовидящих">'
+$a11yToggle = '<button type="button" class="a11y-toggle" aria-label="' . $et('Версия для слабовидящих') . '" title="' . $et('Версия для слабовидящих') . '">'
     . '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>'
-    . '<span>Для слабовидящих</span></button>';
+    . '<span>' . $et('Для слабовидящих') . '</span></button>';
 
 // --- Поиск по сайту (в строке + иконка для выпадающего режима) ---
 $searchAction = htmlspecialchars(Locale::url('search', $currentLang), ENT_QUOTES);
 $searchIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
 $searchHtml = '<form class="site-search" method="get" action="' . $searchAction . '" role="search">'
     . '<input type="search" name="q" placeholder="' . htmlspecialchars(t('Поиск'), ENT_QUOTES) . '" aria-label="' . htmlspecialchars(t('Поиск по сайту'), ENT_QUOTES) . '">'
-    . '<button type="submit" aria-label="Найти">' . $searchIcon . '</button></form>'
-    . '<button type="button" class="site-search-toggle" aria-label="Открыть поиск" aria-expanded="false" data-search-toggle>' . $searchIcon . '</button>';
+    . '<button type="submit" aria-label="' . $et('Найти') . '">' . $searchIcon . '</button></form>'
+    . '<button type="button" class="site-search-toggle" aria-label="' . $et('Открыть поиск') . '" aria-expanded="false" data-search-toggle>' . $searchIcon . '</button>';
 
 // --- Тема-билдер: значения дизайна + классы для <body> ---
 $designVals = \App\Core\DesignSettings::current();
@@ -214,7 +215,7 @@ $designBodyClass = \App\Core\DesignSettings::bodyClasses($designVals);
 
 // --- Бургер для мобильного меню ---
 $burgerHtml = $menuHtml !== ''
-    ? '<button type="button" class="site-burger" data-mobile-menu-toggle aria-label="Меню" aria-expanded="false"><span></span><span></span><span></span></button>'
+    ? '<button type="button" class="site-burger" data-mobile-menu-toggle aria-label="' . $et('Меню') . '" aria-expanded="false"><span></span><span></span><span></span></button>'
     : '';
 
 // --- Макет шапки: 4 варианта ---
@@ -446,32 +447,32 @@ if ($inlineMenu !== '') {
 <?php endif; ?>
 </head>
 <body class="<?= htmlspecialchars(trim($designBodyClass . (!empty($previewNotice) ? ' is-preview' : '')), ENT_QUOTES) ?>">
-<a href="#main-content" class="skip-link">Перейти к содержимому</a>
+<a href="#main-content" class="skip-link"><?= $et('Перейти к содержимому') ?></a>
 <?php if (!empty($previewNotice)): ?>
 <div class="preview-bar" role="status">
-    👁 Режим предпросмотра — эта версия не опубликована и закрыта от индексации.
+    👁 <?= $et('Режим предпросмотра — эта версия не опубликована и закрыта от индексации.') ?>
 </div>
 <?php endif; ?>
 <?php if (empty($hideChrome)): // лендинг (группа 6) скрывает шапку сайта ?>
-<div class="a11y-panel<?= $a11y['on'] ? ' is-open' : '' ?>" role="region" aria-label="Настройки версии для слабовидящих">
+<div class="a11y-panel<?= $a11y['on'] ? ' is-open' : '' ?>" role="region" aria-label="<?= $et('Настройки версии для слабовидящих') ?>">
     <div class="a11y-panel__group">
-        <b>Цвет:</b>
-        <button type="button" data-a11y-set="scheme:cw" title="Чёрным по белому">Ч</button>
-        <button type="button" data-a11y-set="scheme:wc" title="Белым по чёрному">Б</button>
-        <button type="button" data-a11y-set="scheme:bb" title="Тёмно-синим по голубому">С</button>
+        <b><?= $et('Цвет:') ?></b>
+        <button type="button" data-a11y-set="scheme:cw" title="<?= $et('Чёрным по белому') ?>">A</button>
+        <button type="button" data-a11y-set="scheme:wc" title="<?= $et('Белым по чёрному') ?>">A</button>
+        <button type="button" data-a11y-set="scheme:bb" title="<?= $et('Тёмно-синим по голубому') ?>">A</button>
     </div>
     <div class="a11y-panel__group">
-        <b>Размер:</b>
-        <button type="button" class="a11y-panel__size-a1" data-a11y-set="size:m" title="Обычный">А</button>
-        <button type="button" class="a11y-panel__size-a2" data-a11y-set="size:l" title="Крупный">А</button>
-        <button type="button" class="a11y-panel__size-a3" data-a11y-set="size:xl" title="Очень крупный">А</button>
+        <b><?= $et('Размер:') ?></b>
+        <button type="button" class="a11y-panel__size-a1" data-a11y-set="size:m" title="<?= $et('Обычный') ?>">A</button>
+        <button type="button" class="a11y-panel__size-a2" data-a11y-set="size:l" title="<?= $et('Крупный') ?>">A</button>
+        <button type="button" class="a11y-panel__size-a3" data-a11y-set="size:xl" title="<?= $et('Очень крупный') ?>">A</button>
     </div>
     <div class="a11y-panel__group">
-        <b>Изображения:</b>
-        <button type="button" data-a11y-set="images:on" title="Показывать">Вкл</button>
-        <button type="button" data-a11y-set="images:off" title="Скрыть">Выкл</button>
+        <b><?= $et('Изображения:') ?></b>
+        <button type="button" data-a11y-set="images:on" title="<?= $et('Показывать') ?>"><?= $et('Вкл') ?></button>
+        <button type="button" data-a11y-set="images:off" title="<?= $et('Скрыть') ?>"><?= $et('Выкл') ?></button>
     </div>
-    <a href="#" class="a11y-panel__off">Обычная версия</a>
+    <a href="#" class="a11y-panel__off"><?= $et('Обычная версия') ?></a>
 </div>
 <?= $topbarHtml ?>
 <header class="site-header site-header--layout-<?= htmlspecialchars($layout, ENT_QUOTES) ?> site-header--logo-<?= htmlspecialchars($logoPos, ENT_QUOTES) ?><?= $navBarHtml !== '' ? ' site-header--has-nav' : '' ?><?= $drawerMenu !== '' ? ' site-header--has-drawer' : '' ?><?= !empty($hcfg['sticky']) ? ' site-header--sticky' : '' ?><?= $transparentOn ? ' site-header--transparent' : '' ?> site-header--h-<?= htmlspecialchars(in_array($hcfg['middlebar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['middlebar']['height'] : 'normal', ENT_QUOTES) ?> site-header--nav-h-<?= htmlspecialchars(in_array($hcfg['bottombar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['bottombar']['height'] : 'normal', ENT_QUOTES) ?> site-header--borders-<?= htmlspecialchars(in_array($hcfg['borders'] ?? 'full', HeaderConfig::BORDER_MODES, true) ? $hcfg['borders'] : 'full', ENT_QUOTES) ?>"<?= (!empty($hcfg['sticky']) || $transparentOn) ? ' data-header-scroll' : '' ?>>
@@ -496,8 +497,8 @@ if ($inlineMenu !== '') {
       // зависел от containing block шапки (sticky/трансформации). ?>
 <div class="site-drawer" data-drawer>
     <div class="site-drawer__backdrop" data-mobile-menu-toggle aria-hidden="true"></div>
-    <div class="site-drawer__panel" role="dialog" aria-label="Меню" aria-modal="true">
-        <button type="button" class="site-drawer__close" data-mobile-menu-toggle aria-label="Закрыть меню">&times;</button>
+    <div class="site-drawer__panel" role="dialog" aria-label="<?= $et('Меню') ?>" aria-modal="true">
+        <button type="button" class="site-drawer__close" data-mobile-menu-toggle aria-label="<?= $et('Закрыть меню') ?>">&times;</button>
         <?= $drawerMenu ?>
     </div>
 </div>
@@ -505,8 +506,8 @@ if ($inlineMenu !== '') {
 <div class="site-search-overlay" data-search-overlay hidden>
     <form class="site-search-overlay__form" method="get" action="<?= $searchAction ?>" role="search">
         <input type="search" name="q" placeholder="<?= htmlspecialchars(t('Введите запрос…'), ENT_QUOTES) ?>" aria-label="<?= htmlspecialchars(t('Поиск по сайту'), ENT_QUOTES) ?>" data-search-input>
-        <button type="submit" class="site-search-overlay__submit">Найти</button>
-        <button type="button" class="site-search-overlay__close" aria-label="Закрыть поиск" data-search-close>&times;</button>
+        <button type="submit" class="site-search-overlay__submit"><?= $et('Найти') ?></button>
+        <button type="button" class="site-search-overlay__close" aria-label="<?= $et('Закрыть поиск') ?>" data-search-close>&times;</button>
     </form>
 </div>
 <?php endif; ?>
