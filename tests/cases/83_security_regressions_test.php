@@ -22,7 +22,8 @@ test('RepoFile сверяет реальный MIME с ожидаемым', func
 
 test('Чанки изолированы по пользователю и проверяются по порядку', function () {
     $source = (string) file_get_contents(APP_ROOT . '/app/Controllers/Admin/ChunkedUploadController.php');
-    assert_contains("'/storage/cache/chunks/user-' . (int) Auth::id()", $source);
+    assert_contains("APP_ROOT . '/storage/cache/chunks'", $source);
+    assert_contains("\$rootDir . '/user-' . (int) Auth::id()", $source);
     assert_contains('flock($lock, LOCK_EX)', $source);
     assert_contains("Нарушен порядок или состав чанков", $source);
     assert_contains('STALE_AFTER_SECONDS', $source);
