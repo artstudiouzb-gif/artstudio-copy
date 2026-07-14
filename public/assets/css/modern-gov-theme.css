@@ -37,7 +37,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-html { overflow-x: clip; }
+html { font-size: var(--base-font-size, 16px); overflow-x: clip; }
 
 /* --- Защита от раздувания встроенных SVG-иконок --- */
 .cms-block svg,
