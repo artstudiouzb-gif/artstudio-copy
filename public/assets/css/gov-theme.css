@@ -840,6 +840,7 @@ body .site-header--transparent:not(.is-scrolled) .site-lang-switcher__item,
 body .site-header--transparent:not(.is-scrolled) .a11y-toggle,
 body .site-header--transparent:not(.is-scrolled) .site-theme-toggle,
 body .site-header--transparent:not(.is-scrolled) .site-search-toggle,
+body .site-header--transparent:not(.is-scrolled) .site-burger,
 body .site-header--transparent:not(.is-scrolled) .hdr-contact { color: #fff; }
 /* Отдельный (светлый) логотип для прозрачного режима.
    Стандартный логотип прячем ТОЛЬКО когда реально задан светлый вариант —
@@ -867,7 +868,8 @@ body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero { pad
 /* Кнопка для слабовидящих: иконка, текст — в aria-label/title. */
 body .site-header .a11y-toggle span { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 body .site-header .a11y-toggle { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gov-border); padding: 0; }
-body .site-header--transparent:not(.is-scrolled) .a11y-toggle { border-color: rgba(255,255,255,.4); }
+body .site-header--transparent:not(.is-scrolled) .a11y-toggle,
+body .site-header--transparent:not(.is-scrolled) .site-burger { border-color: rgba(255,255,255,.4); }
 /* Поиск: по умолчанию только иконка-лупа; поле выезжает по клику. */
 body .site-header .site-search { display: none; }
 body .site-header .site-search.is-open { display: inline-flex; animation: hdr-search-in .2s ease; }
@@ -1254,6 +1256,16 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
         width: 100%;
         min-height: 44px;
         white-space: normal;
+    }
+    /* Раскрытая панель имеет собственный сплошной фон и не должна наследовать
+       белый текст прозрачной шапки поверх hero. Переменные темы сохраняют
+       правильный контраст и в светлом, и в тёмном режиме. */
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link {
+        color: var(--gov-title);
+    }
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link:hover,
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link:focus-visible {
+        color: var(--gov-teal-text, var(--gov-teal));
     }
 
     .newsfeat-grid, .block-newsdocs { gap: 24px; }
