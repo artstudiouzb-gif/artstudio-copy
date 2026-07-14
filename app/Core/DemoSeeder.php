@@ -330,7 +330,11 @@ final class DemoSeeder
         );
 
         foreach ($pages as $slug => $langData) {
-            $defaultTitle = $langData['ru']['title'] ?? '';
+            if (!is_array($langData)) {
+                continue;
+            }
+            $ruData = $langData['ru'] ?? [];
+            $defaultTitle = is_array($ruData) ? (string) ($ruData['title'] ?? '') : '';
             $pageIns->execute([':t' => $defaultTitle, ':s' => $slug, ':s2' => $slug]);
             $c['pages'] += $pageIns->rowCount();
             $pid = self::pageId($pdo, $slug);
@@ -341,18 +345,31 @@ final class DemoSeeder
             $hasBlocks = (int) $pdo->query('SELECT COUNT(*) FROM blocks WHERE page_id = ' . $pid)->fetchColumn() > 0;
 
             foreach ($langData as $lang => $data) {
+                if (!is_array($data)) {
+                    continue;
+                }
+                $title = (string) ($data['title'] ?? '');
+                $blocks = $data['blocks'] ?? [];
+
                 // Вставляем перевод страницы
                 $transIns->execute([
                     ':pid' => $pid,
                     ':lang' => $lang,
-                    ':title' => $data['title'],
+                    ':title' => $title,
                     ':pid2' => $pid,
                     ':lang2' => $lang
                 ]);
 
-                if (!$hasBlocks) {
+                if (!$hasBlocks && is_array($blocks)) {
                     $order = 1;
-                    foreach ($data['blocks'] as [$type, $btitle, $blockData]) {
+                    foreach ($blocks as $block) {
+                        if (!is_array($block) || count($block) < 3) {
+                            continue;
+                        }
+                        $type = (string) ($block[0] ?? '');
+                        $btitle = (string) ($block[1] ?? '');
+                        $blockData = $block[2] ?? [];
+
                         $blockIns->execute([
                             ':pid' => $pid,
                             ':lang' => $lang,
