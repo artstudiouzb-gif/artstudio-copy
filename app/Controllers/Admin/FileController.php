@@ -105,6 +105,16 @@ final class FileController
             if (is_file($path)) {
                 unlink($path);
             }
+
+            // Удаляем сопутствующие WebP-варианты (name.webp, name-1600.webp, name-800.webp) для растровых картинок
+            $base = preg_replace('/\.[^.]+$/', '', $path) ?? $path;
+            foreach (['.webp', '-1600.webp', '-800.webp'] as $suffix) {
+                $variant = $base . $suffix;
+                if (is_file($variant)) {
+                    @unlink($variant);
+                }
+            }
+
             FileEntry::delete((int) $file['id']);
             Flash::success('Файл удалён.');
         }
