@@ -102,20 +102,21 @@ a:hover { color: color-mix(in srgb, var(--gov-teal) 80%, #000); }
     margin-bottom: 28px;
 }
 
-/* --- Шапка сайта: плавающая с умеренным эффектом стекла --- */
+/* --- Шапка сайта: плавающая с трендовым эффектом стекла --- */
 .site-header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.91) !important;
-    backdrop-filter: blur(10px) saturate(190%);
-    -webkit-backdrop-filter: blur(10px) saturate(190%);
-    border-bottom: 1px solid var(--gov-border) !important;
-    box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.05);
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
 }
 
 :root[data-theme="dark"] .site-header {
-    background: rgba(15, 23, 42, 0.88) !important;
+    background: rgba(15, 23, 42, 0.65) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 .site-header__inner { max-width: var(--container-max); padding: 14px 20px !important; }
@@ -156,15 +157,17 @@ a:hover { color: color-mix(in srgb, var(--gov-teal) 80%, #000); }
 
 /* Выпадающие меню */
 .site-submenu {
-    background: rgba(255, 255, 255, 0.94) !important;
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--gov-border) !important;
-    border-radius: 10px !important;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06) !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08) !important;
     padding: 8px !important;
 }
 :root[data-theme="dark"] .site-submenu {
-    background: rgba(30, 41, 59, 0.94) !important;
+    background: rgba(30, 41, 59, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Выпадающий поиск и мобильное меню с эффектом стекла */
@@ -271,23 +274,31 @@ a:hover { color: color-mix(in srgb, var(--gov-teal) 80%, #000); }
     box-shadow: 0 6px 14px rgba(14, 165, 233, 0.25) !important;
 }
 
-/* --- Карточки контента (Умеренный стеклянный стиль) --- */
+/* --- Карточки контента (Трендовый стеклянный стиль) --- */
 .news-card, .content-card, .contact-card, .counter, .cat-tile, .site-search-results__item,
 .block-testimonials__item, .testimonial, .team-card, .project-card {
-    background: var(--gov-surface) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--gov-border) !important;
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: var(--radius) !important;
-    box-shadow: 0 6px 18px -10px rgba(15, 23, 42, 0.03) !important;
+    box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04) !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     padding: 22px !important;
 }
+:root[data-theme="dark"] :where(.news-card, .content-card, .contact-card, .counter, .cat-tile, .site-search-results__item, .block-testimonials__item, .testimonial, .team-card, .project-card) {
+    background: rgba(30, 41, 59, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
 
 .news-card:hover, .content-card:hover, .contact-card:hover, .cat-tile:hover, .team-card:hover, .project-card:hover {
-    transform: translateY(-3px) !important;
-    box-shadow: 0 16px 24px -10px rgba(15, 23, 42, 0.05) !important;
+    transform: translateY(-4px) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08) !important;
     border-color: var(--gov-teal) !important;
+}
+:root[data-theme="dark"] :where(.news-card, .content-card, .contact-card, .counter, .cat-tile, .site-search-results__item, .block-testimonials__item, .testimonial, .team-card, .project-card):hover {
+    background: rgba(30, 41, 59, 0.8) !important;
 }
 
 .cat-tile {
@@ -300,12 +311,17 @@ a:hover { color: color-mix(in srgb, var(--gov-teal) 80%, #000); }
 
 /* --- Блок счетчиков (Полоса статистики) --- */
 .block-counters {
-    background: var(--gov-surface);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--gov-border);
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 18px;
     padding: clamp(20px, 3vw, 32px);
-    box-shadow: 0 6px 24px -10px rgba(15, 23, 42, 0.02);
+    box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.04);
+}
+:root[data-theme="dark"] .block-counters {
+    background: rgba(30, 41, 59, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 .block-counters__grid {
     display: flex;
