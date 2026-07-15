@@ -153,6 +153,8 @@ final class DemoSeeder
 
     private static function seedNews(PDO $pdo, array &$c): void
     {
+        self::seedFlagshipNews($pdo, $c);
+
         $news = [
             ['Запуск обновлённого официального портала', 'zapusk-portala', 'Представлен новый сайт организации с современным дизайном, удобной навигацией и версией для слабовидящих.'],
             ['График приёма граждан на квартал', 'grafik-priema', 'Опубликовано расписание личного приёма граждан руководством организации.'],
@@ -170,6 +172,74 @@ final class DemoSeeder
         foreach ($news as $i => $n) {
             $ins->execute([':t' => $n[0], ':s' => $n[1], ':e' => $n[2], ':co' => '<p>' . $n[2] . '</p><p>Полный текст материала.</p>', ':img' => $covers[$i % count($covers)], ':d' => $i * 2, ':s2' => $n[1]]);
             $c['news'] += $ins->rowCount();
+        }
+    }
+
+    /**
+     * Флагманская демо-новость в «премиум»-макете (по эскизу детальной
+     * страницы): бейдж, ключевые тезисы, карточка мероприятия, цитата,
+     * документы и фотогалерея. Показывает редактору все возможности
+     * медиа-движка новостей сразу после установки.
+     */
+    private static function seedFlagshipNews(PDO $pdo, array &$c): void
+    {
+        $slug = 'zasedanie-strategiya-2030';
+        $docs = [
+            ['title' => 'Пресс-релиз по итогам заседания', 'meta' => 'PDF · 245 КБ', 'url' => '/catalog/documenty'],
+            ['title' => 'Презентация: ход реализации Стратегии', 'meta' => 'PDF · 1,2 МБ', 'url' => '/catalog/documenty'],
+        ];
+        $content = '<p><strong>В Агентстве стратегического развития и реформ Республики Узбекистан состоялось расширенное заседание, посвящённое вопросам реализации Стратегии «Узбекистан–2030».</strong></p>'
+            . '<p>В заседании приняли участие руководители профильных министерств и ведомств, представители регионов и эксперты. Участники обсудили ход выполнения ключевых инициатив, определили приоритеты на предстоящий период и утвердили конкретные меры по их реализации.</p>'
+            . '<blockquote><p>Наша задача — обеспечить эффективную реализацию всех намеченных инициатив и достичь конкретных результатов, которые ощутит каждый гражданин нашей страны.</p><cite>Директор Агентства</cite></blockquote>'
+            . '<h3>Основные вопросы повестки</h3>'
+            . '<ul><li>Реализация приоритетных направлений Стратегии «Узбекистан–2030»</li>'
+            . '<li>Развитие «зелёной» экономики и энергетики</li>'
+            . '<li>Инвестиционная и промышленная политика</li>'
+            . '<li>Развитие образования, науки и инноваций</li>'
+            . '<li>Цифровая трансформация и электронное правительство</li></ul>'
+            . '<p>По итогам заседания ответственным ведомствам и регионам даны поручения по ускорению реализации проектов и обеспечению своевременного достижения ключевых показателей.</p>';
+
+        $ins = $pdo->prepare(
+            "INSERT INTO news (title, slug, excerpt, badge, content, image, key_points, event_meta, docs, source_note, layout_type, status, published_at, created_at)
+             SELECT :t, :s, :e, :b, :co, :img, :kp, :em, :dc, :sn, 'premium', 'published', NOW() - INTERVAL 1 DAY, NOW()
+             FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM news WHERE slug = :s2)"
+        );
+        $ins->execute([
+            ':t' => 'Заседание по вопросам реализации Стратегии «Узбекистан–2030»',
+            ':s' => $slug,
+            ':e' => 'Обсуждены ключевые приоритеты и ход реализации стратегических инициатив, направленных на устойчивое развитие страны и повышение благосостояния населения.',
+            ':b' => 'Мероприятие',
+            ':co' => $content,
+            ':img' => '/uploads/public/demo-strategy-meeting.jpg',
+            ':kp' => "Рассмотрены приоритетные направления Стратегии «Узбекистан–2030»\nПроанализирован прогресс реализации ключевых инициатив\nУтверждены дальнейшие шаги и ответственные исполнители\nОсобое внимание уделено инвестициям, инновациям и человеческому капиталу",
+            ':em' => "Дата: 20 мая 2026 года\nФормат: расширенное заседание\nУчастники: министерства, ведомства, регионы",
+            ':dc' => json_encode($docs, JSON_UNESCAPED_UNICODE),
+            ':sn' => 'Подготовлено пресс-службой Агентства',
+            ':s2' => $slug,
+        ]);
+        $c['news'] += $ins->rowCount();
+
+        // Фотогалерея новости — если таблица есть и запись только что создана.
+        if ($ins->rowCount() > 0 && (bool) $pdo->query("SHOW TABLES LIKE 'news_images'")->fetchColumn()) {
+            $newsId = $pdo->prepare('SELECT id FROM news WHERE slug = :s LIMIT 1');
+            $newsId->execute([':s' => $slug]);
+            $nid = $newsId->fetchColumn();
+            if ($nid !== false) {
+                $imgIns = $pdo->prepare(
+                    'INSERT INTO news_images (news_id, path, alt_text, sort_order, created_at)
+                     SELECT :nid, :p, :a, :o, NOW()
+                     FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM news_images WHERE news_id = :nid2 AND path = :p2)'
+                );
+                $gallery = [
+                    '/uploads/public/demo-strategy-meeting.jpg',
+                    '/uploads/public/demo-agency-hero.jpg',
+                    '/uploads/public/demo-urban-development.jpg',
+                    '/uploads/public/demo-green-energy.jpg',
+                ];
+                foreach ($gallery as $i => $path) {
+                    $imgIns->execute([':nid' => (int) $nid, ':p' => $path, ':a' => 'Заседание по Стратегии «Узбекистан–2030»', ':o' => $i, ':nid2' => (int) $nid, ':p2' => $path]);
+                }
+            }
         }
     }
 
@@ -372,7 +442,8 @@ final class DemoSeeder
                     'title' => 'Руководство',
                     'blocks' => [
                         ['text', 'Введение', ['title' => 'Руководство', 'content' => '<p>Руководящий состав организации.</p>']],
-                        ['team_list', 'Команда', ['title' => 'Руководящий состав', 'limit' => 0]]
+                        ['team_list', 'Команда', ['title' => 'Руководящий состав', 'limit' => 0]],
+                        ['cta_band', 'Директор', ['title' => 'Директор Агентства', 'text' => 'Биография, приоритеты работы и публикации руководителя.', 'button_text' => 'Страница директора', 'button_url' => '/direktor', 'bg_color' => '#072b61', 'text_color' => '#ffffff']]
                     ]
                 ],
                 'uz' => [
