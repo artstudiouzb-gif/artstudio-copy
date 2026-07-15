@@ -94,6 +94,7 @@ final class SettingsController
         // как есть (доверенный источник), выводится на фронте один раз.
         Setting::set('custom_css_global', (string) ($_POST['custom_css_global'] ?? ''));
         Setting::set('custom_js_global', (string) ($_POST['custom_js_global'] ?? ''));
+        Setting::set('footer_counters', (string) ($_POST['footer_counters'] ?? ''));
 
         Flash::success('Настройки сохранены.');
         header('Location: /admin/settings');

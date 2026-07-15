@@ -113,11 +113,49 @@ $renderFooterWidget = function (array $col) use ($footerLogo, $siteName, $addres
             </div>
         <?php endforeach; ?>
     </div>
-    <div class="site-footer__bottom"><?= htmlspecialchars($footerBottom, ENT_QUOTES) ?></div>
+    <div class="site-footer__bottom">
+        <div class="site-footer__bottom-inner">
+            <div class="site-footer__bottom-col site-footer__bottom-col--left">
+                <?= htmlspecialchars($footerBottom, ENT_QUOTES) ?>
+            </div>
+            <div class="site-footer__bottom-col site-footer__bottom-col--middle">
+                <?php if ($privacyUrl !== ''): ?>
+                    <a href="<?= htmlspecialchars($privacyUrl, ENT_QUOTES) ?>"><?= htmlspecialchars(t('Политика конфиденциальности'), ENT_QUOTES) ?></a>
+                <?php endif; ?>
+            </div>
+            <div class="site-footer__bottom-col site-footer__bottom-col--right">
+                <?php $footerCounters = Setting::get('footer_counters', ''); ?>
+                <?php if (trim($footerCounters) !== ''): ?>
+                    <div class="site-footer__counters">
+                        <?= $footerCounters ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 </footer>
 <?php else: ?>
 <footer class="site-footer">
-    <p><?= htmlspecialchars($footerBottom, ENT_QUOTES) ?></p>
+    <div class="site-footer__bottom">
+        <div class="site-footer__bottom-inner">
+            <div class="site-footer__bottom-col site-footer__bottom-col--left">
+                <?= htmlspecialchars($footerBottom, ENT_QUOTES) ?>
+            </div>
+            <div class="site-footer__bottom-col site-footer__bottom-col--middle">
+                <?php if ($privacyUrl !== ''): ?>
+                    <a href="<?= htmlspecialchars($privacyUrl, ENT_QUOTES) ?>"><?= htmlspecialchars(t('Политика конфиденциальности'), ENT_QUOTES) ?></a>
+                <?php endif; ?>
+            </div>
+            <div class="site-footer__bottom-col site-footer__bottom-col--right">
+                <?php $footerCounters = Setting::get('footer_counters', ''); ?>
+                <?php if (trim($footerCounters) !== ''): ?>
+                    <div class="site-footer__counters">
+                        <?= $footerCounters ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 </footer>
 <?php endif; ?>
 <?php endif; ?>
