@@ -29,7 +29,7 @@ $others = array_values(array_filter(Project::published(), fn (array $p) => (int)
             <span class="projdetail__media" style="background-image:url('<?= htmlspecialchars($cover, ENT_QUOTES) ?>')"></span>
         <?php endif; ?>
     </div>
-    <div class="projdetail__content newsdetail-article__content"><?= $project['description'] ?></div>
+    <div class="projdetail__content newsdetail-article__content rich-content"><?= $project['description'] ?></div>
 
     <?php if (!empty($others)): ?>
         <section class="projdetail-related">

@@ -7,5 +7,5 @@ $content = $data['content'] ?? '';
     <?php if ($title !== ''): ?>
         <h2 class="block-text__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></h2>
     <?php endif; ?>
-    <div class="block-text__content"><?= $content ?></div>
+    <div class="block-text__content rich-content"><?= $content ?></div>
 </div>

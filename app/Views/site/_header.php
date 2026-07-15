@@ -446,6 +446,7 @@ $siteTemplate = \App\Models\Setting::get('design_site_template', 'gov');
 if ($siteTemplate === 'modern_gov'): ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/modern-gov-theme.css'), ENT_QUOTES) ?>">
 <?php endif; ?>
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/rich-content.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/a11y.css'), ENT_QUOTES) ?>">
 <style>
 :root {

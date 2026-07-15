@@ -10,7 +10,7 @@ $items = $data['items'] ?? [];
             <details class="faq-item">
                 <summary class="faq-item__q"><?= htmlspecialchars($item['question'] ?? '', ENT_QUOTES) ?></summary>
                 <?php // Ответ уже прошёл TextProcessor (типограф + санитайзер) при сохранении. ?>
-                <div class="faq-item__a"><?= $item['answer'] ?? '' ?></div>
+                <div class="faq-item__a rich-content"><?= $item['answer'] ?? '' ?></div>
             </details>
         <?php endforeach; ?>
     </div>

@@ -49,7 +49,7 @@ $sideFields = array_values(array_filter($fields, static fn ($f) => !in_array($f[
                 <?php if ($val === '') { continue; } $hasMain = true; ?>
                 <section class="catdetail__section">
                     <h2 class="catdetail__subtitle"><?= htmlspecialchars((string) $f['label'], ENT_QUOTES) ?></h2>
-                    <div class="catdetail__text"><?= $val ?></div>
+                    <div class="catdetail__text rich-content"><?= $val ?></div>
                 </section>
             <?php endforeach; ?>
             <?php if (!$hasMain): ?><p class="catdetail__empty"><?= htmlspecialchars(t('Описание не заполнено.'), ENT_QUOTES) ?></p><?php endif; ?>

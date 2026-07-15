@@ -55,7 +55,12 @@
                     'bold italic underline strikethrough | subscript superscript | blockquote | alignleft aligncenter ' +
                     'alignright alignjustify | bullist numlist outdent indent | ' +
                     'link image table | removeformat code fullscreen',
-                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; }',
+                body_class: 'rich-content',
+                content_css: [
+                    '/assets/css/fonts.css',
+                    '/assets/css/gov-fonts.css',
+                    '/assets/css/rich-content.css'
+                ],
                 setup: function (editor) {
                     editor.on('change input blur', function () {
                         editor.save(); // Synchronizes TinyMCE content back to the textarea

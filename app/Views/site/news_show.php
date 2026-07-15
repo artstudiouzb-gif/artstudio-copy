@@ -246,7 +246,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
         <?php endif; ?>
 
         <div class="newsdetail-article">
-            <div class="newsdetail-article__content"><?= $contentHtml ?></div>
+            <div class="newsdetail-article__content rich-content"><?= $contentHtml ?></div>
             <?php if (!$hasLeft): ?>
                 <?php $shareBlock(' newsdetail-share--inline'); ?>
             <?php endif; ?>
