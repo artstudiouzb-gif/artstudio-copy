@@ -437,7 +437,11 @@ final class BlockController
                 ];
             case 'form':
                 $formId = (int) ($_POST['form_id'] ?? 0);
-                return ['form_id' => $formId > 0 ? $formId : null];
+                $layout = in_array($_POST['layout'] ?? '1col', ['1col', '2col'], true) ? (string) $_POST['layout'] : '1col';
+                return [
+                    'form_id' => $formId > 0 ? $formId : null,
+                    'layout' => $layout,
+                ];
             case 'columns':
                 $cols = (int) ($_POST['columns'] ?? 2);
                 if ($cols < 2 || $cols > 4) {

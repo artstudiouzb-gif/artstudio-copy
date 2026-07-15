@@ -12,7 +12,10 @@ $form = $data['form'] ?? null;
     <?php else: ?>
         <?php if (!empty($form['name'])): ?><h2><?= htmlspecialchars($form['name'], ENT_QUOTES) ?></h2><?php endif; ?>
         <?php $hasFile = false; foreach ($form['fields'] as $f) { if (($f['type'] ?? '') === 'file') { $hasFile = true; break; } } ?>
-        <form method="post" action="/forms/<?= htmlspecialchars($form['slug'], ENT_QUOTES) ?>/submit" class="block-form__form"<?= $hasFile ? ' enctype="multipart/form-data"' : '' ?>>
+        <?php 
+        $formLayoutClass = ($data['layout'] ?? '1col') === '2col' ? ' block-form__form--2col' : '';
+        ?>
+        <form method="post" action="/forms/<?= htmlspecialchars($form['slug'], ENT_QUOTES) ?>/submit" class="block-form__form<?= $formLayoutClass ?>"<?= $hasFile ? ' enctype="multipart/form-data"' : '' ?>>
             <?= Csrf::field() ?>
             <?= Csrf::honeypotField() ?>
             <?php foreach ($form['fields'] as $field): ?>
@@ -32,8 +35,11 @@ $form = $data['form'] ?? null;
                         . '" data-cond-value="' . htmlspecialchars((string) ($cond['value'] ?? ''), ENT_QUOTES) . '"';
                     $hiddenStyle = ' style="display:none"';
                 }
+
+                $isFullWidth = in_array($fieldType, ['textarea', 'file', 'checkbox_group', 'checkbox'], true);
+                $fieldClass = 'block-form__field' . ($isFullWidth ? ' block-form__field--full' : '');
                 ?>
-                <div class="block-form__field"<?= $condAttrs ?><?= $hiddenStyle ?>>
+                <div class="<?= $fieldClass ?>"<?= $condAttrs ?><?= $hiddenStyle ?>>
                     <?php if ($fieldType !== 'checkbox'): ?>
                         <label for="<?= $inputId ?>"><?= $fieldLabel ?></label>
                     <?php endif; ?>
@@ -89,7 +95,9 @@ $form = $data['form'] ?? null;
                 </div>
             <?php endforeach; ?>
             <?php if (\App\Core\Captcha::isEnabled()): ?>
-                <?= \App\Core\Captcha::field('captcha-' . (int) $blockId) ?>
+                <div class="block-form__captcha">
+                    <?= \App\Core\Captcha::field('captcha-' . (int) $blockId) ?>
+                </div>
             <?php endif; ?>
             <?php
             // Согласие на обработку персональных данных (глобальная настройка).

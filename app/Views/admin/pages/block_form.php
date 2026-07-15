@@ -213,6 +213,13 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                     <span class="form-hint">Сначала создайте форму в разделе «Формы».</span>
                 <?php endif; ?>
             </div>
+            <div class="form-field">
+                <label for="form_layout">Макет формы</label>
+                <select id="form_layout" name="layout">
+                    <option value="1col" <?= ($data['layout'] ?? '1col') === '1col' ? 'selected' : '' ?>>В одну колонку</option>
+                    <option value="2col" <?= ($data['layout'] ?? '1col') === '2col' ? 'selected' : '' ?>>В две колонки (сетка)</option>
+                </select>
+            </div>
         <?php endif; ?>
 
         <?php if ($type === 'columns'): ?>
