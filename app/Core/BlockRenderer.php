@@ -52,6 +52,7 @@ final class BlockRenderer
         'text_image' => ['title' => '', 'text' => '', 'image' => '', 'items' => []],
         'docs_list' => ['title' => '', 'all_text' => '', 'all_url' => '', 'columns' => 4, 'items' => []],
         'map_point' => ['title' => '', 'image' => '', 'embed_url' => '', 'card_title' => '', 'address' => '', 'button_text' => '', 'button_url' => ''],
+        'org_structure' => ['title' => '', 'head_title' => 'Директор', 'head_name' => '', 'head_url' => '', 'side_items' => '', 'branches' => [], 'footnote' => ''],
     ];
 
     public static function defaultsFor(string $type): array

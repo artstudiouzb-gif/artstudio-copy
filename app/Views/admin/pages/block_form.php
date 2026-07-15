@@ -25,7 +25,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <input type="text" id="title" name="title" value="<?= htmlspecialchars($block['title'] ?? '', ENT_QUOTES) ?>">
         </div>
 
-        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature', 'person_cards', 'timeline', 'cta_band', 'feature_band', 'stages', 'text_image', 'docs_list', 'map_point'], true)): ?>
+        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature', 'person_cards', 'timeline', 'cta_band', 'feature_band', 'stages', 'text_image', 'docs_list', 'map_point', 'org_structure'], true)): ?>
             <div class="form-field">
                 <label for="title_field">Заголовок, показываемый на сайте</label>
                 <input type="text" id="title_field" name="title_field" value="<?= htmlspecialchars($data['title'] ?? '', ENT_QUOTES) ?>">
@@ -968,6 +968,37 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <div class="form-field"><label for="address">Карточка — адрес (можно в 2 строки)</label><textarea id="address" name="address" rows="2"><?= htmlspecialchars($data['address'] ?? '', ENT_QUOTES) ?></textarea></div>
             <div class="form-field"><label for="button_text">Кнопка (напр. «Построить маршрут») — текст</label><input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>"></div>
             <div class="form-field"><label for="button_url">Кнопка — ссылка</label><input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="https://maps.google.com/?daddr=..."></div>
+        <?php endif; ?>
+
+        <?php if ($type === 'org_structure'): ?>
+            <div class="form-field"><label for="head_title">Руководитель — должность</label><input type="text" id="head_title" name="head_title" value="<?= htmlspecialchars($data['head_title'] ?? 'Директор', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="head_name">Руководитель — Ф.И.О. (необязательно)</label><input type="text" id="head_name" name="head_name" value="<?= htmlspecialchars($data['head_name'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="head_url">Руководитель — ссылка (напр. на страницу директора)</label><input type="text" id="head_url" name="head_url" value="<?= htmlspecialchars($data['head_url'] ?? '', ENT_QUOTES) ?>" placeholder="/direktor"></div>
+            <div class="form-field">
+                <label for="side_items">Органы при руководителе (по одному на строку)</label>
+                <textarea id="side_items" name="side_items" rows="3" placeholder="Координационный совет&#10;Советник"><?= htmlspecialchars($data['side_items'] ?? '', ENT_QUOTES) ?></textarea>
+            </div>
+            <div>
+                <label>Ветки (заместители / блоки подразделений)</label>
+                <div data-repeater="branches">
+                    <?php foreach (($data['branches'] ?? []) as $i => $branch): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>Должность</label><input type="text" name="branches[<?= $i ?>][title]" value="<?= htmlspecialchars($branch['title'] ?? '', ENT_QUOTES) ?>" placeholder="Первый заместитель директора"></div>
+                            <div class="form-field"><label>Ф.И.О. (необязательно)</label><input type="text" name="branches[<?= $i ?>][name]" value="<?= htmlspecialchars($branch['name'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Подразделения (по одному на строку)</label><textarea name="branches[<?= $i ?>][units]" rows="5" placeholder="Отдел стратегического планирования&#10;Отдел анализа и мониторинга"><?= htmlspecialchars($branch['units'] ?? '', ENT_QUOTES) ?></textarea></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить ветку</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="branches">
+                    <div class="form-field"><label>Должность</label><input type="text" name="branches[__INDEX__][title]" placeholder="Заместитель директора"></div>
+                    <div class="form-field"><label>Ф.И.О. (необязательно)</label><input type="text" name="branches[__INDEX__][name]"></div>
+                    <div class="form-field"><label>Подразделения (по одному на строку)</label><textarea name="branches[__INDEX__][units]" rows="5"></textarea></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить ветку</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="branches">+ Добавить ветку</button></div>
+            </div>
+            <div class="form-field"><label for="footnote">Примечание под схемой (необязательно)</label><input type="text" id="footnote" name="footnote" value="<?= htmlspecialchars($data['footnote'] ?? '', ENT_QUOTES) ?>" placeholder="Структура утверждена постановлением…"></div>
         <?php endif; ?>
 
         <?php // Общие поля оформления свёрнуты: контент-поля — основная задача,

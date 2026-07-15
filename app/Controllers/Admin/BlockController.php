@@ -17,7 +17,7 @@ use App\Models\Page;
 
 final class BlockController
 {
-    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature', 'person_cards', 'timeline', 'news_docs', 'cta_band', 'person_profile', 'feature_band', 'bio_education', 'anchor_nav', 'stages', 'text_image', 'docs_list', 'map_point'];
+    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature', 'person_cards', 'timeline', 'news_docs', 'cta_band', 'person_profile', 'feature_band', 'bio_education', 'anchor_nav', 'stages', 'text_image', 'docs_list', 'map_point', 'org_structure'];
 
     public function store(array $params): void
     {
@@ -988,6 +988,31 @@ final class BlockController
                     'address' => trim((string) ($_POST['address'] ?? '')),
                     'button_text' => trim((string) ($_POST['button_text'] ?? '')),
                     'button_url' => $this->safeUrlField('button_url'),
+                ];
+
+            case 'org_structure':
+                $branches = [];
+                foreach ((array) ($_POST['branches'] ?? []) as $branch) {
+                    $bTitle = trim((string) ($branch['title'] ?? ''));
+                    $bName = trim((string) ($branch['name'] ?? ''));
+                    $bUnits = trim((string) ($branch['units'] ?? ''));
+                    if ($bTitle === '' && $bName === '' && $bUnits === '') {
+                        continue;
+                    }
+                    $branches[] = [
+                        'title' => TextProcessor::typographPlain($bTitle, $locale),
+                        'name' => trim($bName),
+                        'units' => $bUnits,
+                    ];
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'head_title' => TextProcessor::typographPlain(trim((string) ($_POST['head_title'] ?? '')), $locale),
+                    'head_name' => trim((string) ($_POST['head_name'] ?? '')),
+                    'head_url' => $this->safeUrlField('head_url'),
+                    'side_items' => trim((string) ($_POST['side_items'] ?? '')),
+                    'branches' => $branches,
+                    'footnote' => TextProcessor::typographPlain(trim((string) ($_POST['footnote'] ?? '')), $locale),
                 ];
             default:
                 return [];

@@ -458,13 +458,37 @@ final class DemoSeeder
                 'ru' => [
                     'title' => 'Структура',
                     'blocks' => [
-                        ['text', 'Структура', ['title' => 'Организационная структура', 'content' => '<p>Организация включает профильные подразделения: юридический отдел, отдел информационных технологий, отдел кадров, пресс-службу и другие структурные единицы.</p>']]
+                        ['org_structure', 'Оргсхема', [
+                            'title' => 'Организационная структура',
+                            'head_title' => 'Директор',
+                            'head_name' => 'Нуриддинов Шерзод Бахтиярович',
+                            'head_url' => '/direktor',
+                            'side_items' => "Координационный совет\nСоветник директора",
+                            'branches' => [
+                                ['title' => 'Первый заместитель директора', 'name' => '', 'units' => "Отдел стратегического планирования\nОтдел макроэкономического анализа\nОтдел мониторинга реформ\nПроектный офис по развитию секторов экономики"],
+                                ['title' => 'Заместитель директора', 'name' => '', 'units' => "Отдел регионального развития\nОтдел инвестиционной политики\nПроектный офис по развитию территорий\nОтдел международного сотрудничества"],
+                                ['title' => 'Заместитель директора', 'name' => '', 'units' => "Юридический отдел\nОтдел управления персоналом\nОтдел финансов и бухгалтерского учёта\nПресс-служба и связи с общественностью\nОтдел цифровизации и информационных технологий"],
+                            ],
+                            'footnote' => 'Структура утверждена в установленном порядке и может уточняться при изменении задач Агентства.',
+                        ]]
                     ]
                 ],
                 'uz' => [
                     'title' => 'Tuzilma',
                     'blocks' => [
-                        ['text', 'Tuzilma', ['title' => 'Tashkiliy tuzilma', 'content' => '<p>Tashkilot tarkibiga quyidagi ixtisoslashtirilgan bo‘linmalar kiradi: yuridik bo‘lim, axborot texnologiyalari bo‘limi, kadrlar bo‘limi, matbuot xizmati va boshqa tarkibiy tuzilmalar.</p>']]
+                        ['org_structure', 'Tuzilma sxemasi', [
+                            'title' => 'Tashkiliy tuzilma',
+                            'head_title' => 'Direktor',
+                            'head_name' => 'Nuriddinov Sherzod Baxtiyarovich',
+                            'head_url' => '/direktor',
+                            'side_items' => "Muvofiqlashtiruvchi kengash\nDirektor maslahatchisi",
+                            'branches' => [
+                                ['title' => 'Direktorning birinchi o‘rinbosari', 'name' => '', 'units' => "Strategik rejalashtirish bo‘limi\nMakroiqtisodiy tahlil bo‘limi\nIslohotlar monitoringi bo‘limi\nIqtisodiyot tarmoqlarini rivojlantirish loyihaviy ofisi"],
+                                ['title' => 'Direktor o‘rinbosari', 'name' => '', 'units' => "Hududiy rivojlanish bo‘limi\nInvestitsiya siyosati bo‘limi\nHududlarni rivojlantirish loyihaviy ofisi\nXalqaro hamkorlik bo‘limi"],
+                                ['title' => 'Direktor o‘rinbosari', 'name' => '', 'units' => "Yuridik bo‘lim\nPersonalni boshqarish bo‘limi\nMoliya va buxgalteriya hisobi bo‘limi\nMatbuot xizmati va jamoatchilik bilan aloqalar\nRaqamlashtirish va axborot texnologiyalari bo‘limi"],
+                            ],
+                            'footnote' => 'Tuzilma belgilangan tartibda tasdiqlangan bo‘lib, Agentlik vazifalari o‘zgarganda aniqlashtirilishi mumkin.',
+                        ]]
                     ]
                 ]
             ],
