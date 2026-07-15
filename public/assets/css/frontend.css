@@ -1272,8 +1272,11 @@ body.design-header-dark .site-nav { border-top-color: rgba(255, 255, 255, .14); 
 .site-menu__text { display: inline-block; }
 /* Разделитель в горизонтальном меню — тонкая вертикальная черта. */
 .site-menu__divider {
-    align-self: center; width: 1px; height: 18px; margin: 0 4px;
-    background: color-mix(in srgb, currentColor 35%, transparent);
+    align-self: center;
+    width: var(--menu-divider-width, 1px);
+    height: var(--menu-divider-height, 18px);
+    margin: 0 8px;
+    background: var(--menu-divider-color, color-mix(in srgb, currentColor 35%, transparent));
 }
 
 /* ==========================================================================

@@ -407,6 +407,20 @@ final class DesignSettings
         if (array_key_exists('radius_custom', $input)) {
             Setting::set('design_radius_custom', self::normalizeRadius((string) $input['radius_custom']));
         }
+        if (array_key_exists('menu_divider_color', $input)) {
+            Setting::set('design_menu_divider_color', SettingsValidator::hexColor((string) $input['menu_divider_color'], '#ffffff'));
+        }
+        if (array_key_exists('menu_divider_color_use', $input)) {
+            Setting::set('design_menu_divider_color_use', (string) $input['menu_divider_color_use'] === '1' ? '1' : '0');
+        } else {
+            Setting::set('design_menu_divider_color_use', '0');
+        }
+        if (array_key_exists('menu_divider_thickness', $input)) {
+            Setting::set('design_menu_divider_thickness', self::normalizePixelValue((string) $input['menu_divider_thickness'], 0, 10));
+        }
+        if (array_key_exists('menu_divider_height', $input)) {
+            Setting::set('design_menu_divider_height', self::normalizePixelValue((string) $input['menu_divider_height'], 2, 100));
+        }
 
         // Ручные цвета и шрифт сохраняются отдельно от активного пресета.
         // При первом сохранении старые рабочие ключи цветов и font_family используются как
@@ -688,8 +702,25 @@ final class DesignSettings
             'elevated' => '0 10px 30px rgba(16,24,40,.12)',
         ][$v['card_style'] ?? 'soft'] ?? 'none';
 
+        $divColor = (string) Setting::get('design_menu_divider_color_use', '0') === '1'
+            ? (string) Setting::get('design_menu_divider_color', '')
+            : '';
+        if ($divColor === '') {
+            $divColor = 'color-mix(in srgb, currentColor 35%, transparent)';
+        }
+
+        $divThickness = (string) Setting::get('design_menu_divider_thickness', '');
+        if ($divThickness === '') {
+            $divThickness = '1px';
+        }
+
+        $divHeight = (string) Setting::get('design_menu_divider_height', '');
+        if ($divHeight === '') {
+            $divHeight = '18px';
+        }
+
         return sprintf(
-            ':root{--container-max:%s;--radius:%s;--radius-sm:calc(%s * .6);--card-gap:%s;--section-pad:%s;--btn-radius:%s;--base-font-size:%s;--base-line-height:%s;--card-shadow:%s;}',
+            ':root{--container-max:%s;--radius:%s;--radius-sm:calc(%s * .6);--card-gap:%s;--section-pad:%s;--btn-radius:%s;--base-font-size:%s;--base-line-height:%s;--card-shadow:%s;--menu-divider-color:%s;--menu-divider-width:%s;--menu-divider-height:%s;}',
             $container,
             $radius,
             $radius,
@@ -698,7 +729,10 @@ final class DesignSettings
             $btn,
             $fontSize,
             $lineHeight,
-            $shadow
+            $shadow,
+            $divColor,
+            $divThickness,
+            $divHeight
         );
     }
 

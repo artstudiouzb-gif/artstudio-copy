@@ -223,6 +223,45 @@ foreach ($options as $key => $opt) {
         </div>
     </section>
 
+    <section class="design-section">
+        <h2 class="design-section__title">Разделители меню</h2>
+        <div class="design-opt">
+            <div class="design-opt__label">
+                <span>Цвет разделителей</span>
+                <small>Цвет вертикальных разделительных линий в главном меню.</small>
+            </div>
+            <div class="design-opt__choices" style="display:flex;align-items:center;gap:12px;">
+                <input type="color" name="menu_divider_color" value="<?= htmlspecialchars((string) \App\Models\Setting::get('design_menu_divider_color', '#ffffff'), ENT_QUOTES) ?>" style="width:64px;height:38px;padding:4px;" data-design-preview-field>
+                <label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
+                    <input type="checkbox" name="menu_divider_color_use" value="1" <?= \App\Models\Setting::get('design_menu_divider_color_use', '') === '1' ? 'checked' : '' ?> data-design-preview-field>
+                    Использовать свой цвет (иначе автоматический)
+                </label>
+            </div>
+        </div>
+        <div class="design-opt">
+            <div class="design-opt__label">
+                <span>Толщина разделителей</span>
+                <small>Ширина разделительной линии в пикселях. От 0 до 10 px. Пусто — 1px.</small>
+            </div>
+            <div class="design-opt__choices">
+                <?php $divThickness = preg_replace('/px$/', '', (string) \App\Models\Setting::get('design_menu_divider_thickness', '')); ?>
+                <input type="number" name="menu_divider_thickness" min="0" max="10" step="0.5" inputmode="decimal"
+                       value="<?= htmlspecialchars((string) $divThickness, ENT_QUOTES) ?>" placeholder="напр. 1" style="max-width:220px;" data-design-preview-field>
+            </div>
+        </div>
+        <div class="design-opt">
+            <div class="design-opt__label">
+                <span>Высота разделителей</span>
+                <small>Высота разделительной линии в пикселях. От 2 до 100 px. Пусто — 18px.</small>
+            </div>
+            <div class="design-opt__choices">
+                <?php $divHeight = preg_replace('/px$/', '', (string) \App\Models\Setting::get('design_menu_divider_height', '')); ?>
+                <input type="number" name="menu_divider_height" min="2" max="100" step="1" inputmode="numeric"
+                       value="<?= htmlspecialchars((string) $divHeight, ENT_QUOTES) ?>" placeholder="напр. 18" style="max-width:220px;" data-design-preview-field>
+            </div>
+        </div>
+    </section>
+
     <div class="design-actions">
         <button type="submit" class="btn btn--primary">Сохранить настройки дизайна</button>
     </div>
