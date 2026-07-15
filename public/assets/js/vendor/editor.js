@@ -52,7 +52,7 @@
                     'insertdatetime', 'media', 'table', 'wordcount'
                 ],
                 toolbar: 'undo redo | blocks | ' +
-                    'bold italic underline strikethrough | alignleft aligncenter ' +
+                    'bold italic underline strikethrough | subscript superscript | blockquote | alignleft aligncenter ' +
                     'alignright alignjustify | bullist numlist outdent indent | ' +
                     'link image table | removeformat code fullscreen',
                 content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; }',
