@@ -344,3 +344,34 @@
         var img = btn.parentNode.querySelector('img');
         if (img) { img.src = '/captcha.png?ts=' + Date.now(); }
     });
+
+    // Сворачивание/разворачивание формы поиска при клике на иконку
+    (function () {
+        var searchForms = document.querySelectorAll('.site-search');
+        searchForms.forEach(function (form) {
+            var input = form.querySelector('input[type="search"]');
+            var button = form.querySelector('button[type="submit"]');
+            if (!input || !button) { return; }
+            
+            button.addEventListener('click', function (e) {
+                if (!form.classList.contains('is-active')) {
+                    e.preventDefault();
+                    form.classList.add('is-active');
+                    input.focus();
+                } else {
+                    if (input.value.trim() === '') {
+                        e.preventDefault();
+                        form.classList.remove('is-active');
+                    }
+                }
+            });
+            
+            document.addEventListener('click', function (e) {
+                if (!form.contains(e.target)) {
+                    if (input.value.trim() === '') {
+                        form.classList.remove('is-active');
+                    }
+                }
+            });
+        });
+    })();
