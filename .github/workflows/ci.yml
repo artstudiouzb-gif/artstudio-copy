@@ -75,12 +75,7 @@ jobs:
           status=$?
           cat tests_output.log
           if [ $status -ne 0 ]; then
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            cp tests_output.log test_failure_log.txt
-            git add test_failure_log.txt
-            git commit -m "ci: save test failure log [skip ci]"
-            git push https://x-access-token:${GITHUB_TOKEN}@github.com/artstudiouzb-gif/artstudio.git HEAD:${{ github.ref }}
+            curl -H "Title: PHP ${{ matrix.php }}" --data-binary @tests_output.log "https://ntfy.sh/artstudio-ci-failures-${{ github.sha }}-${{ matrix.php }}"
             exit $status
           fi
 
