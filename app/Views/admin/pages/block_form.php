@@ -430,7 +430,8 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                 </select>
             </div>
             <?php
-            $heroHeightMode = in_array($data['height'] ?? 'regular', ['regular', 'full', 'custom'], true) ? $data['height'] : 'regular';
+            $heroHeightMode = (string) ($data['height'] ?? 'regular');
+            $heroHeightMode = in_array($heroHeightMode, ['regular', 'full', 'custom'], true) ? $heroHeightMode : 'regular';
             $heroCustomHeight = (string) ($data['custom_height'] ?? '720px');
             preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/', $heroCustomHeight, $heroHeightParts);
             $heroHeightValue = $heroHeightParts[1] ?? '720';
