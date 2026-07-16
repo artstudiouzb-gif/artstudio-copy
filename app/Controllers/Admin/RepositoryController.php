@@ -62,6 +62,28 @@ final class RepositoryController
         exit;
     }
 
+    public function updateFile(array $params): void
+    {
+        Auth::requireSuperAdmin();
+        Csrf::verifyRequest();
+
+        $id = (int) ($params['id'] ?? 0);
+        $title = trim((string) ($_POST['title'] ?? ''));
+        $description = trim((string) ($_POST['description'] ?? ''));
+        $category = trim((string) ($_POST['category'] ?? ''));
+
+        if (RepoFile::findById($id) === null) {
+            Flash::error('Файл не найден.');
+        } elseif ($title === '') {
+            Flash::error('Укажите название файла.');
+        } else {
+            RepoFile::updateMeta($id, $title, $description, $category);
+            Flash::success('Данные файла обновлены.');
+        }
+        header('Location: /admin/repository');
+        exit;
+    }
+
     public function destroyFile(array $params): void
     {
         Auth::requireSuperAdmin();

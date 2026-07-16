@@ -287,6 +287,7 @@ $router->post('/admin/files/{id}/regenerate-token', [AdminFileController::class,
 // --- Admin: защищённое файловое хранилище (супер-админ) ---
 $router->get('/admin/repository', [\App\Controllers\Admin\RepositoryController::class, 'files']);
 $router->post('/admin/repository/upload', [\App\Controllers\Admin\RepositoryController::class, 'upload']);
+$router->post('/admin/repository/{id}/update', [\App\Controllers\Admin\RepositoryController::class, 'updateFile']);
 $router->post('/admin/repository/{id}/delete', [\App\Controllers\Admin\RepositoryController::class, 'destroyFile']);
 $router->get('/admin/repository/users', [\App\Controllers\Admin\RepositoryController::class, 'users']);
 $router->post('/admin/repository/users/create', [\App\Controllers\Admin\RepositoryController::class, 'storeUser']);

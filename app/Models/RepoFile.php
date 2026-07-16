@@ -178,6 +178,20 @@ final class RepoFile
         return (int) Database::pdo()->lastInsertId();
     }
 
+    /** Обновляет название/описание/категорию без перезагрузки самого файла. */
+    public static function updateMeta(int $id, string $title, string $description, string $category): void
+    {
+        $stmt = Database::pdo()->prepare(
+            'UPDATE repo_files SET title = :title, description = :descr, category = :cat WHERE id = :id'
+        );
+        $stmt->execute([
+            ':title' => $title,
+            ':descr' => $description !== '' ? $description : null,
+            ':cat' => $category,
+            ':id' => $id,
+        ]);
+    }
+
     public static function delete(int $id): void
     {
         $file = self::findById($id);

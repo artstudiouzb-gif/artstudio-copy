@@ -70,6 +70,25 @@ require __DIR__ . '/../layout/header.php';
                     <td><?= (int) $f['download_count'] ?></td>
                     <td><?= htmlspecialchars(date('d.m.Y', strtotime((string) $f['created_at'])), ENT_QUOTES) ?></td>
                     <td class="data-table__actions">
+                        <details style="position:relative;display:inline-block;">
+                            <summary class="btn btn--small" style="list-style:none;cursor:pointer;">Изменить</summary>
+                            <form method="post" action="/admin/repository/<?= (int) $f['id'] ?>/update" class="form-card" style="position:absolute;right:0;z-index:10;width:320px;padding:12px;text-align:left;box-shadow:0 8px 24px rgba(16,24,40,.18);">
+                                <?= Csrf::field() ?>
+                                <div class="form-field">
+                                    <label>Название</label>
+                                    <input type="text" name="title" required value="<?= htmlspecialchars((string) $f['title'], ENT_QUOTES) ?>">
+                                </div>
+                                <div class="form-field">
+                                    <label>Категория</label>
+                                    <input type="text" name="category" list="repo-cats" value="<?= htmlspecialchars((string) $f['category'], ENT_QUOTES) ?>">
+                                </div>
+                                <div class="form-field">
+                                    <label>Описание</label>
+                                    <textarea name="description" rows="2"><?= htmlspecialchars((string) ($f['description'] ?? ''), ENT_QUOTES) ?></textarea>
+                                </div>
+                                <button type="submit" class="btn btn--small btn--primary">Сохранить</button>
+                            </form>
+                        </details>
                         <form method="post" action="/admin/repository/<?= (int) $f['id'] ?>/delete" data-confirm="Удалить файл «<?= htmlspecialchars((string) $f['title'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
                             <button type="submit" class="btn btn--small btn--danger">Удалить</button>
