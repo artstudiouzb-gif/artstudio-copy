@@ -287,7 +287,12 @@ $router->post('/admin/files/{id}/regenerate-token', [AdminFileController::class,
 // --- Admin: защищённое файловое хранилище (супер-админ) ---
 $router->get('/admin/repository', [\App\Controllers\Admin\RepositoryController::class, 'files']);
 $router->post('/admin/repository/upload', [\App\Controllers\Admin\RepositoryController::class, 'upload']);
+$router->get('/admin/repository/categories', [\App\Controllers\Admin\RepositoryController::class, 'categories']);
+$router->post('/admin/repository/categories/create', [\App\Controllers\Admin\RepositoryController::class, 'storeCategory']);
+$router->post('/admin/repository/categories/{id}/rename', [\App\Controllers\Admin\RepositoryController::class, 'renameCategory']);
+$router->post('/admin/repository/categories/{id}/delete', [\App\Controllers\Admin\RepositoryController::class, 'destroyCategory']);
 $router->post('/admin/repository/{id}/update', [\App\Controllers\Admin\RepositoryController::class, 'updateFile']);
+$router->post('/admin/repository/{id}/approve', [\App\Controllers\Admin\RepositoryController::class, 'approveFile']);
 $router->post('/admin/repository/{id}/delete', [\App\Controllers\Admin\RepositoryController::class, 'destroyFile']);
 $router->get('/admin/repository/users', [\App\Controllers\Admin\RepositoryController::class, 'users']);
 $router->post('/admin/repository/users/create', [\App\Controllers\Admin\RepositoryController::class, 'storeUser']);
@@ -302,6 +307,7 @@ $router->get('/repo/login/2fa', [\App\Controllers\Repo\AuthController::class, 's
 $router->post('/repo/login/2fa', [\App\Controllers\Repo\AuthController::class, 'verifyTwoFactor']);
 $router->post('/repo/logout', [\App\Controllers\Repo\AuthController::class, 'logout']);
 $router->get('/repo', [\App\Controllers\Repo\PortalController::class, 'index']);
+$router->post('/repo/upload', [\App\Controllers\Repo\PortalController::class, 'upload']);
 $router->get('/repo/download/{id}', [\App\Controllers\Repo\PortalController::class, 'download']);
 $router->get('/repo/security', [\App\Controllers\Repo\PortalController::class, 'security']);
 $router->post('/repo/security/2fa/enable', [\App\Controllers\Repo\PortalController::class, 'enableTotp']);

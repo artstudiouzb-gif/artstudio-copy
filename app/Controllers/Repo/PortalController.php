@@ -12,6 +12,7 @@ use App\Core\RateLimiter;
 use App\Core\RepoAuth;
 use App\Core\TOTP;
 use App\Core\View;
+use App\Models\RepoCategory;
 use App\Models\RepoFile;
 use App\Models\RepoUser;
 
@@ -27,16 +28,16 @@ final class PortalController
         RepoAuth::requireLogin();
 
         $query = trim((string) ($_GET['q'] ?? ''));
-        $category = trim((string) ($_GET['category'] ?? ''));
+        $category = (int) ($_GET['category'] ?? 0);
 
-        $all = RepoFile::all('', '');
+        $all = RepoFile::all();
         // Популярные и последние — для боковых колонок витрины.
         $popular = $all;
         usort($popular, static fn (array $a, array $b) => (int) $b['download_count'] <=> (int) $a['download_count']);
 
         View::render('repo/index', [
             'files' => RepoFile::all($query, $category),
-            'categories' => RepoFile::categories(),
+            'categories' => RepoCategory::flatOptions(),
             'query' => $query,
             'category' => $category,
             'repoUser' => RepoAuth::user(),
@@ -46,13 +47,51 @@ final class PortalController
         ]);
     }
 
+    /** Загрузка файла пользователем портала: публикуется после одобрения админом. */
+    public function upload(): void
+    {
+        RepoAuth::requireLogin();
+        Csrf::verifyRequest();
+
+        // Анти-флуд: не чаще 10 загрузок за 10 минут с одной учётки.
+        if (!RateLimiter::throttle('repo_upload', (string) RepoAuth::id(), 600, 10)) {
+            Flash::error('Слишком много загрузок. Повторите позже.');
+            header('Location: /repo');
+            exit;
+        }
+
+        $title = trim((string) ($_POST['title'] ?? ''));
+        $description = trim((string) ($_POST['description'] ?? ''));
+        $categoryId = (int) ($_POST['category_id'] ?? 0);
+        $categoryId = $categoryId > 0 && RepoCategory::findById($categoryId) !== null ? $categoryId : null;
+        $file = $_FILES['file'] ?? null;
+
+        if ($title === '') {
+            Flash::error('Укажите название файла.');
+        } elseif (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            Flash::error('Выберите файл для загрузки.');
+        } else {
+            try {
+                RepoFile::store($file, $title, $description, $categoryId, null, RepoAuth::id(), 'pending');
+                Logger::security('Файл отправлен на модерацию в репозиторий', [
+                    'repo_user' => (string) ($_SESSION['repo_username'] ?? ''),
+                ]);
+                Flash::success('Файл отправлен. Он появится на портале после одобрения администратором.');
+            } catch (\Throwable $e) {
+                Flash::error('Не удалось загрузить файл: ' . $e->getMessage());
+            }
+        }
+        header('Location: /repo');
+        exit;
+    }
+
     public function download(array $params): void
     {
         RepoAuth::requireLogin();
 
         $id = (int) ($params['id'] ?? 0);
         $file = RepoFile::findById($id);
-        if ($file === null) {
+        if ($file === null || (($file['status'] ?? 'approved') !== 'approved')) {
             http_response_code(404);
             exit('Файл не найден.');
         }
