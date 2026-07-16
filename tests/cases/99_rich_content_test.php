@@ -41,3 +41,16 @@ test('TinyMCE: стандартный вид без узкой колонки и
     assert_false(str_contains($editor, 'rich-content'), 'редакционные стили убраны из редактора');
     assert_contains('max-width: none', $editor);
 });
+
+test('TinyMCE: самохостинг без внешнего CDN', function (): void {
+    $root = dirname(__DIR__, 2);
+    $editor = (string) file_get_contents($root . '/public/assets/js/vendor/editor.js');
+
+    assert_false(str_contains($editor, 'cdn.jsdelivr.net'), 'нет ссылок на внешний CDN');
+    assert_contains("script.src = '/assets/js/vendor/tinymce/tinymce.min.js'", $editor);
+    assert_contains("base_url: '/assets/js/vendor/tinymce'", $editor);
+    // Локальный движок и язык физически присутствуют.
+    assert_true(is_file($root . '/public/assets/js/vendor/tinymce/tinymce.min.js'), 'движок на месте');
+    assert_true(is_file($root . '/public/assets/js/vendor/tinymce/langs/ru.js'), 'русский язык на месте');
+    assert_true(is_file($root . '/public/assets/js/vendor/tinymce/themes/silver/theme.min.js'), 'тема на месте');
+});
