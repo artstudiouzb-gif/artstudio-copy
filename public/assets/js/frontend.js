@@ -526,3 +526,54 @@
             open(list, Math.max(0, links.indexOf(a)), a);
         });
     })();
+
+    // Мягкий каскад появления карточек в сетках при прокрутке.
+    // Начальное скрытие навешивает сам JS (.anim-card), поэтому при отсутствии
+    // JS, старом браузере или reduced-motion карточки остаются видимыми.
+    (function () {
+        'use strict';
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+        if (!('IntersectionObserver' in window)) { return; }
+        var GRIDS = '.imgcards-grid, .newsfeat-grid, .mediagallery-grid, .albums-grid, .persons-grid, .cards-grid, .cat-grid';
+        var grids = document.querySelectorAll(GRIDS);
+        if (!grids.length) { return; }
+        var io = new IntersectionObserver(function (entries, obs) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) { return; }
+                (entry.target.__animCards || []).forEach(function (card, i) {
+                    card.style.transitionDelay = Math.min(i * 60, 360) + 'ms';
+                    card.classList.add('is-inview');
+                });
+                obs.unobserve(entry.target);
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+        grids.forEach(function (grid) {
+            // Не дублируем анимацию, если блок уже проявляется через data-reveal.
+            if (grid.closest('[data-reveal]')) { return; }
+            var cards = Array.prototype.filter.call(grid.children, function (c) { return c.nodeType === 1; });
+            if (cards.length < 2) { return; }
+            cards.forEach(function (c) { c.classList.add('anim-card'); });
+            grid.__animCards = cards;
+            io.observe(grid);
+        });
+
+        // Страховка: если IntersectionObserver почему-то не сработал, любая
+        // карточка, попавшая в область просмотра (скролл/ресайз/через 2.5с),
+        // всё равно проявляется — контент никогда не остаётся скрытым.
+        var failsafe = function () {
+            var hidden = document.querySelectorAll('.anim-card:not(.is-inview)');
+            if (!hidden.length) {
+                window.removeEventListener('scroll', onScroll);
+                window.removeEventListener('resize', onScroll);
+                return;
+            }
+            hidden.forEach(function (c) {
+                var r = c.getBoundingClientRect();
+                if (r.top < window.innerHeight - 20 && r.bottom > 0) { c.classList.add('is-inview'); }
+            });
+        };
+        var onScroll = function () { window.requestAnimationFrame(failsafe); };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        setTimeout(failsafe, 2500);
+    })();
