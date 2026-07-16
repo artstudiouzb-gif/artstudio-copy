@@ -13,9 +13,11 @@
         if (loading) { return; }
         loading = true;
 
+        // Локальный самохостинг TinyMCE (без внешнего CDN): движок и все
+        // ресурсы (скины/плагины/язык) лежат в vendor/tinymce — работает на
+        // голом хостинге и не шлёт запросы админов на сторонние домены.
         var script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js';
-        script.referrerPolicy = 'origin';
+        script.src = '/assets/js/vendor/tinymce/tinymce.min.js';
         script.onload = function () {
             while (callbacks.length > 0) {
                 var cb = callbacks.shift();
@@ -40,8 +42,13 @@
 
             window.tinymce.init({
                 selector: '#' + textarea.id,
+                // base_url обязателен при самохостинге: указывает, откуда
+                // грузить скины, темы, модели и плагины.
+                base_url: '/assets/js/vendor/tinymce',
+                suffix: '.min',
+                license_key: 'gpl',
                 language: 'ru',
-                language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@23.3.18/langs6/ru.js',
+                language_url: '/assets/js/vendor/tinymce/langs/ru.js',
                 height: 400,
                 menubar: false,
                 branding: false,

@@ -71,11 +71,12 @@ final class SecurityHeaders
      */
     public static function adminCsp(string $nonce): string
     {
+        // TinyMCE самохостится (vendor/tinymce) — внешние CDN в CSP не нужны.
+        // 'unsafe-inline' для style остаётся: редактор проставляет инлайн-стили.
         return "default-src 'self'; "
             . "img-src 'self' data:; "
-            // TinyMCE и его языковой пакет подключаются только в админ-редакторе.
-            . "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-            . "script-src 'self' 'nonce-{$nonce}' https://cdn.jsdelivr.net; "
+            . "style-src 'self' 'unsafe-inline'; "
+            . "script-src 'self' 'nonce-{$nonce}'; "
             . "font-src 'self' data:; "
             . "connect-src 'self'; "
             . "object-src 'none'; "
