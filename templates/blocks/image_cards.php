@@ -30,7 +30,11 @@ $items = $data['items'] ?? [];
                 $tag = $url !== '' ? 'a' : 'div';
                 ?>
                 <<?= $tag ?> class="imgcard"<?= $url !== '' ? ' href="' . htmlspecialchars($url, ENT_QUOTES) . '"' : '' ?>>
-                    <span class="imgcard__media"<?= $img !== '' ? ' style="background-image:url(\'' . htmlspecialchars($img, ENT_QUOTES) . '\')"' : '' ?>></span>
+                    <?php if ($img !== ''): ?>
+                        <img class="imgcard__media" src="<?= htmlspecialchars($img, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                    <?php else: ?>
+                        <span class="imgcard__media" aria-hidden="true"></span>
+                    <?php endif; ?>
                     <span class="imgcard__overlay"></span>
                     <span class="imgcard__body">
                         <span class="imgcard__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>

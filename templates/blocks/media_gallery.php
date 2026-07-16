@@ -37,7 +37,8 @@ $showTabs = $hasVideo && $hasPhoto;
                 $kind = ($item['kind'] ?? 'video') === 'photo' ? 'photo' : 'video';
                 ?>
                 <<?= $tag ?> class="mediacard mediacard--<?= $kind ?>" data-media-kind="<?= $kind ?>"<?= $url !== '' ? ' href="' . htmlspecialchars($url, ENT_QUOTES) . '"' : '' ?>>
-                    <span class="mediacard__media"<?= $img !== '' ? ' style="background-image:url(\'' . htmlspecialchars($img, ENT_QUOTES) . '\')"' : '' ?>>
+                    <span class="mediacard__media">
+                        <?php if ($img !== ''): ?><img class="mediacard__img" src="<?= htmlspecialchars($img, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async"><?php endif; ?>
                         <span class="mediacard__play mediacard__play--<?= $kind ?>" aria-hidden="true">
                             <?php if ($kind === 'photo'): ?>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M5 18l5-5 4 4 3-3 2 2"/></svg>

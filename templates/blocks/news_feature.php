@@ -29,7 +29,11 @@ $fmt = static fn (string $d): string => DateFormatter::long($d, $lang);
     <?php else: ?>
     <div class="newsfeat-grid">
         <a class="newsfeat-lead" href="<?= htmlspecialchars((string) $featured['url'], ENT_QUOTES) ?>">
-            <span class="newsfeat-lead__media<?= empty($featured['cover']) ? ' newsfeat-lead__media--empty' : '' ?>"<?= !empty($featured['cover']) ? ' style="background-image:url(\'' . htmlspecialchars((string) $featured['cover'], ENT_QUOTES) . '\')"' : '' ?>></span>
+            <?php if (!empty($featured['cover'])): ?>
+                <img class="newsfeat-lead__media" src="<?= htmlspecialchars((string) $featured['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+            <?php else: ?>
+                <span class="newsfeat-lead__media newsfeat-lead__media--empty" aria-hidden="true"></span>
+            <?php endif; ?>
             <span class="newsfeat-lead__body">
                 <?php if (!empty($featured['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $featured['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                 <span class="newsfeat-lead__title"><?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?></span>
@@ -43,7 +47,11 @@ $fmt = static fn (string $d): string => DateFormatter::long($d, $lang);
                 <div class="newsfeat-side__thumbs">
                     <?php foreach ($withThumb as $item): ?>
                         <a class="newsfeat-mini" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
-                            <span class="newsfeat-mini__media<?= empty($item['cover']) ? ' newsfeat-mini__media--empty' : '' ?>"<?= !empty($item['cover']) ? ' style="background-image:url(\'' . htmlspecialchars((string) $item['cover'], ENT_QUOTES) . '\')"' : '' ?>></span>
+                            <?php if (!empty($item['cover'])): ?>
+                                <img class="newsfeat-mini__media" src="<?= htmlspecialchars((string) $item['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                            <?php else: ?>
+                                <span class="newsfeat-mini__media newsfeat-mini__media--empty" aria-hidden="true"></span>
+                            <?php endif; ?>
                             <span class="newsfeat-mini__body">
                                 <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                                 <span class="newsfeat-mini__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
