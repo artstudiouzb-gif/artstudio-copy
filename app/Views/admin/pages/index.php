@@ -1,11 +1,12 @@
 <?php
 
+use App\Core\AdminUi;
 use App\Core\Csrf;
 use App\Models\Language;
 
 $pageTitle = 'Страницы';
 $activeNav = 'pages';
-$pageActions = '<a href="/admin/pages/create" class="btn btn--primary">+ Добавить страницу</a>';
+$pageActions = '<a href="/admin/pages/create" class="btn btn--primary">' . AdminUi::icon('plus') . 'Добавить страницу</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
@@ -22,7 +23,7 @@ $langs = Language::active();
     <div class="list-filter"><label for="pages_lang">Язык</label><select id="pages_lang" name="lang"><option value="">Все языки</option><?php foreach ($langs as $l): ?><option value="<?= htmlspecialchars($l['code'], ENT_QUOTES) ?>" <?= $filters['lang'] === $l['code'] ? 'selected' : '' ?>><?= $l['code'] === Language::defaultCode() ? 'Основной: ' : 'Есть перевод: ' ?><?= htmlspecialchars($l['name'], ENT_QUOTES) ?></option><?php endforeach; ?></select></div>
     <div class="list-filter"><label for="pages_sort">Сортировка</label><select id="pages_sort" name="sort"><option value="newest" <?= $filters['sort'] === 'newest' ? 'selected' : '' ?>>Сначала новые</option><option value="oldest" <?= $filters['sort'] === 'oldest' ? 'selected' : '' ?>>Сначала старые</option><option value="title_asc" <?= $filters['sort'] === 'title_asc' ? 'selected' : '' ?>>Название А–Я</option><option value="title_desc" <?= $filters['sort'] === 'title_desc' ? 'selected' : '' ?>>Название Я–А</option></select></div>
     <div class="list-filter list-filter--compact"><label for="pages_per_page">На странице</label><select id="pages_per_page" name="per_page"><?php foreach ([20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['per_page'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach; ?></select></div>
-    <div class="list-filters__actions"><button type="submit" class="btn btn--primary">Применить</button><a href="/admin/pages" class="btn">Сбросить</a></div>
+    <div class="list-filters__actions"><button type="submit" class="btn btn--primary"><?= AdminUi::icon('filter') ?>Применить</button><a href="/admin/pages" class="btn"><?= AdminUi::icon('reset') ?>Сбросить</a></div>
 </form>
 
 <p class="list-results">Найдено: <strong><?= (int) $total ?></strong></p>
@@ -49,13 +50,12 @@ $langs = Language::active();
             <th>URL</th>
             <th>Языки</th>
             <th>Статус</th>
-            <th>Главная</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         <?php if (empty($items)): ?>
-            <tr><td colspan="7" class="data-table__empty">Страниц не найдено.</td></tr>
+            <tr><td colspan="6" class="data-table__empty">Страниц не найдено.</td></tr>
         <?php endif; ?>
         <?php
         // Языки контента для всех строк одним запросом (без N+1) и список
@@ -66,7 +66,12 @@ $langs = Language::active();
         <?php foreach ($items as $item): ?>
             <tr>
                 <td><input type="checkbox" name="ids[]" value="<?= (int) $item['id'] ?>" form="bulkform" data-bulk-item></td>
-                <td><a class="data-table__primary" href="/admin/pages/<?= (int) $item['id'] ?>/edit"><?= htmlspecialchars($item['title'], ENT_QUOTES) ?></a></td>
+                <td>
+                    <a class="data-table__primary" href="/admin/pages/<?= (int) $item['id'] ?>/edit"><?= htmlspecialchars($item['title'], ENT_QUOTES) ?></a>
+                    <?php if (!empty($item['is_home'])): ?>
+                        <span class="badge badge--accent badge--home"><?= AdminUi::icon('home', 12) ?>Главная</span>
+                    <?php endif; ?>
+                </td>
                 <td>/<?= htmlspecialchars($item['slug'], ENT_QUOTES) ?></td>
                 <td style="white-space:nowrap;"><?= \App\Core\View::renderPartial('admin/layout/lang_badges', ['siteLangs' => $siteLangs, 'has' => $langMap[(int) $item['id']] ?? []]) ?></td>
                 <td>
@@ -74,17 +79,16 @@ $langs = Language::active();
                         <?= $item['status'] === 'published' ? 'Опубликовано' : 'Черновик' ?>
                     </span>
                 </td>
-                <td><?= $item['is_home'] ? '✓' : '' ?></td>
                 <td class="data-table__actions">
-                    <a class="btn btn--small" href="/admin/pages/<?= (int) $item['id'] ?>/edit">Редактировать</a>
+                    <a class="btn btn--small" href="/admin/pages/<?= (int) $item['id'] ?>/edit"><?= AdminUi::icon('edit') ?>Редактировать</a>
                     <form method="post" action="/admin/pages/<?= (int) $item['id'] ?>/duplicate">
                         <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small">Дублировать</button>
+                        <button type="submit" class="btn btn--small"><?= AdminUi::icon('copy') ?>Дублировать</button>
                     </form>
                     <form method="post" action="/admin/pages/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить страницу «<?= htmlspecialchars($item['title'], ENT_QUOTES) ?>» вместе со всеми блоками?">
                         <?= Csrf::field() ?>
                         <input type="hidden" name="return_query" value="<?= htmlspecialchars(http_build_query($filterParams), ENT_QUOTES) ?>">
-                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        <button type="submit" class="btn btn--small btn--danger"><?= AdminUi::icon('trash') ?>Удалить</button>
                     </form>
                 </td>
             </tr>

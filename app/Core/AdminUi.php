@@ -10,6 +10,36 @@ namespace App\Core;
  */
 final class AdminUi
 {
+    /** Линейные иконки (16px, stroke=currentColor) для кнопок и меток. */
+    private const ICONS = [
+        'edit' => '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+        'copy' => '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+        'trash' => '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+        'plus' => '<path d="M12 5v14M5 12h14"/>',
+        'home' => '<path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
+        'filter' => '<path d="M22 3H2l8 9.5V19l4 2v-8.5L22 3z"/>',
+        'reset' => '<path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/>',
+        'save' => '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+        'external' => '<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
+        'eye' => '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+    ];
+
+    /**
+     * Инлайновая иконка для кнопки/метки. Неизвестное имя — пустая строка
+     * (кнопка просто останется без иконки).
+     */
+    public static function icon(string $name, int $size = 15): string
+    {
+        $inner = self::ICONS[$name] ?? '';
+        if ($inner === '') {
+            return '';
+        }
+
+        return '<svg class="btn__icon" width="' . $size . '" height="' . $size . '" viewBox="0 0 24 24" '
+            . 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '
+            . 'aria-hidden="true" focusable="false">' . $inner . '</svg>';
+    }
+
     /**
      * Поле изображения: превью + URL-инпут + кнопка «Медиабиблиотека» + очистка,
      * опционально с companion-инпутом загрузки файла (FileReader-превью).
