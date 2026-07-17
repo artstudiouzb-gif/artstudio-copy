@@ -55,7 +55,11 @@ $pageUrl = static fn (int $p): string => Locale::url('news')
         <?php if ($featured !== null): ?>
             <?php $fc = News::getCoverImage($featured); ?>
             <a class="newslist-lead" href="<?= htmlspecialchars(Locale::url('news/' . $featured['slug']), ENT_QUOTES) ?>">
-                <span class="newslist-lead__media<?= $fc === null ? ' newslist-lead__media--empty' : '' ?>"<?= $fc !== null ? ' style="background-image:url(\'' . htmlspecialchars($fc, ENT_QUOTES) . '\')"' : '' ?>></span>
+                <?php if ($fc !== null): ?>
+                    <img class="newslist-lead__media" src="<?= htmlspecialchars($fc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                <?php else: ?>
+                    <span class="newslist-lead__media newslist-lead__media--empty" aria-hidden="true"></span>
+                <?php endif; ?>
                 <span class="newslist-lead__body">
                     <?php if (!empty($featured['badge'])): ?><span class="newsdetail__badge"><?= htmlspecialchars((string) $featured['badge'], ENT_QUOTES) ?></span><?php endif; ?>
                     <?php if (!empty($featured['published_at'])): ?><time class="newslist__date"><?= htmlspecialchars($fmt((string) $featured['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
@@ -70,7 +74,11 @@ $pageUrl = static fn (int $p): string => Locale::url('news')
             <?php foreach ($grid as $item): ?>
                 <?php $c = News::getCoverImage($item); ?>
                 <a class="relnews-card" href="<?= htmlspecialchars(Locale::url('news/' . $item['slug']), ENT_QUOTES) ?>">
-                    <span class="relnews-card__media<?= $c === null ? ' relnews-card__media--empty' : '' ?>"<?= $c !== null ? ' style="background-image:url(\'' . htmlspecialchars($c, ENT_QUOTES) . '\')"' : '' ?>></span>
+                    <?php if ($c !== null): ?>
+                        <img class="relnews-card__media" src="<?= htmlspecialchars($c, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                    <?php else: ?>
+                        <span class="relnews-card__media relnews-card__media--empty" aria-hidden="true"></span>
+                    <?php endif; ?>
                     <?php if (!empty($item['published_at'])): ?><time class="relnews-card__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                     <span class="relnews-card__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
                     <?php if (!empty($item['excerpt'])): ?><span class="relnews-card__excerpt"><?= htmlspecialchars(mb_substr(strip_tags((string) $item['excerpt']), 0, 110), ENT_QUOTES) ?></span><?php endif; ?>

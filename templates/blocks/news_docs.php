@@ -21,7 +21,11 @@ $fmt = static fn (string $d): string => DateFormatter::long($d, $lang);
             <div class="newsdocs-news">
                 <?php foreach ($news as $item): ?>
                     <a class="newsdocs-item" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
-                        <span class="newsdocs-item__media<?= empty($item['cover']) ? ' newsdocs-item__media--empty' : '' ?>"<?= !empty($item['cover']) ? ' style="background-image:url(\'' . htmlspecialchars((string) $item['cover'], ENT_QUOTES) . '\')"' : '' ?>></span>
+                        <?php if (!empty($item['cover'])): ?>
+                            <img class="newsdocs-item__media" src="<?= htmlspecialchars((string) $item['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                        <?php else: ?>
+                            <span class="newsdocs-item__media newsdocs-item__media--empty" aria-hidden="true"></span>
+                        <?php endif; ?>
                         <span class="newsdocs-item__body">
                             <?php if (!empty($item['published_at'])): ?><time class="newsdocs-item__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                             <span class="newsdocs-item__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>

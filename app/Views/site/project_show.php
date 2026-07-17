@@ -26,7 +26,7 @@ $others = array_values(array_filter(Project::published(), fn (array $p) => (int)
             <h1 class="projdetail__title"><?= htmlspecialchars((string) $project['title'], ENT_QUOTES) ?></h1>
         </div>
         <?php if ($cover !== ''): ?>
-            <span class="projdetail__media" style="background-image:url('<?= htmlspecialchars($cover, ENT_QUOTES) ?>')"></span>
+            <img class="projdetail__media" src="<?= htmlspecialchars($cover, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $project['title'], ENT_QUOTES) ?>" decoding="async">
         <?php endif; ?>
     </div>
     <div class="projdetail__content newsdetail-article__content rich-content"><?= $project['description'] ?></div>
@@ -41,7 +41,11 @@ $others = array_values(array_filter(Project::published(), fn (array $p) => (int)
                 <?php foreach (array_slice($others, 0, 4) as $item): ?>
                     <?php $c = trim((string) ($item['cover_image'] ?? '')); ?>
                     <a class="imgcard" href="<?= htmlspecialchars(Locale::url('projects/' . $item['slug']), ENT_QUOTES) ?>">
-                        <span class="imgcard__media"<?= $c !== '' ? ' style="background-image:url(\'' . htmlspecialchars($c, ENT_QUOTES) . '\')"' : '' ?>></span>
+                        <?php if ($c !== ''): ?>
+                            <img class="imgcard__media" src="<?= htmlspecialchars($c, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                        <?php else: ?>
+                            <span class="imgcard__media" aria-hidden="true"></span>
+                        <?php endif; ?>
                         <span class="imgcard__overlay"></span>
                         <span class="imgcard__body">
                             <span class="imgcard__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>

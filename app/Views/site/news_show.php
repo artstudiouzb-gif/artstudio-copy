@@ -264,7 +264,7 @@ if (!$isPremium) {
                     <h2 class="newsdetail-card__title"><?= htmlspecialchars(t('Галерея'), ENT_QUOTES) ?></h2>
                     <div class="newsdetail-sidegallery">
                         <?php foreach (array_slice($slides, 0, 4) as $i => $s): ?>
-                            <a class="newsdetail-sidegallery__item<?= $i === 0 ? ' newsdetail-sidegallery__item--wide' : '' ?>" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" style="background-image:url('<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>')" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"></a>
+                            <a class="newsdetail-sidegallery__item<?= $i === 0 ? ' newsdetail-sidegallery__item--wide' : '' ?>" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><img src="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($s['alt'], ENT_QUOTES) ?>" loading="lazy" decoding="async"></a>
                         <?php endforeach; ?>
                     </div>
                     <a class="newsdetail__btn newsdetail__btn--ghost newsdetail-sidegallery__all" href="<?= htmlspecialchars(Locale::url('news/' . $news['slug'] . '/photos.zip', $lang), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Скачать все фото'), ENT_QUOTES) ?> <?= $dlIcon ?></a>
@@ -333,7 +333,7 @@ if (!$isPremium) {
             </div>
             <div class="newsdetail-photos__grid">
                 <?php foreach (array_slice($slides, 0, 8) as $s): ?>
-                    <a class="newsdetail-photos__item" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" style="background-image:url('<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>')" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"></a>
+                    <a class="newsdetail-photos__item" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><img src="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($s['alt'], ENT_QUOTES) ?>" loading="lazy" decoding="async"></a>
                 <?php endforeach; ?>
             </div>
         </section>
@@ -349,7 +349,11 @@ if (!$isPremium) {
                 <?php foreach ($related as $item): ?>
                     <?php $rc = News::getCoverImage($item); ?>
                     <a class="relnews-card" href="<?= htmlspecialchars(Locale::url('news/' . $item['slug'], $lang), ENT_QUOTES) ?>">
-                        <span class="relnews-card__media<?= $rc === null ? ' relnews-card__media--empty' : '' ?>"<?= $rc !== null ? ' style="background-image:url(\'' . htmlspecialchars($rc, ENT_QUOTES) . '\')"' : '' ?>></span>
+                        <?php if ($rc !== null): ?>
+                            <img class="relnews-card__media" src="<?= htmlspecialchars($rc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                        <?php else: ?>
+                            <span class="relnews-card__media relnews-card__media--empty" aria-hidden="true"></span>
+                        <?php endif; ?>
                         <?php if (!empty($item['published_at'])): ?><time class="relnews-card__date"><?= htmlspecialchars(DateFormatter::long((string) $item['published_at'], $lang), ENT_QUOTES) ?></time><?php endif; ?>
                         <span class="relnews-card__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
                         <span class="relnews-card__arrow">→</span>
@@ -375,7 +379,11 @@ if (!$isPremium) {
                 <?php $pc = News::getCoverImage($prevNews); ?>
                 <a class="adjnews adjnews--prev" href="<?= htmlspecialchars(Locale::url('news/' . $prevNews['slug'], $lang), ENT_QUOTES) ?>">
                     <span class="adjnews__arrow">←</span>
-                    <span class="adjnews__media<?= $pc === null ? ' adjnews__media--empty' : '' ?>"<?= $pc !== null ? ' style="background-image:url(\'' . htmlspecialchars($pc, ENT_QUOTES) . '\')"' : '' ?>></span>
+                    <?php if ($pc !== null): ?>
+                        <img class="adjnews__media" src="<?= htmlspecialchars($pc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $prevNews['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                    <?php else: ?>
+                        <span class="adjnews__media adjnews__media--empty" aria-hidden="true"></span>
+                    <?php endif; ?>
                     <span class="adjnews__body">
                         <span class="adjnews__label"><?= htmlspecialchars(t('Предыдущая новость'), ENT_QUOTES) ?></span>
                         <?php if (!empty($prevNews['published_at'])): ?><time class="adjnews__date"><?= htmlspecialchars(DateFormatter::long((string) $prevNews['published_at'], $lang), ENT_QUOTES) ?></time><?php endif; ?>
@@ -386,7 +394,11 @@ if (!$isPremium) {
             <?php if ($nextNews !== null): ?>
                 <?php $nc = News::getCoverImage($nextNews); ?>
                 <a class="adjnews adjnews--next" href="<?= htmlspecialchars(Locale::url('news/' . $nextNews['slug'], $lang), ENT_QUOTES) ?>">
-                    <span class="adjnews__media<?= $nc === null ? ' adjnews__media--empty' : '' ?>"<?= $nc !== null ? ' style="background-image:url(\'' . htmlspecialchars($nc, ENT_QUOTES) . '\')"' : '' ?>></span>
+                    <?php if ($nc !== null): ?>
+                        <img class="adjnews__media" src="<?= htmlspecialchars($nc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $nextNews['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                    <?php else: ?>
+                        <span class="adjnews__media adjnews__media--empty" aria-hidden="true"></span>
+                    <?php endif; ?>
                     <span class="adjnews__body">
                         <span class="adjnews__label"><?= htmlspecialchars(t('Следующая новость'), ENT_QUOTES) ?></span>
                         <?php if (!empty($nextNews['published_at'])): ?><time class="adjnews__date"><?= htmlspecialchars(DateFormatter::long((string) $nextNews['published_at'], $lang), ENT_QUOTES) ?></time><?php endif; ?>

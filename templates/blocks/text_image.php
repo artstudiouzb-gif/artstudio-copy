@@ -21,6 +21,6 @@ $items = $data['items'] ?? [];
         <?php endif; ?>
     </div>
     <?php if ($image !== ''): ?>
-        <span class="textimage__media" style="background-image:url('<?= htmlspecialchars($image, ENT_QUOTES) ?>')"></span>
+        <img class="textimage__media" src="<?= htmlspecialchars($image, ENT_QUOTES) ?>" alt="<?= htmlspecialchars($title !== '' ? $title : '', ENT_QUOTES) ?>" loading="lazy" decoding="async">
     <?php endif; ?>
 </div>

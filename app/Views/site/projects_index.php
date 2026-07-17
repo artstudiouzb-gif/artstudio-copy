@@ -25,7 +25,11 @@ require __DIR__ . '/_crumbs.php';
             <?php foreach ($items as $item): ?>
                 <?php $cover = trim((string) ($item['cover_image'] ?? '')); ?>
                 <a class="imgcard imgcard--project" href="<?= htmlspecialchars(Locale::url('projects/' . $item['slug']), ENT_QUOTES) ?>">
-                    <span class="imgcard__media"<?= $cover !== '' ? ' style="background-image:url(\'' . htmlspecialchars($cover, ENT_QUOTES) . '\')"' : '' ?>></span>
+                    <?php if ($cover !== ''): ?>
+                        <img class="imgcard__media" src="<?= htmlspecialchars($cover, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                    <?php else: ?>
+                        <span class="imgcard__media" aria-hidden="true"></span>
+                    <?php endif; ?>
                     <span class="imgcard__overlay"></span>
                     <span class="imgcard__body">
                         <span class="imgcard__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
