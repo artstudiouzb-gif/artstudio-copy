@@ -99,7 +99,7 @@ $heightSelect = function (string $name, string $current): string {
                     </label>
                 <?php endforeach; ?>
             </div>
-            <div class="hb-inline-fields">
+            <div class="hb-inline-fields hb-inline-fields--settings">
                 <div class="form-field">
                     <label for="logo_position">Логотип</label>
                     <select id="logo_position" name="logo_position">

@@ -1033,7 +1033,12 @@ body.has-sticky-actions .admin-main { padding-bottom: 108px; }
 .hb-tabs .hdr-tabs__tab { border: 0; background: transparent; padding: 6px 14px; border-radius: 7px; font-size: 13px; font-weight: 700; color: #6b7789; cursor: pointer; }
 .hb-tabs .hdr-tabs__tab.is-active { background: #fff; color: #173a63; box-shadow: 0 1px 3px rgba(19,42,92,.12); }
 
-.hb-inline-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+/* Колонки не растягиваем до 1fr (иначе на широком экране поля раздуваются
+   на пол-экрана) — фиксируем разумную ширину и пакуем влево. */
+.hb-inline-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 300px)); gap: 14px 20px; justify-content: start; }
+/* Строка базовых настроек: поля уже, числовые «px» — совсем компактные. */
+.hb-inline-fields--settings { grid-template-columns: repeat(auto-fit, minmax(180px, 230px)); }
+.hb-inline-fields--settings input[type="number"] { max-width: 130px; }
 
 /* Конструктор футера Pro Max: колонки-карточки с перестановкой. */
 .fb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
