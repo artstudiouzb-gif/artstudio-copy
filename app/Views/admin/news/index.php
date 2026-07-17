@@ -79,7 +79,7 @@ $langs = Language::active();
         <?php foreach ($items as $item): ?>
             <tr>
                 <td><input type="checkbox" name="ids[]" value="<?= (int) $item['id'] ?>" form="bulkform" data-bulk-item></td>
-                <td><a class="data-table__primary" href="/admin/news/<?= (int) $item['id'] ?>/edit"><?= htmlspecialchars($item['title'], ENT_QUOTES) ?></a></td>
+                <td class="data-table__flex"><a class="data-table__primary" href="/admin/news/<?= (int) $item['id'] ?>/edit"><?= htmlspecialchars($item['title'], ENT_QUOTES) ?></a></td>
                 <td style="white-space:nowrap;"><?= \App\Core\View::renderPartial('admin/layout/lang_badges', ['siteLangs' => $siteLangs, 'has' => $langMap[(int) $item['id']] ?? []]) ?></td>
                 <td>
                     <span class="badge badge--<?= $item['status'] ?>">
