@@ -739,8 +739,15 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .newsdetail-phero { position: relative; left: calc(50% - 50vw); width: 100vw; min-height: 480px; display: flex; align-items: center; background: var(--gov-navy) center/cover no-repeat; color: #fff; }
 .newsdetail-phero__overlay { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(9,22,42,.93) 20%, rgba(9,22,42,.55) 55%, rgba(9,22,42,.25) 100%); }
 .newsdetail-phero__body { position: relative; width: 100%; max-width: var(--container-max); margin: 0 auto; padding: clamp(40px, 6vw, 72px) 20px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-/* Крошки внутри премиум-hero (вместо серой полосы над ним) — светлые на тёмном фоне. */
-.newsdetail-phero .content-crumbs { margin-bottom: 2px; font-size: .9rem; }
+/* Крошки внутри премиум-hero (вместо серой полосы над ним) — светлые на тёмном фоне.
+   Прижаты к верху секции (как на обычном hero), а не в центрированном теле —
+   иначе они оказываются ниже, чем крошки на остальных страницах. */
+.newsdetail-phero .content-crumbs {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 4;
+    width: 100%; max-width: var(--container-max); margin: 0 auto;
+    padding: clamp(14px, 2vw, 22px) 20px 0; font-size: .9rem;
+}
+body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero .content-crumbs { top: clamp(88px, 11vw, 130px); }
 .newsdetail-phero .content-crumbs a { color: rgba(255, 255, 255, .82); }
 .newsdetail-phero .content-crumbs a:hover { color: #fff; }
 .newsdetail-phero .content-crumbs span { color: rgba(255, 255, 255, .68); }
