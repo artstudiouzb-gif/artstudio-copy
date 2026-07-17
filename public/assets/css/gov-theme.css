@@ -116,6 +116,20 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 :root[data-theme="dark"] .site-lang-switcher__item.is-active { color: var(--gov-teal-text, #3fc1c0); }
 :root[data-theme="dark"] .site-burger { color: var(--gov-ink); border-color: var(--gov-border); }
 :root[data-theme="dark"] .site-search input { background: color-mix(in srgb, var(--gov-surface) 70%, #000); }
+/* Свой цвет шапки (конструктор: middlebar/bottombar bg) не зависит от темы —
+   в ночном режиме фон остаётся заданным (обычно светлым). Возвращаем шапке
+   светлые значения токенов, чтобы текст/иконки/лого не перекрашивались в
+   светлый и не пропадали на светлом фоне. */
+:root[data-theme="dark"] .site-header--mid-bg,
+:root[data-theme="dark"] .site-header--nav-bg .site-nav {
+    --gov-ink: #1f2b3d;
+    --gov-title: var(--gov-navy);
+    --gov-muted: #667182;
+    --gov-border: #e5e9f0;
+    --gov-surface: #ffffff;
+    --text-main: #1a1a1a;
+    --text-muted: #666666;
+}
 
 /* --- Хлебные крошки --- */
 .crumbs, .content-crumbs { color: var(--gov-muted); font-size: .9rem; }
