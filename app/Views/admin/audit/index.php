@@ -65,7 +65,7 @@ $qs = static function (int $p) use ($filters): string {
 
 <p class="form-hint">Все изменяющие действия администраторов в панели: кто, что, когда и с какого IP. Входы/выходы и события безопасности дополнительно пишутся в security-лог. Записи старше 180 дней удаляются автоматически.</p>
 
-<form method="get" action="/admin/audit" class="form-grid form-grid--inline" style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+<form method="get" action="/admin/audit" class="form-grid form-grid--inline" style="margin-bottom:18px;display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;align-items:flex-end;">
     <div class="form-field" style="margin:0;">
         <label for="f_user">Администратор</label>
         <select id="f_user" name="user_id">
