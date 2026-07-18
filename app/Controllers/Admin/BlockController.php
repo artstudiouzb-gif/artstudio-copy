@@ -611,6 +611,12 @@ final class BlockController
                 $pct = static fn ($v, int $def): int => is_numeric($v) ? max(0, min(100, (int) $v)) : $def;
                 $bgType = (string) ($_POST['bg_type'] ?? 'image');
                 $bgType = in_array($bgType, ['none', 'image', 'video', 'youtube'], true) ? $bgType : 'image';
+                // Редактор загрузил фото, но список «Фон секции» остался на
+                // «Без фона» — и снимок молча пропадал. Загруженное фото и есть
+                // явное намерение: включаем фон-изображение сами.
+                if ($bgType === 'none' && trim((string) ($_POST['image'] ?? '')) !== '') {
+                    $bgType = 'image';
+                }
                 $heightMode = (string) ($_POST['hero_height'] ?? 'regular');
                 $heightMode = in_array($heightMode, ['regular', 'full', 'custom'], true) ? $heightMode : 'regular';
                 $heightUnit = (string) ($_POST['hero_height_unit'] ?? 'px');

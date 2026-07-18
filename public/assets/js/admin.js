@@ -454,6 +454,29 @@
             if (file) { file.value = ''; }
             setPreview(field, '');
         });
+
+        // Обложка (hero): выбор фото при типе фона «Без фона» раньше молча
+        // терялся — снимок сохранялся, но не показывался. Переключаем список
+        // сами, чтобы редактор видел, что фон стал фотографией.
+        var syncHeroBg = function (target) {
+            var bgSelect = document.querySelector('[data-hero-bg]');
+            if (!bgSelect || bgSelect.value !== 'none') { return; }
+            var field = target.closest('[data-image-field]');
+            var input = field ? field.querySelector('[data-image-input]') : null;
+            // Только поле фонового изображения обложки, не прочие картинки блока.
+            if (!input || input.getAttribute('name') !== 'image') { return; }
+            var hasImage = input.value.trim() !== ''
+                || (field.querySelector('[data-image-file]') || {}).value;
+            if (hasImage) { bgSelect.value = 'image'; }
+        };
+        document.addEventListener('input', function (e) {
+            if (e.target.closest('[data-image-input]')) { syncHeroBg(e.target); }
+        });
+        document.addEventListener('change', function (e) {
+            if (e.target.closest('[data-image-input]') || e.target.closest('[data-image-file]')) {
+                syncHeroBg(e.target);
+            }
+        });
     })();
 
     // --- Автономный WYSIWYG (задача 75): инициализация на textarea[data-wysiwyg] ---
