@@ -268,6 +268,7 @@ $router->get('/admin/social', [\App\Controllers\Admin\SocialController::class, '
 $router->post('/admin/social', [\App\Controllers\Admin\SocialController::class, 'update']);
 $router->post('/admin/social/run', [\App\Controllers\Admin\SocialController::class, 'runNow']);
 $router->post('/admin/social/check-telegram', [\App\Controllers\Admin\SocialController::class, 'checkTelegram']);
+$router->post('/admin/social/use-login-bot-token', [\App\Controllers\Admin\SocialController::class, 'useLoginBotToken']);
 
 // --- Admin: исходящие вебхуки (только супер-админ) ---
 $router->get('/admin/webhooks', [\App\Controllers\Admin\WebhookController::class, 'index']);

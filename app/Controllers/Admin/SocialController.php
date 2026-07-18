@@ -36,6 +36,9 @@ final class SocialController
 
         View::render('admin/settings/social', [
             'config' => $config,
+            // Токен бота для кодов входа — отдельная настройка; если он задан,
+            // предлагаем подставить его же для публикации.
+            'hasLoginBotToken' => trim((string) Setting::get('telegram_bot_token', '')) !== '',
             'queueLog' => SocialPost::recent(40),
             'queueCounts' => SocialPost::counts(),
             'workerStatus' => Heartbeat::status()['social'] ?? null,
@@ -77,7 +80,22 @@ final class SocialController
         Auth::requireSuperAdmin();
         Csrf::verifyRequest();
 
-        $result = (new SocialPublisher())->checkTelegram(SocialSettings::configFor('telegram'));
+        $cfg = SocialSettings::configFor('telegram');
+        $result = (new SocialPublisher())->checkTelegram($cfg);
+
+        // Частая путаница: токен для кодов входа (telegram_bot_token) и токен
+        // публикации (social_telegram_token) — разные настройки. Если вход
+        // работает, а публикация нет, скорее всего заполнена не та.
+        $loginToken = trim((string) Setting::get('telegram_bot_token', ''));
+        $firstStepFailed = !empty($result['steps']) && !$result['steps'][0]['ok'];
+        if ($firstStepFailed && $loginToken !== '' && $loginToken !== trim((string) ($cfg['token'] ?? ''))) {
+            Flash::error(
+                'В настройках входа задан другой токен бота — тот, которым приходят коды. '
+                . 'Публикация использует отдельное поле «Токен» в этом разделе. '
+                . 'Кнопка «Взять токен бота из настроек входа» подставит рабочий.'
+            );
+        }
+
         foreach ($result['steps'] as $step) {
             $line = $step['name'] . ': ' . $step['text'];
             if ($step['ok']) {
@@ -88,6 +106,28 @@ final class SocialController
         }
         if ($result['ok']) {
             Flash::success('Telegram настроен верно — можно публиковать.');
+        }
+
+        header('Location: /admin/social');
+        exit;
+    }
+
+    /**
+     * Подставляет в поле публикации токен бота из настроек входа. Тот же бот
+     * может и слать коды, и писать в канал — нужно лишь сделать его
+     * администратором канала. Руками это не скопировать: поле токена скрыто.
+     */
+    public function useLoginBotToken(): void
+    {
+        Auth::requireSuperAdmin();
+        Csrf::verifyRequest();
+
+        $loginToken = trim((string) Setting::get('telegram_bot_token', ''));
+        if ($loginToken === '') {
+            Flash::error('В настройках входа токен бота не задан — подставлять нечего.');
+        } else {
+            Setting::set('social_telegram_token', $loginToken);
+            Flash::success('Токен бота из настроек входа подставлен. Проверьте подключение — бот ещё должен быть администратором канала.');
         }
 
         header('Location: /admin/social');
