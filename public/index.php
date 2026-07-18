@@ -379,7 +379,11 @@ $guardPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 if (\App\Core\Session::hasCookie()
     && \App\Core\Auth::check()
     && \App\Core\Auth::requiresTwoFactorSetup()) {
-    $allowedSetupPaths = ['/admin/profile', '/admin/settings', '/admin/logout'];
+    // /admin/telegram обязателен в списке: там задаётся токен бота, то есть
+    // сам канал доставки кода. Без него администратор без привязанного
+    // Telegram не смог бы настроить второй фактор — вход упирался бы в
+    // страницы, где поля токена больше нет.
+    $allowedSetupPaths = ['/admin/profile', '/admin/settings', '/admin/telegram', '/admin/logout'];
     $allowed = false;
     foreach ($allowedSetupPaths as $allowedPath) {
         if ($guardPath === $allowedPath || str_starts_with($guardPath, $allowedPath . '/')) {

@@ -52,6 +52,24 @@ test('Соцсети не сохраняют Telegram: у него свой ра
     assert_contains('/admin/telegram', $view, 'из соцсетей есть ссылка в раздел Telegram');
 });
 
+test('Раздел Telegram доступен до настройки второго фактора', function () {
+    // Замкнутый круг, на который наступили: сессия без привязанного Telegram
+    // пускает только в разрешённые пути, а поле токена бота — то есть сам
+    // канал доставки кода — живёт в разделе Telegram. Не будет его в списке —
+    // администратор не сможет настроить второй фактор вообще.
+    $routes = (string) file_get_contents(dirname(__DIR__, 2) . '/public/index.php');
+    $pos = strpos($routes, '$allowedSetupPaths');
+    assert_true($pos !== false, 'список разрешённых путей на месте');
+    $line = substr($routes, (int) $pos, 200);
+
+    assert_contains("'/admin/telegram'", $line);
+    assert_contains("'/admin/profile'", $line);
+    assert_contains("'/admin/logout'", $line);
+    // Остальная админка при этом обязана оставаться закрытой.
+    assert_not_contains("'/admin/news'", $line);
+    assert_not_contains("'/admin/social'", $line);
+});
+
 test('Раздел Telegram: все шаги подключения на одной странице', function () {
     $view = (string) file_get_contents(dirname(__DIR__, 2) . '/app/Views/admin/telegram/index.php');
     foreach ([

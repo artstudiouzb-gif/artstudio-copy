@@ -57,10 +57,13 @@ function ua_short(?string $ua): string
 <div class="form-card" style="margin-top:24px;">
     <h2 style="margin-top:0;">Код входа через Telegram-бота (бесплатно)</h2>
     <?php if (!($botConfigured ?? false)): ?>
-        <p class="form-hint">Бот не настроен. Супер-администратор может создать бота у @BotFather (бесплатно) и указать токен в «Настройках».</p>
+        <p class="form-hint">
+            Бот не настроен. Создайте бота у <strong>@BotFather</strong> (бесплатно) и укажите токен
+            в разделе <a href="/admin/telegram">Telegram</a> — там же проверка подключения и привязка.
+        </p>
     <?php elseif ($botLinked ?? false): ?>
         <p><span class="badge badge--success">Привязан</span> Коды входа приходят вам в Telegram от бота.</p>
-        <p class="form-hint">Ваш chat_id: <code><?= (int) ($profileUser['telegram_chat_id'] ?? 0) ?></code> — укажите его в «Настройках», чтобы получать уведомления о заявках с форм.</p>
+        <p class="form-hint">Ваш chat_id: <code><?= (int) ($profileUser['telegram_chat_id'] ?? 0) ?></code> — укажите его в разделе <a href="/admin/telegram">Telegram</a>, чтобы получать уведомления о заявках с форм.</p>
         <form method="post" action="/admin/profile/telegram/unlink" class="form-grid" style="max-width:480px;">
             <?= Csrf::field() ?>
             <div class="form-field">
