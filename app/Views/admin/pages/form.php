@@ -220,6 +220,13 @@ foreach ($blocks as $b) {
                 <strong><?= htmlspecialchars($block['title'] ?: ('Блок #' . $block['id']), ENT_QUOTES) ?></strong>
                 <span class="block-list-item__type"><?= htmlspecialchars($blockTypeLabels[$block['type']] ?? $block['type'], ENT_QUOTES) ?></span>
                 <?php if (!$blockActive): ?><span class="block-list-item__badge">Скрыт</span><?php endif; ?>
+                <?php
+                // Условия показа: редактор должен видеть, почему блока нет на
+                // сайте, не заходя внутрь блока.
+                $blockData = json_decode((string) ($block['data'] ?? '{}'), true) ?: [];
+                $visLabel = \App\Core\BlockVisibility::label($blockData);
+                ?>
+                <?php if ($visLabel !== ''): ?><span class="block-list-item__badge" title="Условия показа"><?= htmlspecialchars($visLabel, ENT_QUOTES) ?></span><?php endif; ?>
             </div>
             <div class="block-list-item__actions">
                 <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/move">

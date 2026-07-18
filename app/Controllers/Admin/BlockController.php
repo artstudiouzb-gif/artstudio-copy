@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Admin;
 
 use App\Core\Auth;
+use App\Core\BlockVisibility;
 use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\View;
@@ -152,6 +153,19 @@ final class BlockController
         $padBottom = (string) ($_POST['pad_bottom'] ?? 'default');
         $data['_pad_top'] = in_array($padTop, $padOptions, true) ? $padTop : 'default';
         $data['_pad_bottom'] = in_array($padBottom, $padOptions, true) ? $padBottom : 'default';
+
+        // Условия показа: окно дат (считается на сервере) и устройство (CSS).
+        $data['_visible_from'] = BlockVisibility::normalize($_POST['visible_from'] ?? '');
+        $data['_visible_to'] = BlockVisibility::normalize($_POST['visible_to'] ?? '');
+        $device = (string) ($_POST['visible_device'] ?? '');
+        $data['_visible_device'] = in_array($device, ['desktop', 'mobile'], true) ? $device : '';
+        // Перевёрнутое окно молча не чиним: блок и правда не покажется никогда —
+        // честнее предупредить, чем угадывать намерение редактора.
+        $vFrom = BlockVisibility::parse($data['_visible_from']);
+        $vTo = BlockVisibility::parse($data['_visible_to']);
+        if ($vFrom !== null && $vTo !== null && $vTo <= $vFrom) {
+            Flash::error('Условия показа: дата окончания не позже даты начала — блок не будет показан. Проверьте даты.');
+        }
 
         // История версий (группа 5.1): снимаем текущее состояние ПЕРЕД перезаписью.
         BlockRevision::snapshot(

@@ -175,6 +175,12 @@ summary:focus-visible {
 .cms-block--space-premium { padding: var(--space-premium) 0; }
 .cms-block--space-max { padding: var(--space-max) 0; }
 
+/* Условия показа по устройству. Порог 768px совпадает с основным мобильным
+   брейкпоинтом темы; ограничение решается стилями, потому что кэш страницы
+   общий для всех посетителей. */
+@media (max-width: 768px) { .cms-block--only-desktop { display: none; } }
+@media (min-width: 769px) { .cms-block--only-mobile { display: none; } }
+
 /* Микро-анимации появления при скролле (Intersection Observer, группа 4.2). */
 .cms-block[data-reveal] { opacity: 0; transition: opacity .7s ease, transform .7s ease; }
 .cms-block[data-reveal-type="slide-up"] { transform: translateY(28px); }

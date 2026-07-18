@@ -55,6 +55,13 @@ final class BlockRenderer
         'org_structure' => ['title' => '', 'head_title' => 'Директор', 'head_name' => '', 'head_url' => '', 'side_items' => '', 'branches' => [], 'footnote' => ''],
     ];
 
+    /**
+     * Ближайшая граница расписания среди отрисованных блоков — заполняется в
+     * render(), сбрасывается в renderPage() и отдаётся вызывающему как
+     * expires_at, чтобы кэш страницы не пережил свою же дату показа.
+     */
+    private static ?int $nextBoundary = null;
+
     public static function defaultsFor(string $type): array
     {
         return self::DEFAULTS[$type] ?? [];
@@ -76,6 +83,17 @@ final class BlockRenderer
         // Смердживание с дефолтами по типу блока — устойчивость к старым/
         // неполным JSON-данным.
         $data = array_merge(self::defaultsFor($type), $data);
+
+        // Условия показа (расписание). Границу запоминаем до проверки: блок,
+        // который ещё не начался, тоже обязан разморозить кэш к своему старту.
+        $boundary = BlockVisibility::boundary($data);
+        if ($boundary !== null && (self::$nextBoundary === null || $boundary < self::$nextBoundary)) {
+            self::$nextBoundary = $boundary;
+        }
+        if (!BlockVisibility::isVisible($data)) {
+            return ['html' => '', 'css' => '', 'hidden' => true];
+        }
+
         $data = self::enrichData($type, $data);
 
         // Блок «columns» (группа 4.1): рендерим вложенные блоки, сгруппированные
@@ -136,6 +154,9 @@ final class BlockRenderer
         if ($fullwidth) {
             $extraClass .= ' cms-block--fullwidth';
         }
+        // Ограничение по устройству — только CSS: кэш страницы общий, серверное
+        // ветвление по User-Agent сделало бы его непригодным.
+        $extraClass .= BlockVisibility::deviceClass($data);
         $styleVars = '';
         $padTop = (string) ($data['_pad_top'] ?? 'default');
         $padBottom = (string) ($data['_pad_bottom'] ?? 'default');
@@ -164,16 +185,20 @@ final class BlockRenderer
 
     /**
      * @param array<int, array<string, mixed>> $blocks
-     * @return array{html: string, css: string, assets: array<int, string>}
+     * @return array{html: string, css: string, assets: array<int, string>, expires_at: int|null}
      */
     public static function renderPage(array $blocks): array
     {
         $htmlParts = [];
         $cssParts = [];
         $assets = [];
+        self::$nextBoundary = null;
 
         foreach ($blocks as $block) {
             $rendered = self::render($block);
+            if (!empty($rendered['hidden'])) {
+                continue;
+            }
             $htmlParts[] = $rendered['html'];
             if ($rendered['css'] !== '') {
                 $cssParts[] = "/* block #{$block['id']} ({$block['type']}) */\n" . $rendered['css'];
@@ -186,6 +211,7 @@ final class BlockRenderer
             'html' => implode("\n", $htmlParts),
             'css' => implode("\n\n", $cssParts),
             'assets' => array_keys($assets),
+            'expires_at' => self::$nextBoundary,
         ];
     }
 
@@ -235,6 +261,9 @@ final class BlockRenderer
             $inner = '';
             foreach ($byColumn[$i] as $child) {
                 $rendered = self::render($child);
+                if (!empty($rendered['hidden'])) {
+                    continue;
+                }
                 $inner .= $rendered['html'];
                 if ($rendered['css'] !== '') {
                     $cssParts[] = $rendered['css'];

@@ -63,6 +63,13 @@ php scripts/smoke.php http://127.0.0.1:8000 --admin admin:ПАРОЛЬ
   тянут данные из БД), шаблоны — `templates/blocks/*.php`, редактор полей —
   `app/Views/admin/pages/block_form.php`, сохранение (whitelist полей) —
   `app/Controllers/Admin/BlockController.php::collectData()`.
+- **Условия показа блока** — `App\Core\BlockVisibility` (ключи `_visible_from`,
+  `_visible_to`, `_visible_device` в data блока). Расписание считается на
+  сервере: блок вне окна вообще не попадает в HTML. Устройство — классами
+  `.cms-block--only-mobile/desktop`, потому что кэш страницы общий для всех
+  посетителей. `BlockRenderer::renderPage()` отдаёт `expires_at` (ближайшая
+  граница расписания), `PageController` по ней пересобирает кэш — иначе баннер
+  «до 30 июля» висел бы и 31-го.
 - **Модели** — `app/Models/*` (Project, News, PhotoAlbum, TeamMember, Page,
   MenuItem, Setting, …). Много `SELECT *`; статусы published/draft, мягкое удаление.
 - **i18n публички**: `App\Core\Lang` + глобальный `t()` (`app/Core/helpers.php`),

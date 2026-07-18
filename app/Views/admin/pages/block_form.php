@@ -1100,6 +1100,40 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             </div>
         </details>
 
+        <?php
+        // Условия показа: расписание считается на сервере (блока просто нет в
+        // HTML вне окна), устройство — на CSS (кэш страницы общий для всех).
+        $vis = \App\Core\BlockVisibility::class;
+        $visFrom = $vis::forInput($data['_visible_from'] ?? '');
+        $visTo = $vis::forInput($data['_visible_to'] ?? '');
+        $visDevice = (string) ($data['_visible_device'] ?? '');
+        $visLabel = $vis::label($data);
+        ?>
+        <details class="form-section"<?= $vis::hasConditions($data) ? ' open' : '' ?>>
+            <summary>Условия показа <span class="form-section__hint"><?= $visLabel !== '' ? htmlspecialchars($visLabel, ENT_QUOTES) : 'даты показа, устройство' ?></span></summary>
+            <div class="form-section__body">
+        <div class="form-field">
+            <label for="visible_from">Показывать с</label>
+            <input type="datetime-local" id="visible_from" name="visible_from" value="<?= htmlspecialchars($visFrom, ENT_QUOTES) ?>">
+            <span class="form-hint">Пусто — показывать сразу.</span>
+        </div>
+        <div class="form-field">
+            <label for="visible_to">Показывать до</label>
+            <input type="datetime-local" id="visible_to" name="visible_to" value="<?= htmlspecialchars($visTo, ENT_QUOTES) ?>">
+            <span class="form-hint">Пусто — показывать бессрочно. В указанный момент блок исчезнет сам, без правки страницы.</span>
+        </div>
+        <div class="form-field">
+            <label for="visible_device">Устройства</label>
+            <select id="visible_device" name="visible_device">
+                <option value="" <?= $visDevice === '' ? 'selected' : '' ?>>Все</option>
+                <option value="desktop" <?= $visDevice === 'desktop' ? 'selected' : '' ?>>Только десктоп</option>
+                <option value="mobile" <?= $visDevice === 'mobile' ? 'selected' : '' ?>>Только мобильные</option>
+            </select>
+            <span class="form-hint">Скрытие по устройству делается стилями: блок остаётся в HTML, но не отображается.</span>
+        </div>
+            </div>
+        </details>
+
         <?php if (\App\Core\Auth::isSuperAdmin()): ?>
         <details class="form-section">
             <summary>Дополнительно <span class="form-section__hint">собственный CSS блока</span></summary>

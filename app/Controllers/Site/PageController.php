@@ -64,7 +64,16 @@ final class PageController
         };
         if (\App\Models\Setting::get('perf_page_cache', '1') === '1') {
             $ttl = max(0, (int) \App\Models\Setting::get('perf_cache_ttl', '0'));
-            $rendered = \App\Core\Cache::remember('page:' . (int) $page['id'] . ':' . $lang, $build, $ttl);
+            $cacheKey = 'page:' . (int) $page['id'] . ':' . $lang;
+            $rendered = \App\Core\Cache::remember($cacheKey, $build, $ttl);
+
+            // У блоков с расписанием кэш живёт только до ближайшей границы
+            // показа: иначе баннер «до 30 июля» остался бы висеть 31-го.
+            $expiresAt = is_array($rendered) ? ($rendered['expires_at'] ?? null) : null;
+            if ($expiresAt !== null && (int) $expiresAt <= time()) {
+                \App\Core\Cache::forget($cacheKey);
+                $rendered = \App\Core\Cache::remember($cacheKey, $build, $ttl);
+            }
         } else {
             $rendered = $build();
         }
