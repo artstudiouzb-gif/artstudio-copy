@@ -31,9 +31,18 @@ final class BlockHints
             ['cta_button_text', 'cta_button_url', 'Кнопка в блоке призыва'],
             ['video_button_text', 'video_button_url', 'Кнопка видео'],
         ] as [$textKey, $urlKey, $label]) {
-            if ($filled($textKey) && !$filled($urlKey)) {
-                $hints[] = $label . ': подпись задана, но не указана ссылка — на сайте она не появится.';
+            if (!$filled($textKey) || $filled($urlKey)) {
+                continue;
             }
+            // У «Подписки» это подпись кнопки отправки формы, ссылка ей не нужна.
+            if ($textKey === 'button_text' && $type === 'subscribe') {
+                continue;
+            }
+            // Блоки-обёртки сами подставляют ссылку на раздел при пустом поле.
+            if ($textKey === 'all_text' && self::fillsSectionLink($type, $data)) {
+                continue;
+            }
+            $hints[] = $label . ': подпись задана, но не указана ссылка — на сайте она не появится.';
         }
 
         // Автоматический источник подменяет ручной список целиком.
@@ -66,6 +75,22 @@ final class BlockHints
         }
 
         return $hints;
+    }
+
+    /**
+     * Подставляет ли блок ссылку «Все…» сам (BlockRenderer::enrichData).
+     *
+     * @param array<string,mixed> $data
+     */
+    private static function fillsSectionLink(string $type, array $data): bool
+    {
+        if (in_array($type, ['news_latest', 'news_feature', 'news_docs'], true)) {
+            return true;
+        }
+        $source = (string) ($data['source'] ?? 'manual');
+
+        return ($type === 'image_cards' && $source === 'projects')
+            || ($type === 'media_gallery' && $source === 'albums');
     }
 
     /**

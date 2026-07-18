@@ -12,10 +12,51 @@ use App\Core\Database;
  */
 final class BlockSnippet
 {
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * Список шаблонов с кратким составом: выбирать по одному названию — гадать,
+     * что внутри.
+     *
+     * @return array<int, array<string, mixed>>
+     */
     public static function all(): array
     {
-        return Database::pdo()->query('SELECT id, name, created_at FROM block_snippets ORDER BY created_at DESC')->fetchAll();
+        $rows = Database::pdo()
+            ->query('SELECT id, name, blocks_json, created_at FROM block_snippets ORDER BY created_at DESC')
+            ->fetchAll();
+
+        foreach ($rows as $i => $row) {
+            $blocks = json_decode((string) ($row['blocks_json'] ?? ''), true);
+            $rows[$i]['summary'] = is_array($blocks) ? self::summarize($blocks) : '';
+            $rows[$i]['blocks_count'] = is_array($blocks) ? count($blocks) : 0;
+            unset($rows[$i]['blocks_json']); // в списке не нужен, только вес
+        }
+
+        return $rows;
+    }
+
+    /**
+     * «5 блоков: Обложка, Текст, Контакты…» — состав шаблона одной строкой.
+     *
+     * @param array<int, mixed> $blocks
+     */
+    public static function summarize(array $blocks): string
+    {
+        $labels = [];
+        foreach ($blocks as $block) {
+            if (!is_array($block)) {
+                continue;
+            }
+            $type = (string) ($block['type'] ?? '');
+            $labels[] = \App\Core\BlockRenderer::TYPE_LABELS[$type] ?? $type;
+        }
+        if ($labels === []) {
+            return '';
+        }
+
+        $shown = array_slice($labels, 0, 4);
+        $tail = count($labels) > 4 ? '…' : '';
+
+        return count($labels) . ' бл.: ' . implode(', ', $shown) . $tail;
     }
 
     public static function findById(int $id): ?array

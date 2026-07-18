@@ -370,7 +370,8 @@ foreach ($blocks as $b) {
                     <select name="snippet_id" required>
                         <option value="">— выберите шаблон —</option>
                         <?php foreach ($snippets as $s): ?>
-                            <option value="<?= (int) $s['id'] ?>"><?= htmlspecialchars((string) $s['name'], ENT_QUOTES) ?></option>
+                            <?php // Показываем состав: по одному названию не понять, что применится. ?>
+                            <option value="<?= (int) $s['id'] ?>"><?= htmlspecialchars((string) $s['name'], ENT_QUOTES) ?><?= ($s['summary'] ?? '') !== '' ? ' — ' . htmlspecialchars((string) $s['summary'], ENT_QUOTES) : '' ?></option>
                         <?php endforeach; ?>
                     </select>
                     <select name="mode">

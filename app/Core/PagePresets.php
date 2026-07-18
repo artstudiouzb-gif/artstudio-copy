@@ -192,7 +192,7 @@ final class PagePresets
             'blocks' => [
                 [
                     'type' => 'hero',
-                    'title' => 'Заголовок услуги',
+                    'title' => 'Заголовок услуги — укажите ссылку кнопки',
                     'data' => array_merge([
                         'eyebrow' => 'Услуги',
                         'title' => 'Название услуги',
@@ -426,7 +426,7 @@ final class PagePresets
                 ],
                 [
                     'type' => 'map_point',
-                    'title' => 'Карта проезда',
+                    'title' => 'Карта проезда — вставьте ссылку и код карты',
                     'data' => array_merge([
                         'title' => 'Как добраться',
                         'card_title' => 'Главный офис',
@@ -438,7 +438,7 @@ final class PagePresets
                 ],
                 [
                     'type' => 'form',
-                    'title' => 'Форма обращения',
+                    'title' => 'Форма обращения — выберите форму',
                     'data' => array_merge([
                         'form_id' => null,
                     ], self::look('none', 'premium')),
@@ -521,7 +521,9 @@ final class PagePresets
     {
         return [
             'type' => 'cta_band',
-            'title' => 'Призыв к действию',
+            // Название блока в редакторе подсказывает недостающий шаг: кнопка
+            // без ссылки на сайте не появится.
+            'title' => 'Призыв к действию — укажите ссылку кнопки',
             'data' => array_merge([
                 'title' => $title,
                 'text' => $text,
