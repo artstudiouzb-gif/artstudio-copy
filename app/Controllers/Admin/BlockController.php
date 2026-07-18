@@ -180,6 +180,20 @@ final class BlockController
         \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
         Flash::success('Блок сохранён.');
+
+        // Заполненное, но нерабочее — говорим сразу, а не оставляем редактора
+        // выяснять это, открыв сайт и не найдя своего текста.
+        foreach (\App\Core\BlockHints::forBlock((string) $block['type'], $data) as $hint) {
+            Flash::error($hint);
+        }
+        if (\App\Core\BlockHints::rendersEmpty([
+            'id' => (int) $block['id'],
+            'type' => (string) $block['type'],
+            'data' => json_encode($data, JSON_UNESCAPED_UNICODE),
+            'custom_css' => '',
+        ])) {
+            Flash::error('Блок пока пуст и на сайте не показывается — заполните его поля.');
+        }
         header('Location: ' . $this->pageEditUrl($block));
         exit;
     }
