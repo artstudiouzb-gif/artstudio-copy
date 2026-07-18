@@ -357,7 +357,10 @@
     // кнопка обновляет картинку капчи рядом с собой.
     document.addEventListener('change', function (e) {
         var el = e.target;
-        if (el && el.matches && el.matches('select[data-auto-submit]') && el.form) {
+        // Форму списка обслуживает AJAX-модуль ниже — иначе селект сортировки
+        // сработал бы дважды и перезагрузил страницу поверх подгрузки.
+        if (el && el.matches && el.matches('select[data-auto-submit]') && el.form
+            && !el.form.hasAttribute('data-listing-form')) {
             el.form.submit();
         }
     });
@@ -599,4 +602,130 @@
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onScroll, { passive: true });
         setTimeout(failsafe, 2500);
+    })();
+
+    // AJAX-фильтрация списков (новости, каталоги). Прогрессивное улучшение:
+    // ссылки фильтров/пагинации и форма поиска остаются рабочими без JS, а
+    // здесь мы лишь перехватываем их и подменяем область результатов.
+    // Сервер отдаёт тот же список фрагментом по параметру _fragment=1.
+    (function () {
+        var listings = document.querySelectorAll('[data-listing]');
+        if (!listings.length || !window.fetch || !window.history || !history.pushState) { return; }
+
+        var FRAGMENT_PARAM = '_fragment';
+
+        var fragmentUrl = function (url) {
+            var u = new URL(url, location.href);
+            u.searchParams.set(FRAGMENT_PARAM, '1');
+            return u.toString();
+        };
+
+        // Адрес для истории браузера — без служебного параметра фрагмента.
+        var publicUrl = function (url) {
+            var u = new URL(url, location.href);
+            u.searchParams.delete(FRAGMENT_PARAM);
+            return u.pathname + (u.search === '?' ? '' : u.search);
+        };
+
+        listings.forEach(function (root) {
+            var results = root.querySelector('[data-listing-results]');
+            if (!results) { return; }
+
+            var controller = null;
+            var timer = null;
+
+            var setBusy = function (busy) {
+                results.setAttribute('aria-busy', busy ? 'true' : 'false');
+                root.classList.toggle('listing--loading', busy);
+            };
+
+            // Активная «таблетка» рубрики подсвечивается сразу: ответ сервера
+            // касается только результатов, состояние фильтров — на нас.
+            // syncForm=true только когда адрес пришёл не из самой формы (клик по
+            // «Сбросить», кнопка «назад»): иначе ответ затёр бы текст, который
+            // посетитель успел дописать, пока летел запрос.
+            var syncFilters = function (url, syncForm) {
+                var target = new URL(url, location.href);
+                root.querySelectorAll('.listing-filter__item').forEach(function (link) {
+                    var href = new URL(link.getAttribute('href'), location.href);
+                    var same = href.pathname === target.pathname
+                        && (href.searchParams.get('badge') || '') === (target.searchParams.get('badge') || '');
+                    link.classList.toggle('is-active', same);
+                });
+                var reset = root.querySelector('[data-listing-reset]');
+                if (reset) { reset.hidden = !(target.searchParams.get('q') || ''); }
+
+                if (!syncForm) { return; }
+                var search = root.querySelector('[data-listing-form] input[type="search"]');
+                if (search) { search.value = target.searchParams.get('q') || ''; }
+                var sort = root.querySelector('[data-listing-form] select[name="sort"]');
+                if (sort) { sort.value = target.searchParams.get('sort') || 'new'; }
+            };
+
+            var load = function (url, push, syncForm) {
+                if (controller) { controller.abort(); }
+                controller = ('AbortController' in window) ? new AbortController() : null;
+                setBusy(true);
+
+                fetch(fragmentUrl(url), {
+                    credentials: 'same-origin',
+                    signal: controller ? controller.signal : undefined
+                }).then(function (r) {
+                    if (!r.ok) { throw new Error('HTTP ' + r.status); }
+                    return r.text();
+                }).then(function (html) {
+                    results.innerHTML = html;
+                    syncFilters(url, syncForm);
+                    if (push) { history.pushState({ listing: true }, '', publicUrl(url)); }
+                    setBusy(false);
+                }).catch(function (err) {
+                    if (err && err.name === 'AbortError') { return; }
+                    // Любая ошибка — обычный переход: посетитель не должен
+                    // остаться со старым списком и без объяснений.
+                    location.href = publicUrl(url);
+                });
+            };
+
+            // Клики по рубрикам и страницам.
+            root.addEventListener('click', function (e) {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) { return; }
+                var link = e.target.closest ? e.target.closest('.listing-filter__item, .listing-pager__item, [data-listing-reset]') : null;
+                if (!link || link.tagName !== 'A' || !link.getAttribute('href')) { return; }
+                e.preventDefault();
+                load(link.getAttribute('href'), true, true);
+                // Пагинация уводит взгляд наверх списка, фильтры — нет.
+                if (link.classList.contains('listing-pager__item')) {
+                    root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+
+            // Форма поиска/сортировки каталога.
+            var form = root.querySelector('[data-listing-form]');
+            if (form) {
+                var formUrl = function () {
+                    var params = new URLSearchParams(new FormData(form));
+                    // Пустые значения и сортировку по умолчанию в адрес не тащим.
+                    if (!params.get('q')) { params.delete('q'); }
+                    if (params.get('sort') === 'new') { params.delete('sort'); }
+                    var qs = params.toString();
+                    return form.getAttribute('action') + (qs ? '?' + qs : '');
+                };
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    load(formUrl(), true, false);
+                });
+                form.addEventListener('change', function (e) {
+                    if (e.target && e.target.name === 'sort') { load(formUrl(), true, false); }
+                });
+                form.addEventListener('input', function (e) {
+                    if (!e.target || e.target.type !== 'search') { return; }
+                    if (timer) { clearTimeout(timer); }
+                    timer = setTimeout(function () { load(formUrl(), true, false); }, 400);
+                });
+            }
+
+            window.addEventListener('popstate', function () {
+                load(location.href, false, true);
+            });
+        });
     })();

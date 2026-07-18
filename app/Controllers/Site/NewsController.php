@@ -6,6 +6,7 @@ namespace App\Controllers\Site;
 
 use App\Core\AppUrl;
 use App\Core\Config;
+use App\Core\Fragment;
 use App\Core\Locale;
 use App\Core\View;
 use App\Models\News;
@@ -31,13 +32,21 @@ final class NewsController
         $pages = max(1, (int) ceil($total / $perPage));
         $page = min($page, $pages);
 
-        View::render('site/news_index', [
+        $vars = [
             'items' => News::published($perPage, ($page - 1) * $perPage, $lang, $badge !== '' ? $badge : null),
             'page' => $page,
             'pages' => $pages,
             'badges' => $badges,
             'badge' => $badge,
-        ]);
+        ];
+
+        // AJAX-фильтрация: тот же список, но без шапки и подвала.
+        if (Fragment::wanted()) {
+            Fragment::render('site/_news_list', $vars);
+            return;
+        }
+
+        View::render('site/news_index', $vars);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Site;
 
+use App\Core\Fragment;
 use App\Core\Locale;
 use App\Core\View;
 use App\Models\ContentEntry;
@@ -59,7 +60,7 @@ final class ContentController
             $entries[] = $entry;
         }
 
-        View::render('site/content_index', [
+        $vars = [
             'type' => $type,
             'fields' => $fields,
             'entries' => $entries,
@@ -69,7 +70,15 @@ final class ContentController
             'pages' => $pages,
             'total' => $total,
             'hasDeadline' => $deadlineField !== null,
-        ]);
+        ];
+
+        // AJAX-фильтрация: тот же список, но без шапки и подвала.
+        if (Fragment::wanted()) {
+            Fragment::render('site/_catalog_list', $vars);
+            return;
+        }
+
+        View::render('site/content_index', $vars);
     }
 
     public function show(array $params): void
