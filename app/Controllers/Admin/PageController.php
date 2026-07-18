@@ -128,7 +128,11 @@ final class PageController
 
         // Рендерим блоки заново, минуя дисковый кэш (показываем актуальный черновик).
         $blocks = Block::forPageLocalized((int) $page['id'], $lang);
+        // В предпросмотре незаполненные блоки показываются заметкой, а не
+        // исчезают: иначе редактор не понимает, куда делся добавленный блок.
+        \App\Core\BlockRenderer::setPreviewMode(true);
         $rendered = \App\Core\BlockRenderer::renderPage($blocks);
+        \App\Core\BlockRenderer::setPreviewMode(false);
         foreach ($rendered['assets'] ?? [] as $assetType) {
             \App\Core\AssetCollector::requireJs($assetType);
         }

@@ -62,6 +62,35 @@ final class BlockRenderer
      */
     private static ?int $nextBoundary = null;
 
+    /**
+     * Режим предпросмотра в админке. На сайте незаполненный блок просто не
+     * выводится (иначе на странице зияет пустая секция с отступами), а
+     * редактору вместо него показывается заметка: блок добавлен, но пуст —
+     * иначе «ничего не появилось» читается как поломка.
+     */
+    private static bool $previewMode = false;
+
+    public static function setPreviewMode(bool $on): void
+    {
+        self::$previewMode = $on;
+    }
+
+    /**
+     * Видимой считаем секцию, где есть текст или медиа. Только текст проверять
+     * нельзя: галерея из одних фотографий текста не содержит.
+     */
+    public static function isVisuallyEmpty(string $html): bool
+    {
+        if (preg_match('/<(img|svg|video|iframe|input|button|source)\b/i', $html)) {
+            return false;
+        }
+        if (preg_match('/background-image\s*:\s*url/i', $html)) {
+            return false;
+        }
+
+        return trim((string) preg_replace('/\s+/u', ' ', strip_tags($html))) === '';
+    }
+
     public static function defaultsFor(string $type): array
     {
         return self::DEFAULTS[$type] ?? [];
@@ -199,6 +228,16 @@ final class BlockRenderer
             if (!empty($rendered['hidden'])) {
                 continue;
             }
+            // Незаполненный блок: на сайте пропускаем, в предпросмотре
+            // показываем заметку с типом блока — редактор должен понимать,
+            // что блок есть, но его нужно наполнить.
+            if (self::isVisuallyEmpty($rendered['html'])) {
+                if (!self::$previewMode) {
+                    continue;
+                }
+                $htmlParts[] = self::emptyNotice($block);
+                continue;
+            }
             $htmlParts[] = $rendered['html'];
             if ($rendered['css'] !== '') {
                 $cssParts[] = "/* block #{$block['id']} ({$block['type']}) */\n" . $rendered['css'];
@@ -281,6 +320,47 @@ final class BlockRenderer
 
         return [$html, implode("\n", $cssParts)];
     }
+
+    /**
+     * Заметка о незаполненном блоке для предпросмотра в админке.
+     *
+     * @param array<string,mixed> $block
+     */
+    private static function emptyNotice(array $block): string
+    {
+        $type = preg_replace('/[^a-z0-9_]/', '', strtolower((string) $block['type'])) ?? '';
+        $label = self::TYPE_LABELS[$type] ?? $type;
+        $title = trim((string) ($block['title'] ?? ''));
+
+        return sprintf(
+            '<section id="block-%d" class="cms-block cms-block--empty-notice" data-block-type="%s">'
+            . '<div class="cms-empty-notice"><strong>Блок «%s»%s пока пуст</strong>'
+            . '<span>Заполните поля блока — на сайте он появится. Сейчас посетители его не видят.</span>'
+            . '<a class="cms-empty-notice__edit" href="/admin/blocks/%d/edit">Заполнить</a></div></section>',
+            (int) $block['id'],
+            htmlspecialchars($type, ENT_QUOTES),
+            htmlspecialchars($label, ENT_QUOTES),
+            $title !== '' ? ' (' . htmlspecialchars($title, ENT_QUOTES) . ')' : '',
+            (int) $block['id']
+        );
+    }
+
+    /** Русские названия типов — для сообщений редактору. */
+    public const TYPE_LABELS = [
+        'text' => 'Текст', 'html' => 'Произвольный HTML', 'cta' => 'Призыв к действию',
+        'advantages' => 'Преимущества', 'slider' => 'Слайдер', 'gallery' => 'Галерея',
+        'form' => 'Форма', 'columns' => 'Колонки', 'testimonials' => 'Отзывы',
+        'counters' => 'Счётчики', 'team_list' => 'Команда', 'projects_list' => 'Проекты',
+        'news_latest' => 'Последние новости', 'partners' => 'Партнёры', 'banner' => 'Баннер',
+        'subscribe' => 'Подписка', 'faq' => 'Вопросы и ответы', 'contact_cards' => 'Контакты',
+        'hero' => 'Обложка', 'categories_grid' => 'Сетка категорий', 'media_materials' => 'Медиаматериалы',
+        'cards_grid' => 'Сетка карточек', 'image_cards' => 'Карточки с фото', 'media_gallery' => 'Медиагалерея',
+        'news_feature' => 'Новости и аналитика', 'person_cards' => 'Карточки персон', 'timeline' => 'Хронология',
+        'news_docs' => 'Новости и документы', 'cta_band' => 'Полоса призыва', 'person_profile' => 'Профиль персоны',
+        'feature_band' => 'Полоса преимуществ', 'bio_education' => 'Биография и образование',
+        'anchor_nav' => 'Якорная навигация', 'stages' => 'Этапы', 'text_image' => 'Текст с фото',
+        'docs_list' => 'Список документов', 'map_point' => 'Карта', 'org_structure' => 'Оргструктура',
+    ];
 
     private static function enrichData(string $type, array $data): array
     {

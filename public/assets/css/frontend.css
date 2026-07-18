@@ -1719,3 +1719,23 @@ body.design-header-dark .a11y-toggle:hover,
 .site-topbar .a11y-toggle span {
     display: none !important;
 }
+
+/* Заметка о незаполненном блоке — только в предпросмотре админки.
+   На сайте такие блоки не выводятся вовсе, поэтому посетитель её не увидит. */
+.cms-block--empty-notice { padding: 10px 0 !important; }
+.cms-empty-notice {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    max-width: var(--container-max, 1200px);
+    margin: 0 auto;
+    padding: 14px 18px;
+    border: 1px dashed var(--border-color, #d5d8de);
+    border-radius: var(--radius, 12px);
+    background: color-mix(in srgb, var(--color-accent, #17999b) 5%, transparent);
+    font-size: 0.9rem;
+}
+.cms-empty-notice strong { font-weight: 700; }
+.cms-empty-notice span { color: var(--text-muted, #666); }
+.cms-empty-notice__edit { margin-left: auto; font-weight: 600; white-space: nowrap; }
