@@ -461,6 +461,10 @@ if ($siteTemplate === 'modern_gov'): ?>
 :root {
     --color-primary: <?= htmlspecialchars($primaryColor, ENT_QUOTES) ?>;
     --color-accent: <?= htmlspecialchars($accentColor, ENT_QUOTES) ?>;
+    <?php // Текстовые варианты акцента считаются из него же: «красивый» акцент
+          // почти всегда слишком светлый для мелкого текста. ?>
+    --gov-teal-text: <?= htmlspecialchars(\App\Core\AccentContrast::onLight($accentColor, $semanticColors['bg_surface']), ENT_QUOTES) ?>;
+    --gov-teal-on-dark: <?= htmlspecialchars(\App\Core\AccentContrast::onDark($accentColor), ENT_QUOTES) ?>;
     --bg-primary: <?= htmlspecialchars($semanticColors['bg_primary'], ENT_QUOTES) ?>;
     --bg-surface: <?= htmlspecialchars($semanticColors['bg_surface'], ENT_QUOTES) ?>;
     --text-main: <?= htmlspecialchars($semanticColors['text_main'], ENT_QUOTES) ?>;
