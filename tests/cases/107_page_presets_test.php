@@ -86,6 +86,51 @@ test('Сборки страниц: применяются к странице и
     $pdo->exec("DELETE FROM pages WHERE id = {$pageId}");
 });
 
+test('Автоматический ритм: те же правила для страниц не из сборки', function () {
+    // Демо-контент и импорт собирают страницы своим содержимым, но оформление
+    // секций должно подчиняться тем же правилам, что и готовые сборки.
+    $pages = [
+        ['hero', 'text', 'team_list', 'docs_list', 'contact_cards', 'cta_band'],
+        ['text'],
+        ['org_structure', 'text', 'cta_band'],
+        ['hero', 'text', 'counters', 'feature_band', 'timeline', 'person_cards', 'faq', 'cta_band'],
+    ];
+
+    foreach ($pages as $types) {
+        $looks = PagePresets::rhythmFor($types);
+        assert_same(count($types), count($looks), 'оформление нужно каждому блоку');
+
+        $backgrounds = array_map(static fn (array $l): string => (string) $l['_bg'], $looks);
+        for ($i = 1, $n = count($backgrounds); $i < $n; $i++) {
+            assert_false(
+                $backgrounds[$i] !== 'none' && $backgrounds[$i] === $backgrounds[$i - 1],
+                'два одинаковых фона подряд: ' . implode(',', $backgrounds)
+            );
+        }
+        assert_true(
+            count(array_filter($backgrounds, static fn (string $b): bool => $b === 'navy')) <= 1,
+            'тёмных секций больше одной'
+        );
+        // Первый экран не анимируем.
+        assert_false(!empty($looks[0]['_reveal']['enabled']), 'первый блок анимировать нельзя');
+        // Подложка во всю ширину — только когда фон есть.
+        foreach ($looks as $look) {
+            if ($look['_bg'] === 'none') {
+                assert_false(!empty($look['_fullwidth']), 'полная ширина без фона');
+            }
+        }
+    }
+
+    assert_same([], PagePresets::rhythmFor([]), 'пустая страница — пустое оформление');
+});
+
+test('Демо-контент: оформление берётся из общих правил, тексты остаются своими', function () {
+    $seeder = (string) file_get_contents(dirname(__DIR__, 2) . '/app/Core/DemoSeeder.php');
+    assert_contains('PagePresets::rhythmFor', $seeder, 'демо-страницы получают ритм секций');
+    // Своё оформление в демо-данных приоритетнее автоматического (+= не перетирает).
+    assert_contains('$blockData += $looks', $seeder);
+});
+
 test('Сборки страниц: неизвестный идентификатор не находится', function () {
     assert_same(null, PagePresets::find('нет-такой'));
     assert_same(null, PagePresets::find(''));

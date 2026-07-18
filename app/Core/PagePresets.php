@@ -40,6 +40,49 @@ final class PagePresets
     }
 
     /**
+     * Автоматическая расстановка оформления по тем же правилам ритма — для
+     * страниц, собранных не из сборки (демо-контент, импорт). Сборки выше
+     * размечены вручную и точнее: здесь мы знаем только порядок и типы блоков.
+     *
+     * @param list<string> $types типы блоков страницы по порядку
+     * @return list<array<string,mixed>> оформление для каждого блока
+     */
+    public static function rhythmFor(array $types): array
+    {
+        $looks = [];
+        $previousBg = 'none';
+        $tintTurn = false;
+
+        foreach (array_values($types) as $index => $type) {
+            // Первый блок — обложка: максимум воздуха и без анимации.
+            if ($index === 0) {
+                $looks[] = self::look('none', $type === 'hero' ? 'max' : 'premium');
+                $previousBg = 'none';
+                continue;
+            }
+
+            // Призыв к действию — единственная тёмная секция.
+            if ($type === 'cta_band') {
+                $looks[] = self::look('navy', 'premium', 'fade');
+                $previousBg = 'navy';
+                continue;
+            }
+
+            // Подложка через одну секцию и только после секции без фона —
+            // так фоны не слипаются в одно пятно.
+            $bg = 'none';
+            if ($previousBg === 'none' && $index % 2 === 0) {
+                $bg = $tintTurn ? 'tint' : 'light';
+                $tintTurn = !$tintTurn;
+            }
+            $looks[] = self::look($bg, 'premium', $bg === 'none' ? 'fade' : 'slide-up');
+            $previousBg = $bg;
+        }
+
+        return $looks;
+    }
+
+    /**
      * @return array<string, array{name:string, description:string, outline:list<string>, blocks:list<array<string,mixed>>}>
      */
     public static function all(): array

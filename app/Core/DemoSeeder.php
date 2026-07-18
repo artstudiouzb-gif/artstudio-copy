@@ -577,6 +577,18 @@ final class DemoSeeder
 
                 if (!$hasBlocks && is_array($blocks)) {
                     $order = 1;
+                    // Оформление секций (фоны, отступы, появление) — по общим
+                    // правилам ритма, чтобы демо-страницы не были плоскими.
+                    // Тексты блоков при этом свои: демо-контент конкретного
+                    // ведомства ценнее заготовок из готовых сборок.
+                    $valid = array_values(array_filter(
+                        $blocks,
+                        static fn ($b): bool => is_array($b) && count($b) >= 3
+                    ));
+                    $looks = \App\Core\PagePresets::rhythmFor(
+                        array_map(static fn (array $b): string => (string) $b[0], $valid)
+                    );
+                    $lookIndex = 0;
                     foreach ($blocks as $block) {
                         if (!is_array($block) || count($block) < 3) {
                             continue;
@@ -591,6 +603,13 @@ final class DemoSeeder
                             $blockData['form_id'] = $formId !== false ? (int) $formId : null;
                             unset($blockData['form_slug']);
                         }
+
+                        // Своё оформление блока (если задано в демо-данных)
+                        // важнее автоматического — не перетираем.
+                        if (is_array($blockData)) {
+                            $blockData += $looks[$lookIndex] ?? [];
+                        }
+                        $lookIndex++;
 
                         $blockIns->execute([
                             ':pid' => $pid,
