@@ -74,20 +74,33 @@ final class BlockController
             $columnIndex = max(0, (int) ($_POST['column_index'] ?? 0));
         }
 
+        // Новый блок приходит с образцом наполнения: пустой блок не объясняет,
+        // из чего он состоит, и редактор видит на странице пустое место.
         $title = trim((string) ($_POST['title'] ?? ''));
+        $sample = \App\Core\BlockSamples::for($type);
+        // Блок формы без выбранной формы показывает заглушку. Если на сайте
+        // формы уже есть, подставляем первую — блок сразу рабочий.
+        if ($type === 'form') {
+            $firstForm = FormDef::all()[0] ?? null;
+            if ($firstForm !== null) {
+                $sample['form_id'] = (int) $firstForm['id'];
+            }
+        }
         $blockId = Block::create(
             $pageId,
             $lang,
             $type,
             $title !== '' ? $title : null,
-            \App\Core\BlockRenderer::defaultsFor($type),
+            array_merge(\App\Core\BlockRenderer::defaultsFor($type), $sample),
             '',
             $parentBlockId,
             $columnIndex
         );
         \App\Core\Cache::forgetPrefix('page:' . $pageId);
 
-        Flash::success('Блок добавлен. Заполните его содержимое.');
+        Flash::success($sample !== []
+            ? 'Блок добавлен с примером наполнения — замените тексты своими.'
+            : 'Блок добавлен. Заполните его содержимое.');
         header('Location: /admin/blocks/' . $blockId . '/edit');
         exit;
     }

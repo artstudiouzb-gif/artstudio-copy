@@ -15,7 +15,12 @@ $items = $data['items'] ?? [];
                 if ($url !== '' && !\App\Core\UrlGuard::isSafeLink($url)) {
                     $url = '';
                 }
-                $img = '<img class="block-partners__logo" src="' . $logo . '" alt="' . $name . '" loading="lazy">';
+                // Без логотипа показываем название текстом: пустой <img src="">
+                // — это битая картинка, а имя партнёра было видно только во
+                // всплывающей подсказке.
+                $img = $logo !== ''
+                    ? '<img class="block-partners__logo" src="' . $logo . '" alt="' . $name . '" loading="lazy">'
+                    : '<span class="block-partners__name">' . ($name !== '' ? $name : 'Партнёр') . '</span>';
                 ?>
                 <?php if ($url !== ''): ?>
                     <a class="block-partners__item" href="<?= htmlspecialchars($url, ENT_QUOTES) ?>" target="_blank" rel="noopener" title="<?= $name ?>"><?= $img ?></a>

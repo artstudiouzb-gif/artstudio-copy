@@ -737,6 +737,8 @@ h1, h2 { letter-spacing: -.015em; }
 .block-partners__item:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .block-partners__logo { max-width: 100%; max-height: 56px; width: auto; height: auto; object-fit: contain; filter: grayscale(1); opacity: .75; transition: filter .2s, opacity .2s; }
 .block-partners__item:hover .block-partners__logo { filter: grayscale(0); opacity: 1; }
+/* Партнёр без логотипа: название текстом вместо битой картинки. */
+.block-partners__name { font-weight: 600; font-size: .95rem; text-align: center; color: var(--text-main); }
 
 /* --- Блок «Баннер» --- */
 .block-banner { border-radius: var(--radius, 14px); overflow: hidden; background: var(--bg-surface); }
