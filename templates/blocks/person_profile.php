@@ -17,7 +17,7 @@ $btnUrl = trim((string) ($data['button_url'] ?? ''));
         <?php endif; ?>
     </div>
     <div class="profile__info">
-        <?php if (!empty($data['name'])): ?><h1 class="profile__name"><?= htmlspecialchars((string) $data['name'], ENT_QUOTES) ?></h1><?php endif; ?>
+        <?php if (!empty($data['name'])): ?><?php $hTag = $data['_heading_tag'] ?? 'h1'; ?><<?= $hTag ?> class="profile__name"><?= htmlspecialchars((string) $data['name'], ENT_QUOTES) ?></<?= $hTag ?>><?php endif; ?>
         <?php if (!empty($data['position'])): ?><div class="profile__position"><?= htmlspecialchars((string) $data['position'], ENT_QUOTES) ?></div><?php endif; ?>
         <?php if (!empty($data['text'])): ?><p class="profile__text"><?= nl2br(htmlspecialchars((string) $data['text'], ENT_QUOTES)) ?></p><?php endif; ?>
         <div class="profile__contacts">

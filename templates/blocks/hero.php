@@ -119,7 +119,7 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
     <div class="block-hero__inner">
         <div class="block-hero__text<?= $panelOn ? ' block-hero__text--panel' : '' ?>"<?= $textStyle !== '' ? ' style="' . $textStyle . '"' : '' ?>>
             <?php if ($eyebrow !== ''): ?><span class="block-hero__eyebrow"><?= htmlspecialchars($eyebrow, ENT_QUOTES) ?></span><?php endif; ?>
-            <?php if ($title !== ''): ?><h1 class="block-hero__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></h1><?php endif; ?>
+            <?php if ($title !== ''): ?><?php $hTag = $data['_heading_tag'] ?? 'h1'; ?><<?= $hTag ?> class="block-hero__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></<?= $hTag ?>><?php endif; ?>
             <?php if ($subtitle !== ''): ?><p class="block-hero__subtitle"><?= htmlspecialchars($subtitle, ENT_QUOTES) ?></p><?php endif; ?>
             <?php if (($btnText !== '' && $btnUrl !== '') || ($btn2Text !== '' && $btn2Url !== '') || ($vBtnText !== '')): ?>
             <div class="block-hero__actions">

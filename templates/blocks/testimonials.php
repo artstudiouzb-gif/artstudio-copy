@@ -5,7 +5,10 @@ $items = $data['items'] ?? [];
 ?>
 <div class="block-testimonials">
     <?php if ($title !== ''): ?><h2 class="block-testimonials__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></h2><?php endif; ?>
-    <div class="block-testimonials__track">
+    <?php // Полоса прокручивается вбок: с клавиатуры до неё нужно добраться
+          // и пролистать стрелками, поэтому область фокусируемая и подписана. ?>
+    <div class="block-testimonials__track" tabindex="0" role="group"
+         aria-label="<?= htmlspecialchars(t('Отзывы — прокрутка вбок'), ENT_QUOTES) ?>">
         <?php foreach ($items as $item): ?>
             <figure class="testimonial">
                 <?php if (!empty($item['photo'])): ?>

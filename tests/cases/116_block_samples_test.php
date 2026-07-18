@@ -64,7 +64,8 @@ test('Образцы: без разметки в экранируемых пол
 
 test('Новый блок создаётся с образцом', function () {
     $src = (string) file_get_contents(dirname(__DIR__, 2) . '/app/Controllers/Admin/BlockController.php');
-    assert_contains('BlockSamples::for($type)', $src);
+    // Язык блока передаётся, чтобы ссылки образца вели в раздел того же языка.
+    assert_contains('BlockSamples::for($type, $lang)', $src);
     assert_contains('array_merge(\App\Core\BlockRenderer::defaultsFor($type), $sample)', $src);
     // Блок формы получает первую существующую форму, иначе он бесполезен.
     assert_contains('FormDef::all()[0] ?? null', $src);

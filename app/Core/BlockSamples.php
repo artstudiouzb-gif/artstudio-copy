@@ -26,17 +26,23 @@ final class BlockSamples
     private const LEAD = 'Краткое пояснение в одну-две строки — замените своим текстом.';
 
     /**
-     * @return array<string,mixed> данные образца ('' — для типа образца нет)
+     * @param string|null $lang язык стека блока: ссылки образца ведут в раздел
+     *                          того же языка, иначе UZ-блок ссылался бы на
+     *                          русскую версию
+     * @return array<string,mixed> данные образца ([] — для типа образца нет)
      */
-    public static function for(string $type): array
+    public static function for(string $type, ?string $lang = null): array
     {
-        return self::all()[$type] ?? [];
+        return self::all($lang)[$type] ?? [];
     }
 
     /** @return array<string, array<string,mixed>> */
-    public static function all(): array
+    public static function all(?string $lang = null): array
     {
         $person = static fn (string $role): array => ['name' => 'Фамилия Имя Отчество', 'role' => $role, 'position' => $role, 'photo' => '', 'url' => ''];
+        // Раздел новостей есть на любом сайте — это безопасный адрес для
+        // кнопок образца (кнопка без ссылки на сайте не отображается).
+        $news = Locale::url('news', $lang);
 
         return [
             'text' => ['title' => 'Заголовок раздела', 'content' => '<p>' . self::LEAD . '</p>'],
@@ -45,7 +51,7 @@ final class BlockSamples
                 'title' => 'Заголовок призыва к действию',
                 'text' => self::LEAD,
                 'button_text' => 'Перейти к новостям',
-                'button_url' => '/news',
+                'button_url' => $news,
             ],
             'advantages' => ['title' => 'Преимущества', 'items' => [
                 ['title' => 'Первое преимущество', 'text' => self::LEAD, 'icon_svg' => ''],
@@ -90,7 +96,7 @@ final class BlockSamples
                 'text' => self::LEAD,
                 'image' => '',
                 'button_text' => 'Подробнее',
-                'button_url' => '/news',
+                'button_url' => $news,
             ],
             'subscribe' => [
                 'title' => 'Подписка на новости',
@@ -115,26 +121,26 @@ final class BlockSamples
                 'overlay_opacity' => 55,
             ],
             'categories_grid' => ['title' => 'Направления', 'items' => [
-                ['title' => 'Название направления', 'label' => 'Название направления', 'url' => '/news', 'icon_svg' => ''],
-                ['title' => 'Второе направление', 'label' => 'Второе направление', 'url' => '/news', 'icon_svg' => ''],
-                ['title' => 'Третье направление', 'label' => 'Третье направление', 'url' => '/news', 'icon_svg' => ''],
+                ['title' => 'Название направления', 'label' => 'Название направления', 'url' => $news, 'icon_svg' => ''],
+                ['title' => 'Второе направление', 'label' => 'Второе направление', 'url' => $news, 'icon_svg' => ''],
+                ['title' => 'Третье направление', 'label' => 'Третье направление', 'url' => $news, 'icon_svg' => ''],
             ]],
             'media_materials' => ['title' => 'Медиаматериалы', 'items' => [
-                ['label' => 'Пресс-релиз', 'action' => 'Скачать', 'url' => '/news', 'icon_svg' => ''],
-                ['label' => 'Фотоматериалы', 'action' => 'Открыть', 'url' => '/news', 'icon_svg' => ''],
+                ['label' => 'Пресс-релиз', 'action' => 'Скачать', 'url' => $news, 'icon_svg' => ''],
+                ['label' => 'Фотоматериалы', 'action' => 'Открыть', 'url' => $news, 'icon_svg' => ''],
             ]],
             'cards_grid' => ['title' => 'Разделы', 'columns' => 3, 'items' => [
-                ['title' => 'Название карточки', 'text' => self::LEAD, 'url' => '/news', 'icon_svg' => ''],
-                ['title' => 'Вторая карточка', 'text' => self::LEAD, 'url' => '/news', 'icon_svg' => ''],
-                ['title' => 'Третья карточка', 'text' => self::LEAD, 'url' => '/news', 'icon_svg' => ''],
+                ['title' => 'Название карточки', 'text' => self::LEAD, 'url' => $news, 'icon_svg' => ''],
+                ['title' => 'Вторая карточка', 'text' => self::LEAD, 'url' => $news, 'icon_svg' => ''],
+                ['title' => 'Третья карточка', 'text' => self::LEAD, 'url' => $news, 'icon_svg' => ''],
             ]],
             'image_cards' => ['title' => 'Карточки с фото', 'source' => 'manual', 'limit' => 6, 'items' => [
-                ['title' => 'Название карточки', 'image' => '', 'url' => '/news'],
-                ['title' => 'Вторая карточка', 'image' => '', 'url' => '/news'],
+                ['title' => 'Название карточки', 'image' => '', 'url' => $news],
+                ['title' => 'Вторая карточка', 'image' => '', 'url' => $news],
             ]],
             'media_gallery' => ['title' => 'Медиа', 'source' => 'manual', 'limit' => 8, 'items' => [
-                ['kind' => 'photo', 'title' => 'Название материала', 'image' => '', 'url' => '/news', 'meta' => '', 'text' => ''],
-                ['kind' => 'photo', 'title' => 'Второй материал', 'image' => '', 'url' => '/news', 'meta' => '', 'text' => ''],
+                ['kind' => 'photo', 'title' => 'Название материала', 'image' => '', 'url' => $news, 'meta' => '', 'text' => ''],
+                ['kind' => 'photo', 'title' => 'Второй материал', 'image' => '', 'url' => $news, 'meta' => '', 'text' => ''],
             ]],
             'person_cards' => ['title' => 'Руководство', 'items' => [
                 $person('Директор'), $person('Заместитель директора'),
@@ -148,7 +154,7 @@ final class BlockSamples
                 'title' => 'Заголовок призыва',
                 'text' => self::LEAD,
                 'button_text' => 'Перейти к новостям',
-                'button_url' => '/news',
+                'button_url' => $news,
                 'icon_svg' => '',
             ],
             'person_profile' => [

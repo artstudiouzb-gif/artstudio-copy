@@ -161,4 +161,7 @@ return [
     'Уведомления о новостях' => 'News notifications',
     'Уведомления включены' => 'Notifications enabled',
     'Наверх' => 'To top',
+    // Подписи прокручиваемых полос — их читает экранный диктор.
+    'Отзывы — прокрутка вбок' => 'Testimonials — scroll sideways',
+    'Карточки — прокрутка вбок' => 'Cards — scroll sideways',
 ];

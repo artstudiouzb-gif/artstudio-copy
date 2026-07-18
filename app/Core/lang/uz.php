@@ -161,4 +161,7 @@ return [
     'Уведомления о новостях' => 'Yangiliklar haqida bildirishnomalar',
     'Уведомления включены' => 'Bildirishnomalar yoqilgan',
     'Наверх' => 'Yuqoriga',
+    // Подписи прокручиваемых полос — их читает экранный диктор.
+    'Отзывы — прокрутка вбок' => 'Sharhlar — yon tomonga aylantirish',
+    'Карточки — прокрутка вбок' => 'Kartochkalar — yon tomonga aylantirish',
 ];

@@ -22,7 +22,9 @@ $items = $data['items'] ?? [];
     <?php if (empty($items)): ?>
         <p class="block-imgcards__empty">Карточки ещё не добавлены.</p>
     <?php else: ?>
-        <div class="imgcards-grid<?= $carousel ? ' imgcards-grid--carousel' : '' ?>" data-carousel-track>
+        <?php // В режиме карусели полоса прокручивается вбок — делаем её
+              // доступной с клавиатуры и подписываем для экранного диктора. ?>
+        <div class="imgcards-grid<?= $carousel ? ' imgcards-grid--carousel' : '' ?>" data-carousel-track<?= $carousel ? ' tabindex="0" role="group" aria-label="' . htmlspecialchars(t('Карточки — прокрутка вбок'), ENT_QUOTES) . '"' : '' ?>>
             <?php foreach ($items as $item): ?>
                 <?php
                 $url = trim((string) ($item['url'] ?? ''));

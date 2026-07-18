@@ -77,7 +77,7 @@ final class BlockController
         // Новый блок приходит с образцом наполнения: пустой блок не объясняет,
         // из чего он состоит, и редактор видит на странице пустое место.
         $title = trim((string) ($_POST['title'] ?? ''));
-        $sample = \App\Core\BlockSamples::for($type);
+        $sample = \App\Core\BlockSamples::for($type, $lang);
         // Блок формы без выбранной формы показывает заглушку. Если на сайте
         // формы уже есть, подставляем первую — блок сразу рабочий.
         if ($type === 'form') {

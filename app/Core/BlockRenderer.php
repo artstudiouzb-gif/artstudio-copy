@@ -70,6 +70,31 @@ final class BlockRenderer
      */
     private static bool $previewMode = false;
 
+    /**
+     * Заголовок первого уровня на странице должен быть один: экранный диктор
+     * по нему понимает, о чём страница. Обложка, баннер и профиль персоны
+     * претендуют на h1 — первому из них он и достаётся, остальным h2.
+     */
+    private static bool $h1Used = false;
+
+    /**
+     * Типы, чей заголовок может быть заголовком страницы. Баннер сюда не
+     * входит: это рекламная врезка, и h1 ей не по чину (в тёмном варианте
+     * шаблона там и так всегда был h2).
+     *
+     * @var list<string>
+     */
+    private const H1_BLOCKS = ['hero', 'person_profile'];
+
+    /**
+     * Сообщает рендеру, что h1 на странице уже занят (например, шапкой самой
+     * страницы), чтобы блоки не добавляли второй.
+     */
+    public static function markH1Used(): void
+    {
+        self::$h1Used = true;
+    }
+
     public static function setPreviewMode(bool $on): void
     {
         self::$previewMode = $on;
@@ -121,6 +146,13 @@ final class BlockRenderer
         }
         if (!BlockVisibility::isVisible($data)) {
             return ['html' => '', 'css' => '', 'hidden' => true];
+        }
+
+        // Уровень заголовка блока: первому претенденту на странице — h1,
+        // следующим — h2 (двух h1 на странице быть не должно).
+        if (in_array($type, self::H1_BLOCKS, true)) {
+            $data['_heading_tag'] = self::$h1Used ? 'h2' : 'h1';
+            self::$h1Used = true;
         }
 
         $data = self::enrichData($type, $data);
@@ -222,6 +254,7 @@ final class BlockRenderer
         $cssParts = [];
         $assets = [];
         self::$nextBoundary = null;
+        self::$h1Used = false;
 
         foreach ($blocks as $block) {
             $rendered = self::render($block);
