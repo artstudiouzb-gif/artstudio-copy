@@ -31,25 +31,11 @@ foreach ($options as $key => $opt) {
     <button type="button" class="btn btn--small" data-design-toggle-all>Развернуть всё</button>
 </div>
 
+<?php // Готовые конфигурации из интерфейса убраны: на настроенном сайте одно
+      // нажатие переписывало 22 параметра разом и обнуляло точные размеры,
+      // свой радиус и подключённые шрифты. Остались сохранённые вами наборы —
+      // они же служат откатом. ?>
 <section class="design-section" id="design-presets">
-    <h2 class="design-section__title">Готовые конфигурации</h2>
-    <div class="design-presets">
-        <?php foreach ($presets as $pkey => $preset): ?>
-            <form method="post" action="/admin/design/preset" class="design-preset<?= $activePreset === $pkey ? ' is-active' : '' ?>">
-                <?= Csrf::field() ?>
-                <input type="hidden" name="preset" value="<?= htmlspecialchars($pkey, ENT_QUOTES) ?>">
-                <div class="design-preset__head">
-                    <strong><?= htmlspecialchars($preset['label'], ENT_QUOTES) ?></strong>
-                    <?php if ($activePreset === $pkey): ?><span class="design-preset__badge">Активна</span><?php endif; ?>
-                </div>
-                <p class="design-preset__desc"><?= htmlspecialchars($preset['desc'], ENT_QUOTES) ?></p>
-                <button type="submit" class="btn btn--small btn--primary">Применить</button>
-            </form>
-        <?php endforeach; ?>
-    </div>
-</section>
-
-<section class="design-section">
     <h2 class="design-section__title">Мои конфигурации</h2>
     <?php if (!empty($userPresets)): ?>
         <div class="design-presets" style="margin-bottom:16px;">
@@ -76,13 +62,14 @@ foreach ($options as $key => $opt) {
             <?php endforeach; ?>
         </div>
     <?php else: ?>
-        <p class="form-hint">Сохранённых конфигураций пока нет. Настройте параметры ниже, сохраните — и сможете переключаться в один клик.</p>
+        <p class="form-hint">Сохранённых конфигураций пока нет. Настройте параметры ниже и сохраните текущее состояние — это и точка возврата, и способ переключаться между вариантами оформления.</p>
     <?php endif; ?>
     <form method="post" action="/admin/design/preset/save" class="design-save-preset">
         <?= Csrf::field() ?>
-        <input type="text" name="name" maxlength="40" placeholder="Название конфигурации (напр. «Зимняя тема»)" required>
+        <input type="text" name="name" maxlength="40" placeholder="Название конфигурации (напр. «До правок 18.07»)" required>
         <button type="submit" class="btn">Сохранить текущие настройки</button>
     </form>
+    <p class="form-hint" style="margin-top:8px;">Перед применением сохранённой конфигурации текущие настройки автоматически откладываются в «Автокопия дизайна…» — вернуться можно в одно нажатие.</p>
 </section>
 
 

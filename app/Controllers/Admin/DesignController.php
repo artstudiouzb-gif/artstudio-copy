@@ -23,7 +23,8 @@ final class DesignController
         Auth::requireSuperAdmin();
         View::render('admin/design/index', [
             'options' => DesignSettings::OPTIONS,
-            'presets' => DesignSettings::PRESETS,
+            // Встроенные конфигурации в интерфейс не выводим (см. вью):
+            // остались только сохранённые администратором.
             'userPresets' => DesignSettings::userPresets(),
             'values' => DesignSettings::current(),
             'activePreset' => Setting::get('design_preset', ''),
@@ -211,11 +212,25 @@ final class DesignController
         Csrf::verifyRequest();
 
         $preset = (string) ($_POST['preset'] ?? '');
+        // Встроенные наборы отключены: применять можно только сохранённые
+        // конфигурации. Проверка защищает и от устаревшей открытой вкладки.
+        if (!str_starts_with($preset, 'user:')) {
+            Flash::error('Готовые конфигурации отключены — применять можно только сохранённые вами наборы.');
+            header('Location: /admin/design');
+            exit;
+        }
+
+        // Применение переписывает все настройки разом, поэтому сначала
+        // откладываем текущее состояние — как автокопию страницы перед заменой.
+        $backup = DesignSettings::autoBackupPreset();
+
         if (DesignSettings::applyPreset($preset)) {
             Cache::forgetPrefix('page:');
-            $label = DesignSettings::PRESETS[$preset]['label']
-                ?? (DesignSettings::userPresets()[substr($preset, 5)]['label'] ?? $preset);
+            $label = DesignSettings::userPresets()[substr($preset, 5)]['label'] ?? $preset;
             Flash::success('Конфигурация «' . $label . '» применена.');
+            if ($backup !== null) {
+                Flash::success('Прежние настройки сохранены как «' . $backup . '» — примените её, чтобы вернуть как было.');
+            }
         } else {
             Flash::error('Неизвестная конфигурация.');
         }

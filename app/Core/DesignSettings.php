@@ -832,6 +832,7 @@ final class DesignSettings
                 'font_size_custom' => Setting::get('design_font_size_custom', ''),
                 'radius_custom' => Setting::get('design_radius_custom', ''),
                 'line_height_custom' => Setting::get('design_line_height_custom', ''),
+                'typo_scale' => self::typoScale(),
             ] + array_combine(
                 array_keys(self::TYPO_SIZES),
                 array_map(static fn (string $k): string => (string) Setting::get('design_' . $k, ''), array_keys(self::TYPO_SIZES))
@@ -888,7 +889,7 @@ final class DesignSettings
         $appearanceInput = array_intersect_key($appearance, array_flip(array_merge([
             'color_primary', 'color_accent', 'font_family', 'font_face_name',
             'font_url', 'default_theme', 'font_google_heading', 'font_google_body',
-            'font_size_custom', 'radius_custom', 'line_height_custom',
+            'font_size_custom', 'radius_custom', 'line_height_custom', 'typo_scale',
             'bg_primary', 'bg_surface', 'text_main', 'text_muted', 'border_color',
         ], array_keys(self::TYPO_SIZES))));
         // Старые пользовательские конфигурации не знали об этих полях: при
@@ -899,12 +900,47 @@ final class DesignSettings
             'font_size_custom' => '',
             'radius_custom' => '',
             'line_height_custom' => '',
+            // Конфигурации, сохранённые до появления шкалы, восстанавливают
+            // поведение «как в теме», а не наследуют текущую шкалу.
+            'typo_scale' => 'theme',
         ], array_fill_keys(array_keys(self::TYPO_SIZES), ''), $appearanceInput);
         self::save(array_merge($values, $appearanceInput));
 
         Setting::set('design_preset', 'user:' . $slug);
 
         return true;
+    }
+
+    /** Префикс автокопий дизайна — по нему они узнаются и чистятся. */
+    public const DESIGN_BACKUP_PREFIX = 'Автокопия дизайна';
+
+    /** Сколько автокопий держим: они делят лимит с обычными конфигурациями. */
+    private const DESIGN_BACKUP_KEEP = 2;
+
+    /**
+     * Снимок текущих настроек перед применением конфигурации: применение
+     * переписывает всё разом, а отмены у раздела «Дизайн» нет.
+     *
+     * @return string|null название копии либо null, если сохранить не вышло
+     */
+    public static function autoBackupPreset(): ?string
+    {
+        // Старые автокопии убираем заранее — иначе упрёмся в лимит наборов.
+        $presets = self::userPresets();
+        $auto = array_filter(
+            $presets,
+            static fn (array $p): bool => str_starts_with((string) ($p['label'] ?? ''), self::DESIGN_BACKUP_PREFIX)
+        );
+        if (count($auto) >= self::DESIGN_BACKUP_KEEP) {
+            foreach (array_slice(array_keys($auto), 0, count($auto) - self::DESIGN_BACKUP_KEEP + 1) as $slug) {
+                unset($presets[$slug]);
+            }
+            Setting::set(self::USER_PRESETS_KEY, json_encode($presets, JSON_UNESCAPED_UNICODE));
+        }
+
+        $name = self::DESIGN_BACKUP_PREFIX . ': ' . date('d.m.Y H:i');
+
+        return self::saveUserPreset($name) !== null ? $name : null;
     }
 
     /**
