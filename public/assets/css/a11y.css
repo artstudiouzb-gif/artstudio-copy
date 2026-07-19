@@ -180,3 +180,81 @@ html[data-a11y="1"] .site-header,
 html[data-a11y="1"] .site-footer {
     background-color: var(--a11y-bg) !important;
 }
+
+/* ===== Премиальный дизайн версии для слабовидящих ===== */
+
+/* Тексты и иерархия шрифтов */
+html[data-a11y="1"] * {
+    font-family: 'PT Sans', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Четкие структурированные карточки */
+html[data-a11y="1"] .news-card,
+html[data-a11y="1"] .content-card,
+html[data-a11y="1"] .contact-card,
+html[data-a11y="1"] .feature-card,
+html[data-a11y="1"] .cat-tile,
+html[data-a11y="1"] .testimonial,
+html[data-a11y="1"] .team-card,
+html[data-a11y="1"] .project-card,
+html[data-a11y="1"] .person-card,
+html[data-a11y="1"] .block-advantages__item,
+html[data-a11y="1"] .block-counters,
+html[data-a11y="1"] .catcard,
+html[data-a11y="1"] .mediacard {
+    border: 2px solid var(--a11y-line) !important;
+    border-radius: 12px !important;
+    background-color: var(--a11y-bg) !important;
+    padding: clamp(16px, 3vw, 24px) !important;
+    margin-bottom: 16px !important;
+}
+
+/* Выразительные поля ввода */
+html[data-a11y="1"] input[type="text"],
+html[data-a11y="1"] input[type="search"],
+html[data-a11y="1"] input[type="email"],
+html[data-a11y="1"] input[type="tel"],
+html[data-a11y="1"] textarea,
+html[data-a11y="1"] select {
+    border: 2px solid var(--a11y-line) !important;
+    background-color: var(--a11y-bg) !important;
+    color: var(--a11y-fg) !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    min-height: 44px !important;
+}
+
+/* Кнопки и интерактивные элементы */
+html[data-a11y="1"] button,
+html[data-a11y="1"] .block-hero__button,
+html[data-a11y="1"] .block-cta a,
+html[data-a11y="1"] .catlist-toolbar__btn,
+html[data-a11y="1"] .content-detail__download,
+html[data-a11y="1"] .site-search-overlay__submit {
+    border: 2px solid var(--a11y-line) !important;
+    background-color: var(--a11y-bg) !important;
+    color: var(--a11y-fg) !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+html[data-a11y="1"] button:hover,
+html[data-a11y="1"] .block-hero__button:hover,
+html[data-a11y="1"] .block-cta a:hover,
+html[data-a11y="1"] .catlist-toolbar__btn:hover,
+html[data-a11y="1"] .content-detail__download:hover,
+html[data-a11y="1"] .site-search-overlay__submit:hover {
+    background-color: var(--a11y-fg) !important;
+    color: var(--a11y-bg) !important;
+}
+html[data-a11y="1"] button:hover *,
+html[data-a11y="1"] .block-hero__button:hover *,
+html[data-a11y="1"] .block-cta a:hover * {
+    color: var(--a11y-bg) !important;
+}
