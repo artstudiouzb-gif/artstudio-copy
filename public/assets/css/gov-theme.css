@@ -1869,8 +1869,41 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
 .captcha-row__img { border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-bg); }
 .captcha-row__refresh { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-title); font-size: 1.2rem; cursor: pointer; }
 .captcha-row__refresh:hover { border-color: var(--gov-teal); color: var(--gov-teal-text); }
-.captcha-row input { width: 130px; height: 46px; padding: 0 14px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-title); font: inherit; letter-spacing: .2em; text-transform: uppercase; }
-.captcha-row input:focus-visible { outline: 2px solid var(--gov-teal); outline-offset: 1px; }
+.captcha-row input {
+    width: 130px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--gov-border);
+    border-radius: 10px;
+    background: var(--gov-surface);
+    color: var(--gov-title);
+    font: inherit;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    outline: none !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease !important;
+}
+.captcha-row input:focus,
+.captcha-row input:focus-visible {
+    border-color: var(--color-accent, var(--gov-teal)) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent, var(--gov-teal)) 15%, transparent) !important;
+    outline: none !important;
+}
+
+/* ===== Публичные формы (плавная анимация фокуса) ===== */
+.block-form__field input, .block-form__field textarea, .block-form__field select {
+    border: 1px solid var(--gov-border) !important;
+    background: var(--gov-surface) !important;
+    color: var(--gov-title, inherit) !important;
+    outline: none !important;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease !important;
+}
+.block-form__field input:focus, .block-form__field textarea:focus, .block-form__field select:focus,
+.block-form__field input:focus-visible, .block-form__field textarea:focus-visible, .block-form__field select:focus-visible {
+    border-color: var(--color-accent, var(--gov-teal)) !important;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent, var(--gov-teal)) 15%, transparent) !important;
+    outline: none !important;
+}
 
 /* ============================================================================
    Настраиваемые цвета блоков (CTA, баннер, направления, CTA-полоса).
