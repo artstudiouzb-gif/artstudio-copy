@@ -2071,11 +2071,11 @@ body.design-header-dark .a11y-toggle:hover,
 .cms-empty-notice__edit { margin-left: auto; font-weight: 600; white-space: nowrap; }
 
 /* --- Интерактивный Spotlight-блик при наведении --- */
-.cat-tile, .contact-card, .project-card, .team-card {
+.cat-tile, .contact-card, .project-card, .team-card, .feature-card {
     position: relative;
     overflow: hidden;
 }
-.cat-tile::before, .contact-card::before, .project-card::before, .team-card::before {
+.cat-tile::before, .contact-card::before, .project-card::before, .team-card::before, .feature-card::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -2086,7 +2086,7 @@ body.design-header-dark .a11y-toggle:hover,
     pointer-events: none;
     z-index: 1;
 }
-.cat-tile:hover::before, .contact-card:hover::before, .project-card:hover::before, .team-card:hover::before {
+.cat-tile:hover::before, .contact-card:hover::before, .project-card:hover::before, .team-card:hover::before, .feature-card:hover::before {
     opacity: 1;
 }
 /* Предложение открыть материал на доступном языке без скрытого fallback. */

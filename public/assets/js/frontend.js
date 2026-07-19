@@ -876,7 +876,7 @@
 
     // Интерактивный «прожектор» (Spotlight) для карточек
     (function () {
-        var cards = document.querySelectorAll('.cat-tile, .contact-card, .project-card, .team-card');
+        var cards = document.querySelectorAll('.cat-tile, .contact-card, .project-card, .team-card, .feature-card');
         if (!cards.length) { return; }
         cards.forEach(function (card) {
             card.addEventListener('mousemove', function (e) {
