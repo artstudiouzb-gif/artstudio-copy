@@ -68,12 +68,11 @@ foreach ($blocks as $b) {
     }
 }
 ?>
-<div class="form-card">
-    <?php if ($error): ?><div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div><?php endif; ?>
-    <?php if ($isEdit): ?>
-        <div style="margin-bottom:16px;"><a class="btn btn--small" href="/admin/revisions/page/<?= (int) $page['id'] ?>">История версий</a></div>
-    <?php endif; ?>
-    <form method="post" action="<?= $action ?>" class="form-grid" data-content-draft="page:<?= $isEdit ? (int) $page['id'] : 'new' ?>" data-record-updated="<?= htmlspecialchars((string) ($page['updated_at'] ?? ''), ENT_QUOTES) ?>">
+<?php if ($error): ?><div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div><?php endif; ?>
+<?php if ($isEdit): ?>
+    <div style="margin-bottom:16px;"><a class="btn btn--small" href="/admin/revisions/page/<?= (int) $page['id'] ?>">История версий</a></div>
+<?php endif; ?>
+<form method="post" action="<?= $action ?>" data-content-draft="page:<?= $isEdit ? (int) $page['id'] : 'new' ?>" data-record-updated="<?= htmlspecialchars((string) ($page['updated_at'] ?? ''), ENT_QUOTES) ?>">
         <?= Csrf::field() ?>
         <input type="hidden" name="block_lang" value="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>">
         <?php if ($isEdit): ?>
@@ -81,6 +80,9 @@ foreach ($blocks as $b) {
             <input type="hidden" name="expected_lock_version" value="<?= (int) ($page['lock_version'] ?? 1) ?>">
         <?php endif; ?>
 
+    <div class="entry-grid">
+    <div class="entry-main">
+    <div class="form-card">
         <div data-lang-tabs<?= $isEdit ? ' data-sync-block-language' : '' ?>>
             <div class="lang-tabs">
                 <?php foreach ($languages as $i => $lang): ?>
@@ -136,57 +138,14 @@ foreach ($blocks as $b) {
                 </div>
             <?php endforeach; ?>
         </div>
+    </div>
+    </div>
 
-        <hr style="border:none;border-top:1px solid var(--admin-border);margin:6px 0;">
-
-        <div class="form-field">
-            <label for="slug">ЧПУ (slug) — общий для всех языков</label>
-            <input type="text" id="slug" name="slug" value="<?= htmlspecialchars($page['slug'] ?? '', ENT_QUOTES) ?>" placeholder="оставьте пустым для автогенерации">
-            <span class="form-hint">Адрес: /&lt;slug&gt; (основной язык), /<?= htmlspecialchars($languages[1]['code'] ?? 'uz', ENT_QUOTES) ?>/&lt;slug&gt; (другой язык)</span>
-        </div>
-
-        <div class="form-field">
-            <label for="layout_type">Макет страницы</label>
-            <select id="layout_type" name="layout_type">
-                <option value="no_sidebar" <?= ($page['layout_type'] ?? 'no_sidebar') === 'no_sidebar' ? 'selected' : '' ?>>Без сайдбара (на всю ширину)</option>
-                <option value="left_sidebar" <?= ($page['layout_type'] ?? '') === 'left_sidebar' ? 'selected' : '' ?>>Левый сайдбар</option>
-                <option value="right_sidebar" <?= ($page['layout_type'] ?? '') === 'right_sidebar' ? 'selected' : '' ?>>Правый сайдбар</option>
-            </select>
-            <span class="form-hint">Виджеты сайдбара настраиваются в разделе «Виджеты».</span>
-        </div>
-
-        <div class="form-field">
-            <label for="status">Статус</label>
-            <select id="status" name="status">
-                <option value="draft" <?= ($page['status'] ?? 'draft') === 'draft' ? 'selected' : '' ?>>Черновик</option>
-                <option value="published" <?= ($page['status'] ?? '') === 'published' ? 'selected' : '' ?>>Опубликовано</option>
-            </select>
-        </div>
-
-        <div class="form-field form-field--checkbox">
-            <input type="checkbox" id="is_home" name="is_home" value="1" <?= !empty($page['is_home']) ? 'checked' : '' ?>>
-            <label for="is_home">Сделать главной страницей сайта</label>
-        </div>
-
-        <div class="form-field form-field--checkbox">
-            <input type="checkbox" id="hide_chrome" name="hide_chrome" value="1" <?= !empty($page['hide_chrome']) ? 'checked' : '' ?>>
-            <label for="hide_chrome">Лендинг: скрыть шапку и футер сайта</label>
-        </div>
-        <div class="form-field form-field--checkbox">
-            <input type="checkbox" id="transparent_header" name="transparent_header" value="1" <?= !empty($page['transparent_header']) ? 'checked' : '' ?>>
-            <label for="transparent_header">Прозрачная шапка на этой странице (нужен full-bleed hero первым блоком; режим включается в конструкторе шапки)</label>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn--primary"><?= \App\Core\AdminUi::icon('save') ?>Сохранить</button>
-            <a href="/admin/pages" class="btn">Отмена</a>
-            <?php if ($isEdit): ?>
-                <a href="/admin/pages/<?= (int) $page['id'] ?>/preview?block_lang=<?= urlencode($blockLang) ?>"
-                   class="btn" target="_blank" rel="noopener">Предпросмотр ↗</a>
-            <?php endif; ?>
-        </div>
-    </form>
-</div>
+    <aside class="entry-side">
+        <?php require __DIR__ . '/_settings_sidebar.php'; ?>
+    </aside>
+    </div>
+</form>
 
 <?php if ($isEdit): ?>
     <h2 style="margin-top:40px;">Блоки страницы</h2>
