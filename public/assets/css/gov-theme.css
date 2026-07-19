@@ -1125,13 +1125,39 @@ body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero .cont
 .newsdetail-toc__num { color: var(--gov-teal-text); font-weight: 700; font-size: .8rem; }
 
 /* Светлый сплит-баннер (страницы «О нас», «Контакты»). */
-.block-banner--light { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 24px; background: transparent; border-radius: var(--radius); overflow: hidden; min-height: 360px; }
+.block-banner--light { 
+    position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); 
+    align-items: center; gap: 24px; background: transparent; border-radius: var(--radius); 
+    overflow: hidden; min-height: 360px; 
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.block-banner--light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(19, 42, 92, 0.04);
+}
 @media (max-width: 900px) { .block-banner--light { grid-template-columns: 1fr; } .block-banner--light .block-banner__photo { display: none; } }
 .block-banner--light .block-banner__inner { padding: clamp(20px, 4vw, 48px) 0; text-align: left; }
 .block-banner--light .block-banner__title { color: var(--gov-title); font-size: clamp(1.9rem, 3.4vw, 2.7rem); line-height: 1.15; margin: 0 0 16px; }
 .block-banner--light .block-banner__text { color: var(--gov-muted); opacity: 1; font-size: 1.02rem; line-height: 1.6; max-width: 46ch; margin: 0 0 22px; }
-.block-banner--light .block-banner__button { display: inline-block; padding: 13px 26px; background: var(--gov-navy); color: #fff; border-radius: var(--btn-radius, 8px); font-weight: 700; text-decoration: none; }
-.block-banner__photo { position: relative; height: 100%; min-height: 320px; background: center/cover no-repeat; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%); mask-image: linear-gradient(90deg, transparent 0, #000 22%); }
+.block-banner--light .block-banner__button { 
+    display: inline-block; padding: 13px 26px; background: var(--gov-navy); color: #fff; 
+    border-radius: var(--btn-radius, 8px); font-weight: 700; text-decoration: none; 
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease, background-color 0.3s ease;
+}
+.block-banner--light .block-banner__button:hover {
+    transform: translateY(-2px) scale(1.02);
+    background-color: var(--gov-teal);
+    box-shadow: 0 8px 20px rgba(23, 153, 155, 0.35);
+}
+.block-banner__photo { 
+    position: relative; height: 100%; min-height: 320px; background: center/cover no-repeat; 
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%); 
+    mask-image: linear-gradient(90deg, transparent 0, #000 22%); 
+    transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.block-banner--light:hover .block-banner__photo {
+    transform: scale(1.04);
+}
 
 /* Якорная навигация (вкладки-разделы). */
 .block-anchornav { display: flex; gap: 26px; overflow-x: auto; border-bottom: 1px solid var(--gov-border); scrollbar-width: none; }

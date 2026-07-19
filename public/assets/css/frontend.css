@@ -276,8 +276,28 @@ summary:focus-visible {
     cursor: pointer;
 }
 
-.block-gallery__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-.block-gallery__item img { border-radius: 8px; }
+.block-gallery__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+.block-gallery__item {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius, 12px);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+}
+.block-gallery__item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(19, 42, 92, 0.08);
+}
+.block-gallery__item img { 
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius, 12px); 
+    transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.block-gallery__item:hover img {
+    transform: scale(1.05);
+}
 
 .block-form__consent { display: flex; align-items: flex-start; gap: 8px; margin: 4px 0 16px; font-size: .92rem; color: var(--text-muted); }
 .block-form__consent input { margin-top: 3px; flex-shrink: 0; }
@@ -565,8 +585,10 @@ body.is-preview { outline: 3px solid #b45309; outline-offset: -3px; }
 .team-card__name { font-weight: 700; }
 .team-card__position { color: var(--text-muted); font-size: 0.875rem; }
 .project-card { display: block; text-decoration: none; color: inherit; background: var(--bg-surface); border-radius: 12px; overflow: hidden; }
-.project-card__cover { width: 100%; aspect-ratio: 16/10; object-fit: cover; }
-.project-card__title { font-weight: 700; padding: 12px 14px 0; }
+.project-card__cover { width: 100%; aspect-ratio: 16/10; object-fit: cover; transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.project-card:hover .project-card__cover { transform: scale(1.05); }
+.project-card__title { font-weight: 700; padding: 12px 14px 0; transition: color 0.3s ease; }
+.project-card:hover .project-card__title { color: var(--gov-teal-text, #e63946); }
 .project-card__desc { padding: 6px 14px 14px; margin: 0; color: var(--text-muted); font-size: 0.875rem; }
 .block-team__empty, .block-projects__empty { text-align: center; color: var(--text-muted); }
 
@@ -900,14 +922,29 @@ h1, h2 { letter-spacing: -.015em; }
 .block-partners__name { font-weight: 600; font-size: .95rem; text-align: center; color: var(--text-main); }
 
 /* --- Блок «Баннер» --- */
-.block-banner { border-radius: var(--radius, 14px); overflow: hidden; background: var(--bg-surface); }
-.block-banner--image { background-size: cover; background-position: center; color: #fff; }
-.block-banner__inner { max-width: 720px; margin: 0 auto; padding: clamp(40px, 7vw, 88px) clamp(20px, 4vw, 48px); text-align: center; }
+.block-banner { 
+    border-radius: var(--radius, 14px); overflow: hidden; background: var(--bg-surface); 
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+}
+.block-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(19, 42, 92, 0.05);
+}
+.block-banner--image { background-size: cover; background-position: center; color: #fff; transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.block-banner__inner { position: relative; z-index: 2; max-width: 720px; margin: 0 auto; padding: clamp(40px, 7vw, 88px) clamp(20px, 4vw, 48px); text-align: center; }
 .block-banner__title { font-size: clamp(1.6rem, 3.4vw, 2.4rem); margin: 0 0 12px; line-height: 1.15; }
 .block-banner--image .block-banner__title { color: #fff; }
 .block-banner__text { font-size: 1.1rem; margin: 0 0 24px; opacity: .95; }
-.block-banner__button { display: inline-block; padding: 13px 32px; background: var(--color-accent, #e63946); color: #fff; text-decoration: none; font-weight: 600; border-radius: var(--btn-radius, 10px); box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s; }
-.block-banner__button:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.block-banner__button { 
+    display: inline-block; padding: 13px 32px; background: var(--color-accent, #e63946); 
+    color: #fff; text-decoration: none; font-weight: 600; border-radius: var(--btn-radius, 10px); 
+    box-shadow: var(--shadow-sm); 
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease, background 0.3s ease; 
+}
+.block-banner__button:hover { 
+    transform: translateY(-2px) scale(1.02); 
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.25); 
+}
 
 /* --- Стиль карточек и положение сайдбара (настройки дизайна) --- */
 .content-card, .news-card, .site-search-results__item, .block-partners__item {
@@ -1747,19 +1784,43 @@ body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
 }
 .contact-card {
     background: var(--surface, #fff); border: 1px solid var(--border-color); border-radius: var(--radius, 14px);
-    padding: 24px; transition: box-shadow .15s ease, transform .15s ease;
+    padding: 24px; 
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease;
 }
-.contact-card:hover { box-shadow: var(--shadow-primary); transform: translateY(-3px); }
+.contact-card:hover { 
+    box-shadow: 0 16px 36px rgba(19, 42, 92, 0.06); 
+    transform: translateY(-4px); 
+    border-color: var(--gov-teal, #13999b);
+}
 .contact-card__icon {
     display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; margin-bottom: 14px;
     background: color-mix(in srgb, var(--color-primary, #223d79) 10%, transparent);
     color: var(--color-primary, #223d79);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, color 0.3s;
 }
 .contact-card__icon svg { width: 22px; height: 22px; }
-.contact-card__title { font-family: var(--font-heading, inherit); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; color: var(--color-primary, #223d79); }
+.contact-card:hover .contact-card__icon {
+    transform: scale(1.1) rotate(6deg);
+    background-color: var(--gov-teal, #13999b);
+    color: #fff;
+}
+.contact-card__title { 
+    font-family: var(--font-heading, inherit); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; 
+    color: var(--color-primary, #223d79); 
+    transition: color 0.3s ease;
+}
+.contact-card:hover .contact-card__title {
+    color: var(--gov-teal-text, #13999b);
+}
 .contact-card__line { margin: 2px 0; color: var(--text-muted); }
-.contact-card__link { display: inline-block; margin-top: 12px; font-weight: 600; color: var(--color-accent, #2f6fed); text-decoration: none; }
-.contact-card__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.contact-card__link { 
+    display: inline-block; margin-top: 12px; font-weight: 600; color: var(--color-accent, #2f6fed); text-decoration: none; 
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.contact-card:hover .contact-card__link { 
+    color: var(--gov-teal-text, #13999b);
+    transform: translateX(4px); 
+}
 :root[data-theme="dark"] .contact-card__title { color: var(--text-main); }
 
 /* Полоса статистики (блок «Счётчики» в гос-стиле): карточки с иконкой-подложкой. */
