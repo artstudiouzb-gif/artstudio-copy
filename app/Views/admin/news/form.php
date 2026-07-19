@@ -242,6 +242,14 @@ $languages = Language::active();
                     <input type="datetime-local" id="published_at" name="published_at" value="<?= htmlspecialchars($publishedAtValue, ENT_QUOTES) ?>">
                 </div>
                 <div class="form-field">
+                    <label for="sidebar_layout">Макет страницы с виджетами</label>
+                    <select id="sidebar_layout" name="sidebar_layout">
+                        <option value="no_sidebar" <?= ($news['sidebar_layout'] ?? 'right_sidebar') === 'no_sidebar' ? 'selected' : '' ?>>Без сайдбара</option>
+                        <option value="left_sidebar" <?= ($news['sidebar_layout'] ?? '') === 'left_sidebar' ? 'selected' : '' ?>>Левый сайдбар</option>
+                        <option value="right_sidebar" <?= ($news['sidebar_layout'] ?? 'right_sidebar') === 'right_sidebar' ? 'selected' : '' ?>>Правый сайдбар</option>
+                    </select>
+                </div>
+                <div class="form-field">
                     <label for="slug">ЧПУ (slug) — общий для всех языков</label>
                     <input type="text" id="slug" name="slug" value="<?= htmlspecialchars($news['slug'] ?? '', ENT_QUOTES) ?>" placeholder="оставьте пустым для автогенерации">
                 </div>

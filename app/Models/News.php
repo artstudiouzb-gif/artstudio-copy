@@ -438,8 +438,8 @@ final class News
     public static function create(array $data): int
     {
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO news (title, slug, excerpt, content, image, video_url, layout_type, focal_x, focal_y, meta_title, meta_description, status, published_at, author_id, created_at)
-             VALUES (:title, :slug, :excerpt, :content, :image, :video_url, :layout_type, :focal_x, :focal_y, :meta_title, :meta_description, :status, :published_at, :author_id, NOW())'
+            'INSERT INTO news (title, slug, excerpt, content, image, video_url, layout_type, sidebar_layout, focal_x, focal_y, meta_title, meta_description, status, published_at, author_id, created_at)
+             VALUES (:title, :slug, :excerpt, :content, :image, :video_url, :layout_type, :sidebar_layout, :focal_x, :focal_y, :meta_title, :meta_description, :status, :published_at, :author_id, NOW())'
         );
         $stmt->execute([
             ':title' => $data['title'],
@@ -449,6 +449,7 @@ final class News
             ':image' => $data['image'] ?? null,
             ':video_url' => $data['video_url'] ?? null,
             ':layout_type' => self::normalizeLayout($data['layout_type'] ?? 'standard'),
+            ':sidebar_layout' => $data['sidebar_layout'] ?? 'right_sidebar',
             ':focal_x' => $data['focal_x'] ?? null,
             ':focal_y' => $data['focal_y'] ?? null,
             ':meta_title' => $data['meta_title'] ?? null,
@@ -470,7 +471,7 @@ final class News
     {
         $stmt = Database::pdo()->prepare(
             'UPDATE news SET title = :title, slug = :slug, excerpt = :excerpt, content = :content,
-             image = :image, video_url = :video_url, layout_type = :layout_type,
+             image = :image, video_url = :video_url, layout_type = :layout_type, sidebar_layout = :sidebar_layout,
              focal_x = :focal_x, focal_y = :focal_y,
              meta_title = :meta_title, meta_description = :meta_description,
              status = :status, published_at = :published_at, lock_version = lock_version + 1
@@ -484,6 +485,7 @@ final class News
             ':image' => $data['image'] ?? null,
             ':video_url' => $data['video_url'] ?? null,
             ':layout_type' => self::normalizeLayout($data['layout_type'] ?? 'standard'),
+            ':sidebar_layout' => $data['sidebar_layout'] ?? 'right_sidebar',
             ':focal_x' => $data['focal_x'] ?? null,
             ':focal_y' => $data['focal_y'] ?? null,
             ':meta_title' => $data['meta_title'] ?? null,

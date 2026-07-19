@@ -94,10 +94,10 @@ final class WidgetRenderer
                 $data['items'] = News::published((int) ($data['count'] ?? 5), 0, $lang);
                 break;
             case 'projects_list':
-                $data['items'] = array_slice(Project::published(), 0, (int) ($data['count'] ?? 5));
+                $data['items'] = array_slice(Project::published($lang), 0, (int) ($data['count'] ?? 5));
                 break;
             case 'team_list':
-                $data['items'] = array_slice(TeamMember::published(), 0, (int) ($data['count'] ?? 5));
+                $data['items'] = array_slice(TeamMember::published($lang), 0, (int) ($data['count'] ?? 5));
                 break;
             case 'contacts':
                 $data['phone'] = Setting::get('contact_phone');
