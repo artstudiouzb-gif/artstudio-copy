@@ -581,8 +581,10 @@ body.is-preview { outline: 3px solid #b45309; outline-offset: -3px; }
 
 .block-team__grid, .block-projects__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
 .team-card { text-align: center; }
-.team-card__photo { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
-.team-card__name { font-weight: 700; }
+.team-card__photo { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 12px; transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.team-card:hover .team-card__photo { transform: scale(1.04); }
+.team-card__name { font-weight: 700; transition: color 0.3s ease; }
+.team-card:hover .team-card__name { color: var(--gov-teal-text, #e63946); }
 .team-card__position { color: var(--text-muted); font-size: 0.875rem; }
 .project-card { display: block; text-decoration: none; color: inherit; background: var(--bg-surface); border-radius: 12px; overflow: hidden; }
 .project-card__cover { width: 100%; aspect-ratio: 16/10; object-fit: cover; transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
@@ -1870,13 +1872,23 @@ body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
     display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;
     padding: 24px 14px; border: 1px solid var(--border-color); border-radius: var(--radius, 14px);
     background: var(--surface, #fff); color: var(--text-main); text-decoration: none;
-    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+    transition: border-color .4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow .4s cubic-bezier(0.165, 0.84, 0.44, 1), transform .4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
-.cat-tile:hover { border-color: var(--color-accent, #2f6fed); box-shadow: var(--shadow-primary); transform: translateY(-2px); }
-.cat-tile.is-active { background: color-mix(in srgb, var(--color-accent, #2f6fed) 10%, var(--surface)); border-color: var(--color-accent, #2f6fed); }
-.cat-tile__icon { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 14px; background: color-mix(in srgb, var(--color-primary, #223d79) 9%, transparent); color: var(--color-primary, #223d79); }
+.cat-tile:hover { border-color: var(--gov-teal, #13999b); box-shadow: 0 12px 28px rgba(19, 42, 92, 0.05); transform: translateY(-3px); }
+.cat-tile.is-active { background: color-mix(in srgb, var(--gov-teal, #13999b) 8%, var(--surface)); border-color: var(--gov-teal, #13999b); }
+.cat-tile__icon { 
+    display: grid; place-items: center; width: 50px; height: 50px; border-radius: 14px; 
+    background: color-mix(in srgb, var(--color-primary, #223d79) 9%, transparent); 
+    color: var(--color-primary, #223d79); 
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s ease, color 0.3s ease;
+}
 .cat-tile__icon svg { width: 24px; height: 24px; }
-.cat-tile.is-active .cat-tile__icon { background: color-mix(in srgb, var(--color-accent, #2f6fed) 18%, transparent); color: var(--color-accent, #2f6fed); }
+.cat-tile:hover .cat-tile__icon {
+    transform: scale(1.08) rotate(4deg);
+    background-color: var(--gov-teal, #13999b);
+    color: #fff;
+}
+.cat-tile.is-active .cat-tile__icon { background-color: var(--gov-teal, #13999b); color: #fff; }
 .cat-tile__label { font-weight: 600; font-size: .96rem; }
 
 /* Медиаматериалы: список ссылок с иконкой-подложкой и действием. */
