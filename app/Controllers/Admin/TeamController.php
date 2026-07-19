@@ -10,6 +10,8 @@ use App\Core\Flash;
 use App\Core\ImageField;
 use App\Core\View;
 use App\Models\TeamMember;
+use App\Models\Language;
+use App\Models\TeamMemberTranslation;
 
 final class TeamController
 {
@@ -22,7 +24,7 @@ final class TeamController
     public function create(): void
     {
         Auth::requireLogin();
-        View::render('admin/team/form', ['member' => null, 'error' => null]);
+        View::render('admin/team/form', ['member' => null, 'translations' => [], 'error' => null]);
     }
 
     public function store(): void
@@ -33,11 +35,16 @@ final class TeamController
         [$data, $error] = $this->collectInput(null);
 
         if ($error !== null) {
-            View::render('admin/team/form', ['member' => $data, 'error' => $error]);
+            View::render('admin/team/form', [
+                'member' => $data,
+                'translations' => $this->collectTranslationsFromPost(),
+                'error' => $error
+            ]);
             return;
         }
 
-        TeamMember::create($data);
+        $id = TeamMember::create($data);
+        $this->saveTranslations($id);
         Flash::success('Сотрудник добавлен.');
         header('Location: /admin/team');
         exit;
@@ -55,7 +62,11 @@ final class TeamController
         }
         $member['socials'] = json_decode((string) $member['socials_json'], true) ?: [];
 
-        View::render('admin/team/form', ['member' => $member, 'error' => null]);
+        View::render('admin/team/form', [
+            'member' => $member,
+            'translations' => TeamMemberTranslation::forMember((int) $member['id']),
+            'error' => null
+        ]);
     }
 
     public function update(array $params): void
@@ -74,11 +85,16 @@ final class TeamController
         [$data, $error] = $this->collectInput($id, $member);
 
         if ($error !== null) {
-            View::render('admin/team/form', ['member' => array_merge($member, $data), 'error' => $error]);
+            View::render('admin/team/form', [
+                'member' => array_merge($member, $data),
+                'translations' => $this->collectTranslationsFromPost(),
+                'error' => $error
+            ]);
             return;
         }
 
         TeamMember::update($id, $data);
+        $this->saveTranslations($id);
         Flash::success('Данные сотрудника обновлены.');
         header('Location: /admin/team');
         exit;
@@ -133,5 +149,41 @@ final class TeamController
         ];
 
         return [$data, null];
+    }
+
+    private function saveTranslations(int $memberId): void
+    {
+        $defaultCode = Language::defaultCode();
+        $input = (array) ($_POST['translations'] ?? []);
+
+        foreach (Language::active() as $lang) {
+            $code = (string) $lang['code'];
+            if ($code === $defaultCode) {
+                continue;
+            }
+            $t = (array) ($input[$code] ?? []);
+            TeamMemberTranslation::upsert($memberId, $code, [
+                'name' => trim((string) ($t['name'] ?? '')),
+                'position' => trim((string) ($t['position'] ?? '')),
+            ]);
+        }
+    }
+
+    private function collectTranslationsFromPost(): array
+    {
+        $input = (array) ($_POST['translations'] ?? []);
+        $translations = [];
+        foreach (Language::active() as $lang) {
+            $code = (string) $lang['code'];
+            if ($code === Language::defaultCode()) {
+                continue;
+            }
+            $t = (array) ($input[$code] ?? []);
+            $translations[$code] = [
+                'name' => trim((string) ($t['name'] ?? '')),
+                'position' => trim((string) ($t['position'] ?? '')),
+            ];
+        }
+        return $translations;
     }
 }

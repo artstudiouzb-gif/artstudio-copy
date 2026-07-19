@@ -144,15 +144,6 @@ foreach ($blocks as $b) {
             <span class="form-hint">Адрес: /&lt;slug&gt; (основной язык), /<?= htmlspecialchars($languages[1]['code'] ?? 'uz', ENT_QUOTES) ?>/&lt;slug&gt; (другой язык)</span>
         </div>
 
-        <div class="form-field">
-            <label for="layout_type">Макет страницы</label>
-            <select id="layout_type" name="layout_type">
-                <option value="no_sidebar" <?= ($page['layout_type'] ?? 'no_sidebar') === 'no_sidebar' ? 'selected' : '' ?>>Без сайдбара (на всю ширину)</option>
-                <option value="left_sidebar" <?= ($page['layout_type'] ?? '') === 'left_sidebar' ? 'selected' : '' ?>>Левый сайдбар</option>
-                <option value="right_sidebar" <?= ($page['layout_type'] ?? '') === 'right_sidebar' ? 'selected' : '' ?>>Правый сайдбар</option>
-            </select>
-            <span class="form-hint">Виджеты сайдбара настраиваются в разделе «Виджеты».</span>
-        </div>
 
         <div class="form-field">
             <label for="status">Статус</label>
@@ -289,33 +280,53 @@ foreach ($blocks as $b) {
 
     <?php $snippets = \App\Models\BlockSnippet::all(); ?>
     <div class="form-card" style="margin-top:16px;">
-        <h3 style="margin-top:0;">Шаблоны страницы</h3>
+        <h3 style="margin-top:0; display:flex; align-items:center; gap:8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color:var(--color-primary);"><path d="M19 11H5m14 0a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2m14 0V9a2 2 0 0 0-2-2M5 11V9a2 2 0 0 1 2-2m0 0V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2M7 7h10"/></svg>
+            <?= htmlspecialchars(t('Шаблоны страницы (сниппеты)'), ENT_QUOTES) ?>
+        </h3>
         <p class="form-hint">Шаблон сохраняет все блоки этого языка, включая содержимое колонок. Его можно применить к любой странице: добавить к текущим блокам или полностью заменить их.</p>
-        <div class="snippet-tools">
-            <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/snippets/save" class="snippet-tools__row">
+        
+        <?php if (!empty($snippets)): ?>
+            <div class="snippet-library" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--gov-border, #e0e0e0);">
+                <div style="font-size: 13px; font-weight: 700; color: var(--gov-title, #333); margin-bottom: 8px;">Сохранённые шаблоны:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <?php foreach ($snippets as $s): ?>
+                        <div class="snippet-badge" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.03); border: 1px solid var(--gov-border, #dcdfe6); border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 600;">
+                            <span><?= htmlspecialchars((string) $s['name'], ENT_QUOTES) ?></span>
+                            <form method="post" action="/admin/snippets/<?= (int) $s['id'] ?>/delete" style="display: inline-flex;" onsubmit="return confirm('Удалить этот шаблон?');">
+                                <?= Csrf::field() ?>
+                                <button type="submit" style="background: none; border: none; color: #f56c6c; cursor: pointer; font-weight: 700; padding: 0 4px; font-size: 16px; line-height: 1;" title="Удалить шаблон">&times;</button>
+                            </form>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <div class="snippet-tools" style="display: flex; flex-direction: column; gap: 14px;">
+            <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/snippets/save" class="snippet-tools__row" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
                 <?= Csrf::field() ?>
                 <input type="hidden" name="block_lang" value="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>">
-                <input type="text" name="snippet_name" placeholder="Название шаблона" required>
-                <button type="submit" class="btn btn--small">Сохранить страницу как шаблон</button>
+                <input type="text" name="snippet_name" placeholder="Название нового шаблона" required style="max-width: 280px; padding: 8px 12px; border-radius: 6px;">
+                <button type="submit" class="btn btn--small">Сохранить как новый шаблон</button>
             </form>
+            
             <?php if (!empty($snippets)): ?>
-                <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/snippets/insert" class="snippet-tools__row" data-snippet-insert>
+                <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/snippets/insert" class="snippet-tools__row" data-snippet-insert style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 6px;">
                     <?= Csrf::field() ?>
                     <input type="hidden" name="block_lang" value="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>">
-                    <select name="snippet_id" required>
-                        <option value="">— выберите шаблон —</option>
+                    <select name="snippet_id" required style="padding: 8px 12px; border-radius: 6px;">
+                        <option value="">— выберите шаблон для вставки —</option>
                         <?php foreach ($snippets as $s): ?>
                             <option value="<?= (int) $s['id'] ?>"><?= htmlspecialchars((string) $s['name'], ENT_QUOTES) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <select name="mode">
+                    <select name="mode" style="padding: 8px 12px; border-radius: 6px;">
                         <option value="append">Добавить к текущим</option>
                         <option value="replace">Заменить текущие блоки</option>
                     </select>
-                    <button type="submit" class="btn btn--small">Применить шаблон</button>
+                    <button type="submit" class="btn btn--small">Применить шаблон на страницу</button>
                 </form>
-            <?php else: ?>
-                <p class="form-hint">Пока нет сохранённых шаблонов.</p>
             <?php endif; ?>
         </div>
     </div>

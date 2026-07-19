@@ -168,65 +168,7 @@ $languages = Language::active();
             <span class="form-hint">Для типа «Видео»: обложка берётся с YouTube, плеер загружается только по клику.</span>
         </div>
 
-        <details class="form-field" style="border:1px solid var(--admin-border,#e1e3e8);border-radius:8px;padding:14px;">
-            <summary style="cursor:pointer;font-weight:700;">Детальная страница: тезисы, мероприятие, документы</summary>
-            <div class="form-field" style="margin-top:14px;">
-                <label for="badge">Бейдж категории (напр. МЕРОПРИЯТИЕ)</label>
-                <input type="text" id="badge" name="badge" value="<?= htmlspecialchars($news['badge'] ?? '', ENT_QUOTES) ?>">
-            </div>
-            <div class="form-field">
-                <label for="source_note">Подпись источника</label>
-                <input type="text" id="source_note" name="source_note" value="<?= htmlspecialchars($news['source_note'] ?? '', ENT_QUOTES) ?>" placeholder="Подготовлено пресс-службой Агентства">
-            </div>
-            <div class="form-field">
-                <label for="press_release_url">Пресс-релиз (URL файла)</label>
-                <div style="display:flex;gap:8px;">
-                    <input type="text" id="press_release_url" name="press_release_url" value="<?= htmlspecialchars($news['press_release_url'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/press.pdf" style="flex:1;">
-                    <button type="button" class="btn btn--secondary btn--small" data-media-pick data-media-target="#press_release_url" data-media-type="all_files">Выбрать из медиа</button>
-                </div>
-            </div>
-            <div class="form-field">
-                <label for="key_points">Ключевые тезисы (по одному на строку)</label>
-                <textarea id="key_points" name="key_points" rows="4"><?= htmlspecialchars($news['key_points'] ?? '', ENT_QUOTES) ?></textarea>
-            </div>
-            <div class="form-field">
-                <label for="event_meta">О мероприятии (по одной строке: дата, место, участники, теги)</label>
-                <textarea id="event_meta" name="event_meta" rows="4"><?= htmlspecialchars($news['event_meta'] ?? '', ENT_QUOTES) ?></textarea>
-            </div>
-            <div>
-                <label>Документы</label>
-                <?php $ndDocs = json_decode((string) ($news['docs'] ?? '[]'), true) ?: []; ?>
-                <div data-repeater="docs">
-                    <?php foreach ($ndDocs as $i => $doc): ?>
-                        <div class="repeater-row">
-                            <div class="form-field"><label>Название</label><input type="text" name="docs[<?= $i ?>][title]" value="<?= htmlspecialchars($doc['title'] ?? '', ENT_QUOTES) ?>"></div>
-                            <div class="form-field"><label>Мета (PDF · 2.4 МБ)</label><input type="text" name="docs[<?= $i ?>][meta]" value="<?= htmlspecialchars($doc['meta'] ?? '', ENT_QUOTES) ?>"></div>
-                            <div class="form-field">
-                                <label>Ссылка</label>
-                                <div style="display:flex;gap:8px;">
-                                    <input type="text" name="docs[<?= $i ?>][url]" value="<?= htmlspecialchars($doc['url'] ?? '', ENT_QUOTES) ?>" style="flex:1;">
-                                    <button type="button" class="btn btn--secondary btn--small" data-media-pick data-media-target="[name='docs[<?= $i ?>][url]']" data-media-type="all_files">Выбрать</button>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <template data-repeater-template="docs">
-                    <div class="form-field"><label>Название</label><input type="text" name="docs[__INDEX__][title]"></div>
-                    <div class="form-field"><label>Мета (PDF · 2.4 МБ)</label><input type="text" name="docs[__INDEX__][meta]"></div>
-                    <div class="form-field">
-                        <label>Ссылка</label>
-                        <div style="display:flex;gap:8px;">
-                            <input type="text" name="docs[__INDEX__][url]" style="flex:1;">
-                            <button type="button" class="btn btn--secondary btn--small" data-media-pick data-media-target="[name='docs[__INDEX__][url]']" data-media-type="all_files">Выбрать</button>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
-                </template>
-                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="docs">+ Добавить документ</button></div>
-            </div>
-        </details>
+
 
         <div class="form-field">
             <label>Галерея фотографий</label>
@@ -273,6 +215,14 @@ $languages = Language::active();
                     <input type="datetime-local" id="published_at" name="published_at" value="<?= htmlspecialchars($publishedAtValue, ENT_QUOTES) ?>">
                 </div>
                 <div class="form-field">
+                    <label for="sidebar_layout">Макет страницы с виджетами</label>
+                    <select id="sidebar_layout" name="sidebar_layout">
+                        <option value="no_sidebar" <?= ($news['sidebar_layout'] ?? 'right_sidebar') === 'no_sidebar' ? 'selected' : '' ?>>Без сайдбара</option>
+                        <option value="left_sidebar" <?= ($news['sidebar_layout'] ?? '') === 'left_sidebar' ? 'selected' : '' ?>>Левый сайдбар</option>
+                        <option value="right_sidebar" <?= ($news['sidebar_layout'] ?? 'right_sidebar') === 'right_sidebar' ? 'selected' : '' ?>>Правый сайдбар</option>
+                    </select>
+                </div>
+                <div class="form-field">
                     <label for="slug">ЧПУ (slug) — общий для всех языков</label>
                     <input type="text" id="slug" name="slug" value="<?= htmlspecialchars($news['slug'] ?? '', ENT_QUOTES) ?>" placeholder="оставьте пустым для автогенерации">
                 </div>
@@ -283,6 +233,66 @@ $languages = Language::active();
                 <?php if ($isEdit): ?>
                     <a href="/admin/news/<?= (int) $news['id'] ?>/preview" class="btn" target="_blank" rel="noopener">Предпросмотр ↗</a>
                 <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h2 style="margin-top:0;font-size:1.1rem;">Детальная страница</h2>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="source_note">Подпись источника</label>
+                    <input type="text" id="source_note" name="source_note" value="<?= htmlspecialchars($news['source_note'] ?? '', ENT_QUOTES) ?>" placeholder="Подготовлено пресс-службой Агентства">
+                </div>
+                <div class="form-field">
+                    <label for="press_release_url">Пресс-релиз (URL файла)</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="press_release_url" name="press_release_url" value="<?= htmlspecialchars($news['press_release_url'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/press.pdf" style="flex:1;">
+                        <button type="button" class="btn btn--secondary btn--small" data-media-pick data-media-target="#press_release_url" data-media-type="all_files">Выбрать</button>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label for="key_points">Ключевые тезисы (по одному на строку)</label>
+                    <textarea id="key_points" name="key_points" rows="4"><?= htmlspecialchars($news['key_points'] ?? '', ENT_QUOTES) ?></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="event_meta">О мероприятии (по одной строке: дата, место, теги)</label>
+                    <textarea id="event_meta" name="event_meta" rows="4"><?= htmlspecialchars($news['event_meta'] ?? '', ENT_QUOTES) ?></textarea>
+                </div>
+                <div class="form-field">
+                    <label>Документы</label>
+                    <?php $ndDocs = json_decode((string) ($news['docs'] ?? '[]'), true) ?: []; ?>
+                    <div data-repeater="docs">
+                        <?php foreach ($ndDocs as $i => $doc): ?>
+                            <div class="repeater-row" style="border:1px solid var(--admin-border,#e1e3e8);border-radius:6px;padding:8px;margin-bottom:8px;background:var(--admin-bg,#f6f7f7);">
+                                <div class="form-field"><label>Название</label><input type="text" name="docs[<?= $i ?>][title]" value="<?= htmlspecialchars($doc['title'] ?? '', ENT_QUOTES) ?>"></div>
+                                <div class="form-field"><label>Мета (PDF · 2.4 МБ)</label><input type="text" name="docs[<?= $i ?>][meta]" value="<?= htmlspecialchars($doc['meta'] ?? '', ENT_QUOTES) ?>"></div>
+                                <div class="form-field">
+                                    <label>Ссылка</label>
+                                    <div style="display:flex;gap:8px;">
+                                        <input type="text" name="docs[<?= $i ?>][url]" value="<?= htmlspecialchars($doc['url'] ?? '', ENT_QUOTES) ?>" style="flex:1;">
+                                        <button type="button" class="btn btn--secondary btn--small" data-media-pick data-media-target="[name='docs[<?= $i ?>][url]']" data-media-type="all_files">Выбрать</button>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove style="margin-top:8px;width:100%;">Удалить</button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <template data-repeater-template="docs">
+                        <div class="repeater-row" style="border:1px solid var(--admin-border,#e1e3e8);border-radius:6px;padding:8px;margin-bottom:8px;background:var(--admin-bg,#f6f7f7);">
+                            <div class="form-field"><label>Название</label><input type="text" name="docs[__INDEX__][title]"></div>
+                            <div class="form-field"><label>Мета (PDF · 2.4 МБ)</label><input type="text" name="docs[__INDEX__][meta]"></div>
+                            <div class="form-field">
+                                <label>Ссылка</label>
+                                <div style="display:flex;gap:8px;">
+                                    <input type="text" name="docs[__INDEX__][url]" style="flex:1;">
+                                    <button type="button" class="btn btn--secondary btn--small" data-media-pick data-media-target="[name='docs[__INDEX__][url]']" data-media-type="all_files">Выбрать</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove style="margin-top:8px;width:100%;">Удалить</button>
+                        </div>
+                    </template>
+                    <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="docs" style="width:100%;">+ Добавить документ</button></div>
+                </div>
             </div>
         </div>
     </aside>

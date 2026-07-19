@@ -12,12 +12,12 @@ final class ProjectController
 {
     public function index(): void
     {
-        View::render('site/projects_index', ['items' => Project::published()]);
+        View::render('site/projects_index', ['items' => Project::published(\App\Core\Locale::current())]);
     }
 
     public function show(array $params): void
     {
-        $project = Project::findPublishedBySlug((string) ($params['slug'] ?? ''));
+        $project = Project::findPublishedBySlug((string) ($params['slug'] ?? ''), \App\Core\Locale::current());
         if (!$project) {
             http_response_code(404);
             View::render('errors/404');

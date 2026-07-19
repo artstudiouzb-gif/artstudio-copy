@@ -338,16 +338,17 @@ final class NewsController
 
         $videoUrl = trim((string) ($_POST['video_url'] ?? ''));
         $layoutType = in_array($_POST['layout_type'] ?? 'standard', News::LAYOUTS, true) ? (string) $_POST['layout_type'] : 'standard';
+        $sidebarLayout = in_array($_POST['sidebar_layout'] ?? 'right_sidebar', ['no_sidebar', 'left_sidebar', 'right_sidebar'], true) ? (string) $_POST['sidebar_layout'] : 'right_sidebar';
         $focalX = self::clampPercent($_POST['focal_x'] ?? null);
         $focalY = self::clampPercent($_POST['focal_y'] ?? null);
 
         if ($title === '') {
-            return [['title' => $title, 'slug' => $slugInput, 'excerpt' => $excerpt, 'content' => $content, 'status' => $status], 'Укажите заголовок новости.'];
+            return [['title' => $title, 'slug' => $slugInput, 'excerpt' => $excerpt, 'content' => $content, 'status' => $status, 'sidebar_layout' => $sidebarLayout], 'Укажите заголовок новости.'];
         }
 
         if ($videoUrl !== '' && !\App\Core\Video::isYoutube($videoUrl)) {
             return [
-                ['title' => $title, 'slug' => $slugInput, 'excerpt' => $excerpt, 'content' => $content, 'status' => $status, 'video_url' => $videoUrl, 'layout_type' => $layoutType],
+                ['title' => $title, 'slug' => $slugInput, 'excerpt' => $excerpt, 'content' => $content, 'status' => $status, 'video_url' => $videoUrl, 'layout_type' => $layoutType, 'sidebar_layout' => $sidebarLayout],
                 'Ссылка на видео должна быть YouTube-адресом (youtube.com/watch, youtu.be и т.п.).',
             ];
         }
@@ -369,6 +370,7 @@ final class NewsController
             'image' => $image,
             'video_url' => $videoUrl !== '' ? $videoUrl : null,
             'layout_type' => $layoutType,
+            'sidebar_layout' => $sidebarLayout,
             'focal_x' => $focalX,
             'focal_y' => $focalY,
             'meta_title' => $metaTitle !== '' ? $metaTitle : null,

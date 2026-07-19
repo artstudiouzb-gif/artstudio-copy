@@ -5,6 +5,8 @@ use App\Core\Csrf;
 $isEdit = !empty($project['id']);
 $pageTitle = $isEdit ? 'Редактирование проекта' : 'Новый проект';
 $activeNav = 'projects';
+$defaultCode = \App\Models\Language::defaultCode();
+$languages = \App\Models\Language::active();
 require __DIR__ . '/../layout/header.php';
 
 /** @var array|null $project */
@@ -26,19 +28,46 @@ $action = $isEdit ? '/admin/projects/' . (int) $project['id'] . '/edit' : '/admi
             <input type="hidden" name="expected_lock_version" value="<?= (int) ($project['lock_version'] ?? 1) ?>">
         <?php endif; ?>
 
-        <div class="form-field">
-            <label for="title">Название проекта</label>
-            <input type="text" id="title" name="title" value="<?= htmlspecialchars($project['title'] ?? '', ENT_QUOTES) ?>" required>
+        <div data-lang-tabs>
+            <div class="lang-tabs">
+                <?php foreach ($languages as $i => $lang): ?>
+                    <button type="button" class="lang-tab-btn <?= $i === 0 ? 'is-active' : '' ?>" data-lang-target="<?= htmlspecialchars($lang['code'], ENT_QUOTES) ?>">
+                        <?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>
+                        <?php if ($lang['code'] === $defaultCode): ?><span class="lang-tab-btn__badge">(основной)</span><?php endif; ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+
+            <?php foreach ($languages as $i => $lang): ?>
+                <?php $code = (string) $lang['code']; $isDefault = $code === $defaultCode; ?>
+                <div class="lang-tab-panel <?= $i === 0 ? 'is-active' : '' ?>" data-lang-panel="<?= htmlspecialchars($code, ENT_QUOTES) ?>">
+                    <?php if ($isDefault): ?>
+                        <div class="form-field">
+                            <label for="title">Название проекта</label>
+                            <input type="text" id="title" name="title" value="<?= htmlspecialchars($project['title'] ?? '', ENT_QUOTES) ?>" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="description">Описание</label>
+                            <textarea id="description" name="description" data-wysiwyg style="min-height:160px;"><?= htmlspecialchars($project['description'] ?? '', ENT_QUOTES) ?></textarea>
+                        </div>
+                    <?php else: ?>
+                        <?php $t = $translations[$code] ?? []; ?>
+                        <div class="form-field">
+                            <label for="title_<?= $code ?>">Название проекта (<?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>)</label>
+                            <input type="text" id="title_<?= $code ?>" name="translations[<?= $code ?>][title]" value="<?= htmlspecialchars($t['title'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                        <div class="form-field">
+                            <label for="description_<?= $code ?>">Описание (<?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>)</label>
+                            <textarea id="description_<?= $code ?>" name="translations[<?= $code ?>][description]" data-wysiwyg style="min-height:160px;"><?= htmlspecialchars($t['description'] ?? '', ENT_QUOTES) ?></textarea>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
 
         <div class="form-field">
             <label for="slug">ЧПУ (slug)</label>
             <input type="text" id="slug" name="slug" value="<?= htmlspecialchars($project['slug'] ?? '', ENT_QUOTES) ?>" placeholder="оставьте пустым для автогенерации">
-        </div>
-
-        <div class="form-field">
-            <label for="description">Описание</label>
-            <textarea id="description" name="description" style="min-height:160px;"><?= htmlspecialchars($project['description'] ?? '', ENT_QUOTES) ?></textarea>
         </div>
 
         <?= \App\Core\AdminUi::imageField('cover_image_url', $project['cover_image'] ?? '', [

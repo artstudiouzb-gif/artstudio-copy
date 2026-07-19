@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS news (
     source_note     VARCHAR(255) NULL COMMENT 'подпись источника (пресс-служба)',
     views           INT UNSIGNED NOT NULL DEFAULT 0,
     layout_type     ENUM('standard','gallery','video','side_image','premium') NOT NULL DEFAULT 'standard',
+    sidebar_layout  ENUM('no_sidebar','left_sidebar','right_sidebar') NOT NULL DEFAULT 'right_sidebar',
     focal_x         TINYINT UNSIGNED NULL COMMENT 'фокальная точка обложки X, %',
     focal_y         TINYINT UNSIGNED NULL COMMENT 'фокальная точка обложки Y, %',
     meta_title      VARCHAR(255) NULL,
@@ -253,6 +254,17 @@ CREATE TABLE IF NOT EXISTS project_fields (
     CONSTRAINT fk_project_fields_project FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Переводы проектов
+CREATE TABLE IF NOT EXISTS project_translations (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    project_id      INT UNSIGNED NOT NULL,
+    lang            VARCHAR(8) NOT NULL,
+    title           VARCHAR(255) NULL,
+    description     LONGTEXT NULL,
+    UNIQUE KEY uq_project_translations (project_id, lang),
+    CONSTRAINT fk_project_translations_project FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ---------------------------------------------------------------------------
 -- Команда
 -- ---------------------------------------------------------------------------
@@ -268,6 +280,17 @@ CREATE TABLE IF NOT EXISTS team_members (
     sort_order      INT NOT NULL DEFAULT 0,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Переводы членов команды
+CREATE TABLE IF NOT EXISTS team_member_translations (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    member_id       INT UNSIGNED NOT NULL,
+    lang            VARCHAR(8) NOT NULL,
+    name            VARCHAR(190) NULL,
+    position        VARCHAR(190) NULL,
+    UNIQUE KEY uq_team_member_translations (member_id, lang),
+    CONSTRAINT fk_team_member_translations_member FOREIGN KEY (member_id) REFERENCES team_members(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
@@ -842,7 +865,9 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_12_videos.sql'),
     ('2026_07_13_content_revisions.sql'),
     ('2026_07_13_content_locking.sql'),
-    ('2026_07_13_encrypt_secrets.sql')
+    ('2026_07_13_encrypt_secrets.sql'),
+    ('2026_07_14_project_team_translations.sql'),
+    ('2026_07_15_news_sidebar_layout.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

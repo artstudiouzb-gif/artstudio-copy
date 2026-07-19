@@ -5,6 +5,8 @@ use App\Core\Csrf;
 $isEdit = !empty($member['id']);
 $pageTitle = $isEdit ? 'Редактирование сотрудника' : 'Новый сотрудник';
 $activeNav = 'team';
+$defaultCode = \App\Models\Language::defaultCode();
+$languages = \App\Models\Language::active();
 require __DIR__ . '/../layout/header.php';
 
 /** @var array|null $member */
@@ -18,14 +20,41 @@ $socials = $member['socials'] ?? [];
     <form method="post" action="<?= $action ?>" enctype="multipart/form-data" class="form-grid">
         <?= Csrf::field() ?>
 
-        <div class="form-field">
-            <label for="name">Имя</label>
-            <input type="text" id="name" name="name" value="<?= htmlspecialchars($member['name'] ?? '', ENT_QUOTES) ?>" required>
-        </div>
+        <div data-lang-tabs>
+            <div class="lang-tabs">
+                <?php foreach ($languages as $i => $lang): ?>
+                    <button type="button" class="lang-tab-btn <?= $i === 0 ? 'is-active' : '' ?>" data-lang-target="<?= htmlspecialchars($lang['code'], ENT_QUOTES) ?>">
+                        <?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>
+                        <?php if ($lang['code'] === $defaultCode): ?><span class="lang-tab-btn__badge">(основной)</span><?php endif; ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
 
-        <div class="form-field">
-            <label for="position">Должность</label>
-            <input type="text" id="position" name="position" value="<?= htmlspecialchars($member['position'] ?? '', ENT_QUOTES) ?>">
+            <?php foreach ($languages as $i => $lang): ?>
+                <?php $code = (string) $lang['code']; $isDefault = $code === $defaultCode; ?>
+                <div class="lang-tab-panel <?= $i === 0 ? 'is-active' : '' ?>" data-lang-panel="<?= htmlspecialchars($code, ENT_QUOTES) ?>">
+                    <?php if ($isDefault): ?>
+                        <div class="form-field">
+                            <label for="name">Имя</label>
+                            <input type="text" id="name" name="name" value="<?= htmlspecialchars($member['name'] ?? '', ENT_QUOTES) ?>" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="position">Должность</label>
+                            <input type="text" id="position" name="position" value="<?= htmlspecialchars($member['position'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                    <?php else: ?>
+                        <?php $t = $translations[$code] ?? []; ?>
+                        <div class="form-field">
+                            <label for="name_<?= $code ?>">Имя (<?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>)</label>
+                            <input type="text" id="name_<?= $code ?>" name="translations[<?= $code ?>][name]" value="<?= htmlspecialchars($t['name'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                        <div class="form-field">
+                            <label for="position_<?= $code ?>">Должность (<?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>)</label>
+                            <input type="text" id="position_<?= $code ?>" name="translations[<?= $code ?>][position]" value="<?= htmlspecialchars($t['position'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
 
         <?= \App\Core\AdminUi::imageField('photo_url', $member['photo'] ?? '', [

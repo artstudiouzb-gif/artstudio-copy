@@ -15,13 +15,50 @@ final class TeamMember
         return $stmt->fetchAll();
     }
 
-    public static function published(): array
+    public static function published(?string $lang = null): array
     {
         $stmt = Database::pdo()->query(
             "SELECT * FROM team_members WHERE status = 'published' ORDER BY sort_order ASC, id ASC"
         );
+        $rows = $stmt->fetchAll();
+        if ($lang !== null) {
+            return self::localizeRows($rows, $lang);
+        }
 
-        return $stmt->fetchAll();
+        return $rows;
+    }
+
+    public static function localize(array $row, string $lang): array
+    {
+        $translation = TeamMemberTranslation::find((int) $row['id'], $lang);
+        return self::applyTranslation($row, $translation);
+    }
+
+    /** @param array<int, array<string, mixed>> $rows @return array<int, array<string, mixed>> */
+    private static function localizeRows(array $rows, string $lang): array
+    {
+        $translations = TeamMemberTranslation::forMemberIds(
+            array_map(static fn (array $row): int => (int) $row['id'], $rows),
+            $lang
+        );
+        return array_map(
+            static fn (array $row): array => self::applyTranslation($row, $translations[(int) $row['id']] ?? null),
+            $rows
+        );
+    }
+
+    private static function applyTranslation(array $row, ?array $translation): array
+    {
+        if ($translation === null) {
+            return $row;
+        }
+
+        foreach (['name', 'position'] as $field) {
+            if (isset($translation[$field]) && trim((string) $translation[$field]) !== '') {
+                $row[$field] = $translation[$field];
+            }
+        }
+        return $row;
     }
 
     public static function findById(int $id): ?array

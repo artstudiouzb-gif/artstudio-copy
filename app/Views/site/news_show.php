@@ -122,7 +122,18 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                 </div>
             </div>
 <?php };
+$sidebar = $sidebar ?? null;
+$hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
 ?>
+<?php if ($hasSidebar): ?>
+    <div class="layout layout--<?= htmlspecialchars($sidebar['position'], ENT_QUOTES) ?>">
+        <?php if ($sidebar['position'] === 'left'): ?>
+            <aside class="layout__sidebar"><?= $sidebar['html'] ?></aside>
+            <div class="layout__main">
+        <?php else: ?>
+            <div class="layout__main">
+        <?php endif; ?>
+<?php endif; ?>
 <article class="newsdetail<?= $isPremium ? ' newsdetail--premium' : '' ?>">
     <?php if ($isPremium): ?>
     <div class="newsdetail-phero"<?= $cover !== '' ? ' style="background-image:url(\'' . htmlspecialchars($cover, ENT_QUOTES) . '\')"' : '' ?>>
@@ -156,7 +167,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
         </div>
     </div>
     <?php else: ?>
-    <div class="newsdetail-head<?= $hasMedia ? '' : ' newsdetail-head--full' ?><?= $hasMedia && $layout === 'side_image' ? ' newsdetail-head--side' : '' ?>">
+    <div class="newsdetail-head<?= ($hasMedia && !$hasSidebar) ? '' : ' newsdetail-head--full' ?><?= $hasMedia && $layout === 'side_image' && !$hasSidebar ? ' newsdetail-head--side' : '' ?>">
         <div class="newsdetail-head__info">
             <?php if (!empty($news['badge'])): ?>
                 <span class="newsdetail__badge"><?= htmlspecialchars((string) $news['badge'], ENT_QUOTES) ?></span>
@@ -230,8 +241,8 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
     </div>
     <?php endif; ?>
 
-    <div class="newsdetail-body<?= $hasLeft ? '' : ' newsdetail-body--no-left' ?>">
-        <?php if ($hasLeft): ?>
+    <div class="newsdetail-body<?= ($hasLeft && !$hasSidebar) ? '' : ' newsdetail-body--no-left' ?>">
+        <?php if ($hasLeft && !$hasSidebar): ?>
         <aside class="newsdetail-side">
             <div class="newsdetail-card">
                 <h2 class="newsdetail-card__title"><?= htmlspecialchars(t('Ключевые тезисы'), ENT_QUOTES) ?></h2>
@@ -246,8 +257,19 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
         <?php endif; ?>
 
         <div class="newsdetail-article">
+            <?php if ($hasLeft && $hasSidebar): ?>
+                <div class="newsdetail-card newsdetail-card--thesis-inline" style="margin-bottom: 30px; background: color-mix(in srgb, var(--gov-teal) 4%, var(--gov-surface)); border-left: 4px solid var(--gov-teal); border-top: 1px solid var(--gov-border); border-right: 1px solid var(--gov-border); border-bottom: 1px solid var(--gov-border); border-radius: 0 12px 12px 0; padding: 22px;">
+                    <h2 class="newsdetail-card__title" style="color: var(--gov-teal-text); font-weight: 700; margin: 0 0 14px; font-size: 1.05rem;"><?= htmlspecialchars(t('Ключевые тезисы'), ENT_QUOTES) ?></h2>
+                    <ul class="newsdetail-points" style="gap: 12px;">
+                        <?php foreach ($keyPoints as $point): ?>
+                            <li class="newsdetail-points__item" style="font-size: 0.92rem; line-height: 1.55;"><span class="newsdetail-points__icon" style="color: var(--gov-teal);"><?= $pointIcon ?></span><?= htmlspecialchars($point, ENT_QUOTES) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
             <div class="newsdetail-article__content rich-content"><?= $contentHtml ?></div>
-            <?php if (!$hasLeft): ?>
+            <?php if (!$hasLeft || $hasSidebar): ?>
                 <?php $shareBlock(' newsdetail-share--inline'); ?>
             <?php endif; ?>
         </div>
@@ -392,6 +414,13 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
         </nav>
     <?php endif; ?>
 </article>
+<?php if ($hasSidebar): ?>
+            </div>
+            <?php if ($sidebar['position'] === 'right'): ?>
+                <aside class="layout__sidebar"><?= $sidebar['html'] ?></aside>
+            <?php endif; ?>
+    </div>
+<?php endif; ?>
 <?php // Schema.org: карточка новости для поисковиков. ?>
 <?= \App\Core\SchemaOrg::render(\App\Core\SchemaOrg::newsArticle(
     (string) $news['title'],

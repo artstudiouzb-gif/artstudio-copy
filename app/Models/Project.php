@@ -123,6 +123,7 @@ final class Project
             ]);
             \App\Core\Duplicator::copyChildren('project_images', 'project_id', $id, $newId);
             \App\Core\Duplicator::copyChildren('project_fields', 'project_id', $id, $newId);
+            \App\Core\Duplicator::copyChildren('project_translations', 'project_id', $id, $newId);
 
             $pdo->commit();
 
@@ -148,13 +149,17 @@ final class Project
         self::bustPageCache();
     }
 
-    public static function published(): array
+    public static function published(?string $lang = null): array
     {
         $stmt = Database::pdo()->query(
             "SELECT * FROM projects WHERE status = 'published' AND deleted_at IS NULL ORDER BY sort_order ASC, created_at DESC"
         );
+        $rows = $stmt->fetchAll();
+        if ($lang !== null) {
+            return self::localizeRows($rows, $lang);
+        }
 
-        return $stmt->fetchAll();
+        return $rows;
     }
 
     /**
@@ -164,7 +169,7 @@ final class Project
      *
      * @return array<int, array<string, mixed>>
      */
-    public static function forHome(int $limit = 6): array
+    public static function forHome(int $limit = 6, ?string $lang = null): array
     {
         $limit = max(1, min(24, $limit));
         $stmt = Database::pdo()->prepare(
@@ -173,16 +178,20 @@ final class Project
         );
         $stmt->execute();
         $rows = $stmt->fetchAll();
-        if (!empty($rows)) {
-            return $rows;
+        if (empty($rows)) {
+            $stmt = Database::pdo()->prepare(
+                "SELECT * FROM projects WHERE status = 'published' AND deleted_at IS NULL
+                 ORDER BY sort_order ASC, created_at DESC LIMIT {$limit}"
+            );
+            $stmt->execute();
+            $rows = $stmt->fetchAll();
         }
-        $stmt = Database::pdo()->prepare(
-            "SELECT * FROM projects WHERE status = 'published' AND deleted_at IS NULL
-             ORDER BY sort_order ASC, created_at DESC LIMIT {$limit}"
-        );
-        $stmt->execute();
 
-        return $stmt->fetchAll();
+        if ($lang !== null) {
+            return self::localizeRows($rows, $lang);
+        }
+
+        return $rows;
     }
 
     public static function findById(int $id): ?array
@@ -194,15 +203,55 @@ final class Project
         return $row ?: null;
     }
 
-    public static function findPublishedBySlug(string $slug): ?array
+    public static function findPublishedBySlug(string $slug, ?string $lang = null): ?array
     {
         $stmt = Database::pdo()->prepare(
             "SELECT * FROM projects WHERE slug = :slug AND status = 'published' AND deleted_at IS NULL LIMIT 1"
         );
         $stmt->execute([':slug' => $slug]);
         $row = $stmt->fetch();
+        if (!$row) {
+            return null;
+        }
 
-        return $row ?: null;
+        if ($lang !== null) {
+            return self::localize($row, $lang);
+        }
+
+        return $row;
+    }
+
+    public static function localize(array $row, string $lang): array
+    {
+        $translation = ProjectTranslation::find((int) $row['id'], $lang);
+        return self::applyTranslation($row, $translation);
+    }
+
+    /** @param array<int, array<string, mixed>> $rows @return array<int, array<string, mixed>> */
+    private static function localizeRows(array $rows, string $lang): array
+    {
+        $translations = ProjectTranslation::forProjectIds(
+            array_map(static fn (array $row): int => (int) $row['id'], $rows),
+            $lang
+        );
+        return array_map(
+            static fn (array $row): array => self::applyTranslation($row, $translations[(int) $row['id']] ?? null),
+            $rows
+        );
+    }
+
+    private static function applyTranslation(array $row, ?array $translation): array
+    {
+        if ($translation === null) {
+            return $row;
+        }
+
+        foreach (['title', 'description'] as $field) {
+            if (isset($translation[$field]) && trim((string) $translation[$field]) !== '') {
+                $row[$field] = $translation[$field];
+            }
+        }
+        return $row;
     }
 
     public static function slugExists(string $slug, ?int $excludeId = null): bool

@@ -269,8 +269,7 @@ final class PageController
         $lead = trim((string) ($_POST['lead'] ?? ''));
         $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
         $isHome = !empty($_POST['is_home']);
-        $layoutType = in_array($_POST['layout_type'] ?? '', ['no_sidebar', 'left_sidebar', 'right_sidebar'], true)
-            ? $_POST['layout_type'] : 'no_sidebar';
+        $layoutType = 'no_sidebar';
 
         if ($title === '') {
             return [['title' => $title, 'slug' => $slugInput, 'status' => $status], 'Укажите заголовок страницы.'];
