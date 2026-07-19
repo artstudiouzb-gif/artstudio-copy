@@ -40,7 +40,7 @@ $badge = static fn (array $i): string => trim((string) ($i['badge'] ?? ''));
                 <span class="newsfeat-lead__over">
                     <?php if ($badge($featured) !== ''): ?><span class="news-badge"><?= htmlspecialchars($badge($featured), ENT_QUOTES) ?></span><?php endif; ?>
                     <span class="newsfeat-lead__title"><?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?></span>
-                    <?php if (!empty($featured['excerpt'])): ?><span class="newsfeat-lead__excerpt"><?= htmlspecialchars(mb_substr(strip_tags((string) $featured['excerpt']), 0, 160), ENT_QUOTES) ?></span><?php endif; ?>
+                    <?php if (!empty($featured['excerpt'])): ?><span class="newsfeat-lead__excerpt"><?= htmlspecialchars(excerpt((string) $featured['excerpt'], 160), ENT_QUOTES) ?></span><?php endif; ?>
                     <?php if (!empty($featured['published_at'])): ?><time class="newsfeat__date newsfeat__date--on-media"><?= htmlspecialchars($fmt((string) $featured['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                 </span>
             </span>

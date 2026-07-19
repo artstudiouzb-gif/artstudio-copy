@@ -43,7 +43,7 @@ $pageUrl = static fn (int $p): string => Locale::url('news')
                 <?php if (!empty($featured['badge'])): ?><span class="news-badge news-badge--plain"><?= htmlspecialchars((string) $featured['badge'], ENT_QUOTES) ?></span><?php endif; ?>
                 <?php if (!empty($featured['published_at'])): ?><time class="newslist__date"><?= htmlspecialchars($fmt((string) $featured['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                 <span class="newslist-lead__title"><?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?></span>
-                <?php if (!empty($featured['excerpt'])): ?><span class="newslist-lead__excerpt"><?= htmlspecialchars(mb_substr(strip_tags((string) $featured['excerpt']), 0, 200), ENT_QUOTES) ?></span><?php endif; ?>
+                <?php if (!empty($featured['excerpt'])): ?><span class="newslist-lead__excerpt"><?= htmlspecialchars(excerpt((string) $featured['excerpt'], 200), ENT_QUOTES) ?></span><?php endif; ?>
             </span>
         </a>
     <?php endif; ?>
@@ -62,7 +62,7 @@ $pageUrl = static fn (int $p): string => Locale::url('news')
                 </span>
                 <?php if (!empty($item['published_at'])): ?><time class="relnews-card__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                 <span class="relnews-card__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
-                <?php if (!empty($item['excerpt'])): ?><span class="relnews-card__excerpt"><?= htmlspecialchars(mb_substr(strip_tags((string) $item['excerpt']), 0, 110), ENT_QUOTES) ?></span><?php endif; ?>
+                <?php if (!empty($item['excerpt'])): ?><span class="relnews-card__excerpt"><?= htmlspecialchars(excerpt((string) $item['excerpt'], 110), ENT_QUOTES) ?></span><?php endif; ?>
             </a>
         <?php endforeach; ?>
     </div>

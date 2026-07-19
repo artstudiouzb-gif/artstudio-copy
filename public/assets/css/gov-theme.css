@@ -1261,6 +1261,9 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .newslist-lead:hover .newslist-lead__title { color: var(--gov-teal); }
 
 /* Сетка новостей (переиспользует карточки relnews). */
+/* Крупная новость стыковалась с сеткой вплотную (0px). Отступ задаётся ей,
+   а не сетке: на страницах фильтра и со 2-й сетка идёт без крупной. */
+.newslist-lead { margin-bottom: clamp(22px, 3vw, 34px); }
 .newslist-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
 @media (max-width: 1000px) { .newslist-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .newslist-grid { grid-template-columns: 1fr; } }
