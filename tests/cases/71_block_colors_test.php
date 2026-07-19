@@ -41,3 +41,15 @@ test('Блоки без выбранных цветов не добавляют 
     $h = render_color_block('cta', ['title' => 'T']);
     assert_true(!str_contains($h, '--cta-bg') && !str_contains($h, '--cta-text') && !str_contains($h, '--cta-btn'), 'нет лишних переменных');
 });
+
+test('Настройка фона кнопок имеет приоритет над государственной темой', function () {
+    $css = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/gov-theme.css');
+    assert_contains('.block-hero--media .block-hero__button:not(.block-hero__button--ghost)', $css);
+    assert_contains('background: var(--hero-btn, #16406e) !important;', $css);
+    assert_contains('.block-hero__button--ghost { background: transparent !important;', $css);
+    assert_contains('background: var(--cta-btn) !important;', $css);
+
+    $form = (string) file_get_contents(dirname(__DIR__, 2) . '/app/Views/admin/pages/block_form.php');
+    assert_contains('Цвет фона основной кнопки', $form);
+    assert_contains('Цвет фона кнопки', $form);
+});

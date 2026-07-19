@@ -336,17 +336,17 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
     text-decoration: none; 
     transition: background 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
 }
-.block-hero--media .block-hero__button { background: var(--hero-btn, #16406e); }
-.block-hero:not(.block-hero--media) .block-hero__button { background: var(--hero-btn, var(--gov-navy)); }
+.block-hero--media .block-hero__button:not(.block-hero__button--ghost) { background: var(--hero-btn, #16406e) !important; }
+.block-hero:not(.block-hero--media) .block-hero__button:not(.block-hero__button--ghost) { background: var(--hero-btn, var(--gov-navy)) !important; }
 .block-hero__button:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(22, 64, 110, 0.3);
 }
-.block-hero--media .block-hero__button:hover {
-    background: var(--gov-teal);
+.block-hero--media .block-hero__button:not(.block-hero__button--ghost):hover {
+    background: color-mix(in srgb, var(--hero-btn, #16406e) 86%, #fff) !important;
     box-shadow: 0 8px 20px rgba(23, 153, 155, 0.35);
 }
-.block-hero__button--ghost { background: transparent; border: 1px solid rgba(255,255,255,.5); }
+.block-hero__button--ghost { background: transparent !important; border: 1px solid rgba(255,255,255,.5) !important; }
 .block-hero__button--ghost:hover { 
     background: rgba(255,255,255,.12) !important; 
     border-color: #fff;
@@ -1807,7 +1807,7 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
 /* CTA */
 .block-cta[style*="--cta-bg"] { background: var(--cta-bg); }
 .block-cta[style*="--cta-text"] h2, .block-cta[style*="--cta-text"] p { color: var(--cta-text); }
-.block-cta[style*="--cta-btn"] a, .block-cta[style*="--cta-btn"] .block-cta__button { background: var(--cta-btn); }
+.block-cta[style*="--cta-btn"] a, .block-cta[style*="--cta-btn"] .block-cta__button { background: var(--cta-btn) !important; }
 
 /* Баннер (тёмный и светлый варианты) */
 .block-banner[style*="--banner-bg"] { background-color: var(--banner-bg); }

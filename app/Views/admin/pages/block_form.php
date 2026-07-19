@@ -63,7 +63,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <div class="colorfield-row">
                 <?= \App\Core\AdminUi::colorField('bg_color', $data['bg_color'] ?? '', 'Цвет фона', '#eef2f7') ?>
                 <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста', '#173a63') ?>
-                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет кнопки', '#17999b') ?>
+                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет фона кнопки', '#17999b') ?>
             </div>
         <?php endif; ?>
 
@@ -335,7 +335,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <div class="colorfield-row">
                 <?= \App\Core\AdminUi::colorField('bg_color', $data['bg_color'] ?? '', 'Цвет фона (без фото)', '#173a63') ?>
                 <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста', '#ffffff') ?>
-                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет кнопки', '#17999b') ?>
+                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет фона кнопки', '#17999b') ?>
             </div>
         <?php endif; ?>
 
@@ -534,8 +534,9 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             </div>
             <div class="colorfield-row">
                 <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста', '#ffffff', 'Авто (белый на фото, тёмный без фона)') ?>
-                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет кнопок', '#173a63', 'По умолчанию') ?>
+                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет фона основной кнопки', '#173a63', 'По умолчанию') ?>
             </div>
+            <span class="form-hint" style="display:block;margin:-6px 0 14px;">Применяется к первой кнопке Hero. Вторая кнопка остаётся прозрачной и контурной.</span>
             <div class="form-field">
                 <label class="hb-switch"><input type="checkbox" name="panel_enabled" value="1" <?= !empty($data['panel_enabled']) ? 'checked' : '' ?>><span class="hb-switch__track"></span> Подложка под текстом</label>
                 <span class="form-hint">Цветная полупрозрачная плашка под заголовком — для читаемости на пёстром фоне. Если делаете светлую подложку — задайте тёмный цвет текста выше.</span>
@@ -773,7 +774,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <div class="colorfield-row">
                 <?= \App\Core\AdminUi::colorField('bg_color', $data['bg_color'] ?? '', 'Цвет фона полосы', '#173a63') ?>
                 <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста', '#ffffff') ?>
-                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет кнопки', '#ffffff') ?>
+                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет фона кнопки', '#ffffff') ?>
             </div>
         <?php endif; ?>
 
