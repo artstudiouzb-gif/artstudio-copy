@@ -18,6 +18,10 @@ module.exports = defineConfig({
             use: { ...devices['Desktop Chrome'] }
         },
         {
+            name: 'tablet-chromium',
+            use: { viewport: { width: 834, height: 1112 } }
+        },
+        {
             name: 'mobile-chromium',
             use: { ...devices['Pixel 7'] }
         }
