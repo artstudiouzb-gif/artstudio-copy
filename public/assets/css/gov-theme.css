@@ -658,7 +658,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
    Разорванной связи «картинка отдельно, текст отдельно» больше нет. */
 .newsfeat-lead { display: block; min-width: 0; text-decoration: none; color: var(--gov-ink); }
 .newsfeat-lead__frame { position: relative; display: block; height: 100%; border-radius: var(--radius); overflow: hidden; }
-.newsfeat-lead__media { display: block; width: 100%; height: 100%; min-height: 260px; background: #24425f center/cover no-repeat; object-fit: cover; }
+.newsfeat-lead__media { display: block; width: 100%; height: 100%; min-height: 260px; background: #24425f center/cover no-repeat; object-fit: cover; overflow: hidden; }
+.newsfeat-lead__media img { transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) !important; }
+.newsfeat-lead:hover .newsfeat-lead__media img { transform: scale(1.04); }
 .newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 22%, var(--gov-surface)), var(--gov-surface)); }
 /* Подложка под текстом — затемнение снизу, чтобы белый читался на любом фото. */
 .newsfeat-lead__over {
@@ -695,7 +697,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsfeat__date--on-media { color: rgba(255,255,255,.88); }
 .newsfeat__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; }
 .newsfeat-mini { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--gov-ink); }
-.newsfeat-mini__media { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; border-radius: 8px; background: #24425f center/cover no-repeat; object-fit: cover; }
+.newsfeat-mini__media { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; border-radius: 8px; background: #24425f center/cover no-repeat; object-fit: cover; overflow: hidden; }
+.newsfeat-mini__media img { transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) !important; }
+.newsfeat-mini:hover .newsfeat-mini__media img { transform: scale(1.04); }
 .newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsfeat-mini__body { display: flex; flex-direction: column; gap: 6px; }
 .newsfeat-mini__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
@@ -717,9 +721,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 /* На обложке акцентный цвет не держит контраст — метка становится белой. */
 .news-badge--on-media { color: #fff; }
 .newsfeat-text__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
-.newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
-/* Заголовок лида белый на фото — подсвечиваем подчёркиванием, не цветом. */
-.newsfeat-lead:hover .newsfeat-lead__title { text-decoration: underline; text-underline-offset: 3px; }
+.newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--color-accent, var(--gov-teal)); }
+/* Заголовок лида белый на фото — при наведении оставляем чистым белый при зуме обложки */
+.newsfeat-lead:hover .newsfeat-lead__title { text-decoration: none !important; }
 @media (max-width: 560px) { .newsfeat-lead__over { padding: 14px; } .newsfeat-lead__title { font-size: 1.12rem; } }
 
 /* --- Медиа-галерея: переключатели --- */
@@ -2004,6 +2008,9 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
     }
     :where(.newsfeat-lead, .newsfeat-mini, .newsfeat-text):hover {
         transform: translateY(-1px);
+    }
+    .newsfeat-text:hover {
+        transform: none !important;
     }
     .news-card:hover {
         transform: translateY(-2px);
