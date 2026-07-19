@@ -31,6 +31,12 @@ final class PublicResponseCache
             return;
         }
 
+        // Ответ, устанавливающий языковое cookie, не должен попасть в общий CDN-кеш.
+        if (LocalePreference::changedThisRequest()) {
+            header('Cache-Control: private, no-store');
+            return;
+        }
+
         $path = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/');
         $status = http_response_code();
         $status = is_int($status) && $status > 0 ? $status : 200;
