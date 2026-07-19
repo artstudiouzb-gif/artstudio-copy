@@ -409,25 +409,37 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 /* --- Блок «Новости и аналитика»: крупная + список (по эскизу) --- */
 .newsfeat-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
 @media (max-width: 900px) { .newsfeat-grid { grid-template-columns: 1fr; } }
-.newsfeat-lead { display: flex; flex-direction: column; gap: 14px; min-width: 0; text-decoration: none; color: var(--gov-ink); }
-/* Заголовок лид-карточки лежит на обложке: карточка перестаёт быть вдвое выше соседей. */
-.newsfeat-lead__frame { position: relative; display: block; border-radius: var(--radius); overflow: hidden; }
-.newsfeat-lead__media { display: block; width: 100%; aspect-ratio: 16/10; background: #24425f center/cover no-repeat; object-fit: cover; }
-.newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
+/* Лид — цельная плитка: рубрика, заголовок, лид и дата лежат на обложке.
+   Разорванной связи «картинка отдельно, текст отдельно» больше нет. */
+.newsfeat-lead { display: block; min-width: 0; text-decoration: none; color: var(--gov-ink); }
+.newsfeat-lead__frame { position: relative; display: block; height: 100%; border-radius: var(--radius); overflow: hidden; }
+.newsfeat-lead__media { display: block; width: 100%; height: 100%; min-height: 260px; background: #24425f center/cover no-repeat; object-fit: cover; }
+.newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 22%, var(--gov-surface)), var(--gov-surface)); }
 /* Подложка под текстом — затемнение снизу, чтобы белый читался на любом фото. */
 .newsfeat-lead__over {
     position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-direction: column;
-    align-items: flex-start; gap: 10px; padding: 20px;
-    /* Плотность подобрана так, чтобы белый заголовок держал 4.5:1 даже
+    align-items: flex-start; gap: 10px; padding: 22px;
+    /* Плотность подобрана так, чтобы белый текст держал 4.5:1 даже
        на самой светлой обложке, а не только 3:1 «как крупный текст». */
     background: linear-gradient(to top,
         color-mix(in srgb, var(--gov-navy) 96%, transparent),
-        color-mix(in srgb, var(--gov-navy) 78%, transparent) 52%,
+        color-mix(in srgb, var(--gov-navy) 82%, transparent) 58%,
         transparent);
 }
-.newsfeat-lead__body { display: flex; flex-direction: column; gap: 10px; }
-.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; color: #fff; line-height: 1.35; }
-.newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.5; font-size: .95rem; }
+.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.35rem; color: #fff; line-height: 1.32; }
+.newsfeat-lead__excerpt {
+    color: rgba(255,255,255,.86); line-height: 1.5; font-size: .93rem;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+.newsfeat__date--on-media { color: rgba(255,255,255,.88); }
+/* На широком экране плитка тянется ровно на высоту правой колонки — колонки
+   всегда заканчиваются вровень, независимо от длины заголовков. */
+@media (min-width: 901px) { .newsfeat-grid { align-items: stretch; } }
+/* В одну колонку высоту задаёт пропорция, а не растяжка по соседу.
+   На узком экране плитка вытянута вертикально: иначе подложка с текстом
+   занимает больше половины картинки. */
+@media (max-width: 900px) { .newsfeat-lead__media { height: auto; min-height: 0; aspect-ratio: 16/10; } }
+@media (max-width: 560px) { .newsfeat-lead__media { aspect-ratio: 4/5; } }
 .newsfeat-side { display: flex; flex-direction: column; gap: 24px; }
 .newsfeat-side__thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
 @media (max-width: 560px) { .newsfeat-side__thumbs { grid-template-columns: 1fr; } }

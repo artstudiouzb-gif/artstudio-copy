@@ -44,7 +44,6 @@ return [
     // Хлебные крошки / разделы
     'Главная' => 'Bosh sahifa',
     'Новости' => 'Yangiliklar',
-    'Новость' => 'Yangilik',
     'Проекты' => 'Loyihalar',
     'Фотоальбомы' => 'Fotoalbomlar',
     'Хлебные крошки' => 'Navigatsiya yo‘li',
