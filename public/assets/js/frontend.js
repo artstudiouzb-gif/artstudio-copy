@@ -1,6 +1,76 @@
 (function () {
     'use strict';
 
+    // MP4 в Hero — декоративный фон, а не видеоплеер. Атрибутов разметки
+    // достаточно в большинстве браузеров, но после возврата на вкладку или
+    // системной паузы autoplay может не возобновиться сам. Восстанавливаем
+    // фон без контролов, звука и видимой кнопки воспроизведения.
+    (function () {
+        var videos = document.querySelectorAll('[data-hero-background-video]');
+        if (!videos.length) { return; }
+
+        videos.forEach(function (video) {
+            var resume = function () {
+                video.controls = false;
+                video.muted = true;
+                video.defaultMuted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.removeAttribute('controls');
+
+                var promise = video.play();
+                if (promise && typeof promise.catch === 'function') {
+                    // Браузер сам повторит попытку после canplay/visibilitychange.
+                    promise.catch(function () {});
+                }
+            };
+
+            video.addEventListener('canplay', resume);
+            video.addEventListener('ended', function () {
+                // Резерв для браузеров, игнорирующих loop после выгрузки вкладки.
+                video.currentTime = 0;
+                resume();
+            });
+            video.addEventListener('pause', function () {
+                if (!document.hidden && !video.ended) { resume(); }
+            });
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) { resume(); }
+            });
+
+            resume();
+        });
+    })();
+
+    // YouTube-фон использует те же правила. enablejsapi=1 в iframe позволяет
+    // вернуть воспроизведение после фоновой приостановки вкладки, не открывая
+    // пользователю элементы плеера.
+    (function () {
+        var frames = document.querySelectorAll('[data-hero-youtube-background]');
+        if (!frames.length) { return; }
+
+        frames.forEach(function (frame) {
+            var command = function (name, args) {
+                if (!frame.contentWindow) { return; }
+                frame.contentWindow.postMessage(JSON.stringify({
+                    event: 'command',
+                    func: name,
+                    args: args || []
+                }), 'https://www.youtube-nocookie.com');
+            };
+            var resume = function () {
+                command('mute');
+                command('setLoop', [true]);
+                command('playVideo');
+            };
+
+            frame.addEventListener('load', resume);
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) { resume(); }
+            });
+        });
+    })();
+
     // Переключатели главного меню: бургер (мобильные / макет «боковая панель»),
     // а также фон и кнопка закрытия off-canvas панели. Любой из них
     // открывает/закрывает меню через класс body; Esc закрывает.

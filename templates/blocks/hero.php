@@ -105,7 +105,7 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
       // карточка с рамкой и подложкой в этой роли читается как чужой блок. ?>
 <div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= (!$hasMedia && $heroBg === '') ? ' block-hero--plain' : '' ?><?= $heroBg !== '' ? ' block-hero--bgcolor' : '' ?><?= ($bgType === 'video' || $bgType === 'youtube') ? ' block-hero--video' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?> block-hero--pos-<?= $textPos ?>"<?= $heroRootStyle !== '' ? ' style="' . $heroRootStyle . '"' : '' ?>>
     <?php if ($bgType === 'video' && $videoFile !== ''): ?>
-        <video class="block-hero__video" autoplay muted loop playsinline preload="metadata"
+        <video class="block-hero__video" data-hero-background-video autoplay muted loop playsinline webkit-playsinline preload="metadata"
                disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
                tabindex="-1" <?= $image !== '' ? 'poster="' . htmlspecialchars($image, ENT_QUOTES) . '"' : '' ?> aria-hidden="true">
             <source src="<?= htmlspecialchars($videoFile, ENT_QUOTES) ?>" type="video/mp4">
@@ -114,7 +114,7 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
         <div class="block-hero__yt" aria-hidden="true">
             <?php // Hero находится на первом экране: lazy iframe Chrome может
                   // отложить навсегда из-за абсолютного позиционирования фона. ?>
-            <iframe src="https://www.youtube-nocookie.com/embed/<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3" title="" tabindex="-1" frameborder="0" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <iframe data-hero-youtube-background src="https://www.youtube-nocookie.com/embed/<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3&enablejsapi=1" title="" tabindex="-1" frameborder="0" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media"></iframe>
         </div>
     <?php elseif ($bgType === 'image' && $image !== ''): ?>
         <?= Media::picture($image, '', null, null, 'block-hero__image', false, '100vw', true, 'block-hero__media') ?>
