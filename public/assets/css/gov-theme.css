@@ -376,7 +376,16 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .imgcard__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,26,48,.1) 30%, rgba(11,26,48,.85) 100%); }
 .imgcard__body { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
 .imgcard__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.1rem; line-height: 1.25; }
-.imgcard__more { text-transform: uppercase; font-size: 0.75rem; letter-spacing: .06em; font-weight: 700; color: rgba(255,255,255,.9); }
+.imgcard__more { display: inline-flex; align-items: center; text-transform: uppercase; font-size: 0.75rem; letter-spacing: .06em; font-weight: 700; color: rgba(255,255,255,.9); transition: color .18s ease, transform .18s ease; }
+/* Карточка целиком — ссылка, а «Подробнее» внутри неё был мёртвым текстом:
+   при наведении не менялось ничего, кроме масштаба фото. Специфичность здесь
+   выше правила-переопределения цвета ниже по файлу, поэтому порядок не важен. */
+@media (hover: hover) and (pointer: fine) {
+    .imgcard:hover .imgcard__more,
+    .imgcard:focus-visible .imgcard__more {
+        color: #fff; text-decoration: underline; text-underline-offset: 3px; transform: translateX(3px);
+    }
+}
 
 /* Карусель проектов. */
 .section-head__tools { display: flex; align-items: center; gap: 16px; }
@@ -1691,6 +1700,7 @@ a.orgstruct__head:hover .orgstruct__head-name { color: color-mix(in srgb, var(--
     .block-cta__button:hover, .site-footer__social-link:hover,
     .block-hero__button:hover, .btn-cta:hover, .btn:hover,
     .cms-columns__col .cms-block--cta .block-cta:hover,
+    .imgcard:hover .imgcard__more,
     .imgcard:hover .imgcard__media { transform: none; }
 }
 
