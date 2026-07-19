@@ -718,13 +718,39 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsdocs-item__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
 .newsdocs-item:hover .newsdocs-item__title { color: var(--gov-teal); }
 .newsdocs-docs { display: flex; flex-direction: column; gap: 14px; }
-.doc-card { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 18px 20px; background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); text-decoration: none; color: var(--gov-ink); transition: box-shadow .15s ease; }
-.doc-card:hover { box-shadow: 0 10px 26px rgba(19,42,92,.1); }
-.doc-card__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: color-mix(in srgb, var(--gov-teal) 12%, var(--gov-surface)); color: var(--gov-teal); }
+.doc-card { 
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 18px 20px; 
+    background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); 
+    text-decoration: none; color: var(--gov-ink); 
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease; 
+}
+.doc-card:hover { 
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(19,42,92,.08); 
+    border-color: var(--gov-teal);
+}
+.doc-card__icon { 
+    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; 
+    background: color-mix(in srgb, var(--gov-teal) 12%, var(--gov-surface)); color: var(--gov-teal); 
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s, color 0.3s;
+}
+.doc-card:hover .doc-card__icon {
+    transform: scale(1.08) rotate(4deg);
+    background: var(--gov-teal);
+    color: #fff;
+}
 .doc-card__body { display: flex; flex-direction: column; gap: 4px; }
-.doc-card__title { font-weight: 700; color: var(--gov-title); font-size: .95rem; line-height: 1.35; }
+.doc-card__title { font-weight: 700; color: var(--gov-title); font-size: .95rem; line-height: 1.35; transition: color 0.3s ease; }
+.doc-card:hover .doc-card__title { color: var(--gov-teal-text); }
 .doc-card__meta { color: var(--gov-muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
-.doc-card__dl { color: var(--gov-title); }
+.doc-card__dl { 
+    color: var(--gov-title); 
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease; 
+}
+.doc-card:hover .doc-card__dl {
+    transform: translateY(3px);
+    color: var(--gov-teal);
+}
 
 /* CTA-полоса (navy) «Есть вопросы или предложения?». */
 .block-ctaband { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; background: var(--gov-navy); border-radius: var(--radius); padding: 34px 38px; color: #fff; }
@@ -1029,17 +1055,41 @@ body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero .cont
 .stages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; position: relative; }
 @media (max-width: 1000px) { .stages { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .stages { grid-template-columns: 1fr; } }
-.stages::before { content: ''; position: absolute; top: 5px; left: 0; right: 0; height: 2px; background: var(--gov-border); }
+.stages::before { 
+    content: ''; position: absolute; top: 5px; left: 0; right: 0; height: 2px; 
+    background: linear-gradient(90deg, var(--gov-teal) 0%, var(--gov-teal) 65%, var(--gov-border) 90%); 
+}
 @media (max-width: 1000px) { .stages::before { display: none; } }
-.stage { position: relative; display: flex; flex-direction: column; gap: 7px; padding-top: 24px; }
-.stage__dot { position: absolute; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--gov-surface); border: 2px solid var(--gov-border); }
+.stage { 
+    position: relative; display: flex; flex-direction: column; gap: 7px; padding-top: 24px; 
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.stage:hover {
+    transform: translateY(-2px);
+}
+.stage__dot { 
+    position: absolute; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%; 
+    background: var(--gov-surface); border: 2px solid var(--gov-border); 
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s, background-color 0.3s;
+}
+.stage:hover .stage__dot {
+    transform: scale(1.35);
+    box-shadow: 0 0 10px rgba(23, 153, 155, 0.5);
+}
 .stage--done .stage__dot { background: var(--gov-teal); border-color: var(--gov-teal); }
 .stage--active .stage__dot { background: var(--gov-surface); border-color: var(--gov-teal); }
-.stage__year { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.25rem; color: var(--gov-title); }
+.stage__year { 
+    font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.25rem; 
+    color: var(--gov-title); 
+    transition: color 0.3s ease;
+}
+.stage:hover .stage__year {
+    color: var(--gov-teal-text);
+}
 .stage__label { color: var(--gov-muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
 .stage__title { font-weight: 700; color: var(--gov-title); font-size: .98rem; }
 .stage__text { color: var(--gov-muted); font-size: .88rem; line-height: 1.5; flex: 1; }
-.stage__status { align-self: flex-start; padding: 5px 12px; border-radius: 999px; font-size: .78rem; font-weight: 700; background: color-mix(in srgb, var(--gov-navy) 7%, var(--gov-bg)); color: var(--gov-muted); }
+.stage__status { align-self: flex-start; padding: 5px 12px; border-radius: 999px; font-size: .78rem; font-weight: 700; background: color-mix(in srgb, var(--gov-navy) 7%, var(--gov-bg)); color: var(--gov-muted); transition: background 0.3s, color 0.3s; }
 .stage--done .stage__status { background: color-mix(in srgb, var(--gov-teal) 14%, var(--gov-bg)); color: var(--gov-teal-text); }
 .stage--active .stage__status { background: color-mix(in srgb, #2f80ed 13%, var(--gov-bg)); color: #2465c6; }
 
@@ -1783,6 +1833,12 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
     background: var(--gov-navy); color: #fff;
     border-radius: var(--radius); text-decoration: none;
     box-shadow: 0 14px 34px color-mix(in srgb, var(--gov-navy) 28%, transparent);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), background-color 0.4s ease, box-shadow 0.4s ease;
+}
+a.orgstruct__head:hover {
+    transform: translateY(-4px) scale(1.02);
+    background-color: color-mix(in srgb, var(--gov-teal) 8%, var(--gov-navy));
+    box-shadow: 0 20px 40px color-mix(in srgb, var(--gov-navy) 40%, transparent);
 }
 a.orgstruct__head:hover .orgstruct__head-name { color: color-mix(in srgb, var(--gov-teal) 55%, #fff); }
 .orgstruct__head-role { font-size: 0.75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; opacity: .78; }
@@ -1793,6 +1849,12 @@ a.orgstruct__head:hover .orgstruct__head-name { color: color-mix(in srgb, var(--
     padding: 9px 18px; border: 1.5px dashed var(--org-line); border-radius: 999px;
     background: var(--gov-surface); color: var(--gov-title);
     font-size: 0.8125rem; font-weight: 700; letter-spacing: .02em;
+    transition: border-color 0.3s ease, color 0.3s ease, background-color 0.3s ease;
+}
+.orgstruct__aside-item:hover {
+    border-color: var(--gov-teal);
+    color: var(--gov-teal-text);
+    background-color: color-mix(in srgb, var(--gov-teal) 5%, var(--gov-surface));
 }
 
 /* Соединитель: вертикальный ствол от руководителя к веткам.
@@ -1824,6 +1886,12 @@ a.orgstruct__head:hover .orgstruct__head-name { color: color-mix(in srgb, var(--
     background: var(--gov-surface); border: 1px solid var(--gov-border);
     border-top: 3px solid var(--gov-teal); border-radius: var(--radius);
     box-shadow: 0 8px 22px -14px color-mix(in srgb, var(--gov-navy) 35%, transparent);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.orgstruct__deputy:hover {
+    transform: translateY(-4px);
+    border-color: var(--gov-teal);
+    box-shadow: 0 16px 36px rgba(19, 42, 92, 0.08);
 }
 .orgstruct__deputy-role { color: var(--gov-title); font-weight: 700; font-size: 0.9375rem; line-height: 1.35; }
 .orgstruct__deputy-name { color: var(--gov-muted); font-size: 0.8125rem; }
@@ -1834,6 +1902,12 @@ a.orgstruct__head:hover .orgstruct__head-name { color: color-mix(in srgb, var(--
     background: color-mix(in srgb, var(--gov-navy) 4%, var(--gov-surface));
     border: 1px solid var(--gov-border); border-radius: 8px;
     color: var(--gov-ink); font-size: 0.875rem; line-height: 1.5;
+    transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+.orgstruct__unit:hover {
+    transform: translateX(4px);
+    border-color: var(--gov-teal);
+    background-color: color-mix(in srgb, var(--gov-teal) 8%, var(--gov-surface));
 }
 .orgstruct__unit::before {
     content: ''; position: absolute; left: -14px; top: 50%; width: 12px; height: 2px;
