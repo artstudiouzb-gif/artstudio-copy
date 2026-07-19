@@ -103,7 +103,9 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
         </video>
     <?php elseif ($bgType === 'youtube' && $youtubeId !== null): ?>
         <div class="block-hero__yt" aria-hidden="true">
-            <iframe src="https://www.youtube-nocookie.com/embed/<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3" title="" tabindex="-1" frameborder="0" loading="lazy" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <?php // Hero находится на первом экране: lazy iframe Chrome может
+                  // отложить навсегда из-за абсолютного позиционирования фона. ?>
+            <iframe src="https://www.youtube-nocookie.com/embed/<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3" title="" tabindex="-1" frameborder="0" loading="eager" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
     <?php elseif ($bgType === 'image' && $image !== ''): ?>
         <?= Media::picture($image, '', null, null, 'block-hero__image', false, '100vw', true, 'block-hero__media') ?>
