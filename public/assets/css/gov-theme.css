@@ -1254,7 +1254,7 @@ body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero .cont
 /* Якорная навигация (вкладки-разделы). */
 .block-anchornav { display: flex; gap: 26px; overflow-x: auto; border-bottom: 1px solid var(--gov-border); scrollbar-width: none; }
 .block-anchornav::-webkit-scrollbar { display: none; }
-.block-anchornav__link { padding: 14px 2px; white-space: nowrap; text-decoration: none; color: var(--gov-muted); font-weight: 700; font-size: .95rem; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.block-anchornav__link { padding: 14px 2px; white-space: nowrap; text-decoration: none; color: var(--gov-muted); font-weight: 700; font-size: .95rem; border-bottom: 3px solid transparent; margin-bottom: -1px; transition: color 0.3s ease, border-color 0.3s ease; }
 .block-anchornav__link.is-active, .block-anchornav__link:hover { color: var(--gov-title); border-bottom-color: var(--gov-teal); }
 
 /* Этапы реализации — горизонтальный таймлайн со статусами. */
@@ -2384,4 +2384,35 @@ body.design-scrolltop .scroll-top:focus-visible { outline: 2px solid var(--gov-t
     }
     /* Кнопка поиска в шапке была 36×32. */
     .site-search button { min-height: 40px; min-width: 40px; }
+}
+
+/* ============================================================================
+   Дополнительные визуальные улучшения (скроллбар и кнопка загрузки)
+   ============================================================================ */
+
+/* Кастомный тонкий премиум-скроллбар */
+@media (min-width: 1024px) {
+    html::-webkit-scrollbar {
+        width: 7px;
+        background-color: var(--gov-bg, #f3f4f6);
+    }
+    html::-webkit-scrollbar-thumb {
+        background-color: color-mix(in srgb, var(--color-primary, var(--gov-navy)) 28%, transparent);
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+    }
+    html::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-accent, var(--gov-teal));
+    }
+}
+
+/* Анимация пульсации для загружающейся кнопки формы */
+@keyframes submit-btn-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.9; }
+}
+.block-form__submit.is-loading {
+    animation: submit-btn-pulse 1.4s infinite ease-in-out !important;
+    cursor: progress !important;
+    pointer-events: none !important;
 }

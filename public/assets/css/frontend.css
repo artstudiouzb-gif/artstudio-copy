@@ -2012,6 +2012,7 @@ body.design-header-dark .a11y-toggle,
 .a11y-toggle:hover {
     background: rgba(15, 23, 42, 0.08) !important;
     color: var(--gov-teal, var(--color-accent)) !important;
+    transform: scale(1.1) !important;
 }
 
 /* Ховер для темных/акцентных/прозрачных шапок (остается белым со светлым фоном) */
@@ -2026,6 +2027,7 @@ body.design-header-dark .a11y-toggle:hover,
 .site-header--transparent:not(.is-scrolled) .a11y-toggle:hover {
     background: rgba(255, 255, 255, 0.15) !important;
     color: #fff !important;
+    transform: scale(1.1) !important;
 }
 
 /* Все иконки строго одинакового размера */
