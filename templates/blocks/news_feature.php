@@ -53,11 +53,13 @@ $badge = static fn (array $i): string => trim((string) ($i['badge'] ?? ''));
                 <div class="newsfeat-side__thumbs">
                     <?php foreach ($withThumb as $item): ?>
                         <a class="newsfeat-mini" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
-                            <?php if (!empty($item['cover'])): ?>
-                                <?= \App\Core\Media::picture((string) $item['cover'], (string) $item['title'], null, null, 'newsfeat-mini__media', true, '(max-width: 700px) 100vw, 30vw') ?>
-                            <?php else: ?>
-                                <span class="newsfeat-mini__media newsfeat-mini__media--empty" aria-hidden="true"></span>
-                            <?php endif; ?>
+                            <span class="newsfeat-mini__thumb">
+                                <?php if (!empty($item['cover'])): ?>
+                                    <?= \App\Core\Media::picture((string) $item['cover'], (string) $item['title'], null, null, 'newsfeat-mini__media', true, '(max-width: 700px) 100vw, 30vw') ?>
+                                <?php else: ?>
+                                    <span class="newsfeat-mini__media newsfeat-mini__media--empty" aria-hidden="true"></span>
+                                <?php endif; ?>
+                            </span>
                             <span class="newsfeat-mini__body">
                                 <span class="news-meta">
                                     <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
