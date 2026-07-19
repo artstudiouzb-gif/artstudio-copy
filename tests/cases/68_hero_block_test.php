@@ -21,6 +21,8 @@ test('Hero: YouTube-фон рендерит iframe с nocookie-доменом и
     assert_true(str_contains($html, 'youtube-nocookie.com/embed/dQw4w9WgXcQ'), 'iframe YouTube с id');
     assert_true(str_contains($html, 'block-hero--video'), 'класс видео-героя');
     assert_true(str_contains($html, 'autoplay=1&mute=1&loop=1'), 'автозапуск без звука, цикл');
+    assert_true(str_contains($html, 'loading="eager"'), 'фон первого экрана загружается сразу');
+    assert_true(!str_contains($html, 'loading="lazy"'), 'YouTube hero не откладывается lazy-loading');
 });
 
 test('Hero: overlay использует заданный цвет и прозрачность', function () {
