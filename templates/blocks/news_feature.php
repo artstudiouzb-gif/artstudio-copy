@@ -16,6 +16,10 @@ $textOnly = array_slice($rest, 2);
 
 // Дата — единым числовым форматом на всех языках: 19.07.2026.
 $fmt = static fn (string $d): string => DateFormatter::short($d);
+// Рубрика карточки: badge новости, а без него — нейтральное «Новость».
+$badge = static fn (array $i): string => ($i['badge'] ?? '') !== ''
+    ? (string) $i['badge']
+    : t('Новость');
 ?>
 <div class="block-newsfeat">
     <div class="section-head">
@@ -28,14 +32,19 @@ $fmt = static fn (string $d): string => DateFormatter::short($d);
     <?php else: ?>
     <div class="newsfeat-grid">
         <a class="newsfeat-lead" href="<?= htmlspecialchars((string) $featured['url'], ENT_QUOTES) ?>">
-            <?php if (!empty($featured['cover'])): ?>
-                <img class="newsfeat-lead__media" src="<?= htmlspecialchars((string) $featured['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
-            <?php else: ?>
-                <span class="newsfeat-lead__media newsfeat-lead__media--empty" aria-hidden="true"></span>
-            <?php endif; ?>
+            <span class="newsfeat-lead__frame">
+                <?php if (!empty($featured['cover'])): ?>
+                    <img class="newsfeat-lead__media" src="<?= htmlspecialchars((string) $featured['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                <?php else: ?>
+                    <span class="newsfeat-lead__media newsfeat-lead__media--empty" aria-hidden="true"></span>
+                <?php endif; ?>
+                <span class="newsfeat-lead__over">
+                    <span class="newsfeat-badge"><?= htmlspecialchars($badge($featured), ENT_QUOTES) ?></span>
+                    <span class="newsfeat-lead__title"><?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?></span>
+                </span>
+            </span>
             <span class="newsfeat-lead__body">
                 <?php if (!empty($featured['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $featured['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
-                <span class="newsfeat-lead__title"><?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?></span>
                 <?php if (!empty($featured['excerpt'])): ?><span class="newsfeat-lead__excerpt"><?= htmlspecialchars(mb_substr(strip_tags((string) $featured['excerpt']), 0, 160), ENT_QUOTES) ?></span><?php endif; ?>
             </span>
         </a>
@@ -45,11 +54,14 @@ $fmt = static fn (string $d): string => DateFormatter::short($d);
                 <div class="newsfeat-side__thumbs">
                     <?php foreach ($withThumb as $item): ?>
                         <a class="newsfeat-mini" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
-                            <?php if (!empty($item['cover'])): ?>
-                                <img class="newsfeat-mini__media" src="<?= htmlspecialchars((string) $item['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
-                            <?php else: ?>
-                                <span class="newsfeat-mini__media newsfeat-mini__media--empty" aria-hidden="true"></span>
-                            <?php endif; ?>
+                            <span class="newsfeat-mini__frame">
+                                <?php if (!empty($item['cover'])): ?>
+                                    <img class="newsfeat-mini__media" src="<?= htmlspecialchars((string) $item['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                                <?php else: ?>
+                                    <span class="newsfeat-mini__media newsfeat-mini__media--empty" aria-hidden="true"></span>
+                                <?php endif; ?>
+                                <span class="newsfeat-badge newsfeat-badge--corner"><?= htmlspecialchars($badge($item), ENT_QUOTES) ?></span>
+                            </span>
                             <span class="newsfeat-mini__body">
                                 <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                                 <span class="newsfeat-mini__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
@@ -62,6 +74,7 @@ $fmt = static fn (string $d): string => DateFormatter::short($d);
                 <div class="newsfeat-side__texts">
                     <?php foreach ($textOnly as $item): ?>
                         <a class="newsfeat-text" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
+                            <span class="newsfeat-badge newsfeat-badge--plain"><?= htmlspecialchars($badge($item), ENT_QUOTES) ?></span>
                             <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                             <span class="newsfeat-text__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
                         </a>

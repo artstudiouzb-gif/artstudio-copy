@@ -409,11 +409,24 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 /* --- Блок «Новости и аналитика»: крупная + список (по эскизу) --- */
 .newsfeat-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
 @media (max-width: 900px) { .newsfeat-grid { grid-template-columns: 1fr; } }
-.newsfeat-lead { display: flex; flex-direction: column; gap: 18px; min-width: 0; text-decoration: none; color: var(--gov-ink); }
-.newsfeat-lead__media { display: block; width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); background: #24425f center/cover no-repeat; object-fit: cover; }
+.newsfeat-lead { display: flex; flex-direction: column; gap: 14px; min-width: 0; text-decoration: none; color: var(--gov-ink); }
+/* Заголовок лид-карточки лежит на обложке: карточка перестаёт быть вдвое выше соседей. */
+.newsfeat-lead__frame { position: relative; display: block; border-radius: var(--radius); overflow: hidden; }
+.newsfeat-lead__media { display: block; width: 100%; aspect-ratio: 16/10; background: #24425f center/cover no-repeat; object-fit: cover; }
 .newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
-.newsfeat-lead__body { display: flex; flex-direction: column; gap: 12px; }
-.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; color: var(--gov-title); line-height: 1.35; }
+/* Подложка под текстом — затемнение снизу, чтобы белый читался на любом фото. */
+.newsfeat-lead__over {
+    position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-direction: column;
+    align-items: flex-start; gap: 10px; padding: 20px;
+    /* Плотность подобрана так, чтобы белый заголовок держал 4.5:1 даже
+       на самой светлой обложке, а не только 3:1 «как крупный текст». */
+    background: linear-gradient(to top,
+        color-mix(in srgb, var(--gov-navy) 96%, transparent),
+        color-mix(in srgb, var(--gov-navy) 78%, transparent) 52%,
+        transparent);
+}
+.newsfeat-lead__body { display: flex; flex-direction: column; gap: 10px; }
+.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; color: #fff; line-height: 1.35; }
 .newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.5; font-size: .95rem; }
 .newsfeat-side { display: flex; flex-direction: column; gap: 24px; }
 .newsfeat-side__thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
@@ -424,13 +437,31 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
 .newsfeat__more { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; }
 .newsfeat-mini { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--gov-ink); }
-.newsfeat-mini__media { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; border-radius: 8px; background: #24425f center/cover no-repeat; object-fit: cover; }
+.newsfeat-mini__frame { position: relative; display: block; border-radius: 8px; overflow: hidden; }
+.newsfeat-mini__media { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; background: #24425f center/cover no-repeat; object-fit: cover; }
 .newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsfeat-mini__body { display: flex; flex-direction: column; gap: 6px; }
 .newsfeat-mini__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
 .newsfeat-text { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--gov-ink); }
+
+/* Рубрика карточки. На фото — плашка (нужен свой фон для читаемости),
+   без фото — просто набранная метка. */
+.newsfeat-badge {
+    display: inline-block; max-width: 100%; border-radius: 4px; padding: 4px 9px;
+    background: color-mix(in srgb, var(--gov-navy) 92%, transparent); color: #fff;
+    font-size: .68rem; font-weight: 700; line-height: 1.25;
+    text-transform: uppercase; letter-spacing: .04em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.newsfeat-badge--corner { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); }
+.newsfeat-badge--plain {
+    padding: 0; background: none; color: var(--gov-teal-text); letter-spacing: .05em;
+}
 .newsfeat-text__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
-.newsfeat-lead:hover .newsfeat-lead__title, .newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
+.newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
+/* Заголовок лида белый на фото — подсвечиваем подчёркиванием, не цветом. */
+.newsfeat-lead:hover .newsfeat-lead__title { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 560px) { .newsfeat-lead__over { padding: 14px; } .newsfeat-lead__title { font-size: 1.12rem; } }
 
 /* --- Медиа-галерея: переключатели --- */
 .media-tabs { display: inline-flex; gap: 22px; margin-right: auto; margin-left: 24px; }
