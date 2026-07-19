@@ -651,14 +651,19 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 @media (max-width: 560px) { .persons-grid { grid-template-columns: 1fr; } }
 .person-card { display: flex; flex-direction: column; background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); overflow: hidden; }
 .person-card__photo { display: block; aspect-ratio: 4/4.4; background: #24425f center/cover no-repeat; width: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1); }
-.person-card:hover .person-card__photo { transform: scale(1.04); }
+.person-card:hover .person-card__photo { transform: scale(1.05); }
 .person-card__placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; aspect-ratio: 4/4.4; background: color-mix(in srgb, var(--gov-navy) 5%, var(--gov-surface)); color: var(--gov-muted); }
-.person-card__placeholder svg { opacity: .55; }
+.person-card__placeholder svg { opacity: .55; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease; }
+.person-card:hover .person-card__placeholder svg { transform: scale(1.15); color: var(--gov-teal); }
 .person-card__vacant { text-transform: uppercase; font-size: 0.75rem; letter-spacing: .08em; font-weight: 700; color: var(--gov-muted); }
 .person-card__body { display: flex; flex-direction: column; gap: 6px; padding: 18px; text-align: center; flex: 1; }
-.person-card__name { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.05rem; color: var(--gov-title); }
+.person-card__name { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.05rem; color: var(--gov-title); transition: color 0.3s ease; }
+.person-card:hover .person-card__name { color: var(--gov-teal-text); }
 .person-card__role { color: var(--gov-muted); font-size: .9rem; line-height: 1.35; flex: 1; }
-.person-card__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; text-decoration: none; margin-top: 8px; }
+.person-card__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; text-decoration: none; margin-top: 8px; transition: transform 0.3s ease, color 0.3s ease; display: inline-block; }
+.person-card:hover .person-card__more { transform: translateX(4px); }
+.person-card--vacant { border: 1.5px dashed var(--gov-border); background: color-mix(in srgb, var(--gov-navy) 2%, var(--gov-surface)); }
+.person-card--vacant:hover { border-color: var(--gov-teal); background-color: color-mix(in srgb, var(--gov-teal) 4%, var(--gov-surface)); }
 .person-card--vacant .person-card__role { color: var(--gov-ink); font-weight: 700; }
 
 /* История — таймлайн + CTA-карточка с фоном. */
@@ -753,15 +758,36 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 }
 
 /* CTA-полоса (navy) «Есть вопросы или предложения?». */
-.block-ctaband { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; background: var(--gov-navy); border-radius: var(--radius); padding: 34px 38px; color: #fff; }
+.block-ctaband { 
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; 
+    background: linear-gradient(135deg, var(--gov-navy) 0%, color-mix(in srgb, var(--gov-navy) 88%, #000) 100%); 
+    border-radius: var(--radius); padding: 34px 38px; color: #fff; 
+}
 .ctaband__lead { display: flex; align-items: center; gap: 22px; }
-.ctaband__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); color: #fff; flex: 0 0 auto; }
+.ctaband__icon { 
+    display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; 
+    border: 1px solid rgba(255,255,255,.35); color: #fff; flex: 0 0 auto; 
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, background 0.3s ease;
+}
 .ctaband__icon svg { width: 30px; height: 30px; }
+.block-ctaband:hover .ctaband__icon {
+    transform: rotate(6deg) scale(1.05);
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
 .ctaband__body { display: flex; flex-direction: column; gap: 6px; }
 .ctaband__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; }
 .ctaband__text { color: rgba(255,255,255,.82); line-height: 1.5; }
-.ctaband__button { display: inline-block; padding: 13px 26px; background: #fff; color: var(--gov-navy); border-radius: var(--btn-radius, 8px); font-weight: 700; font-size: .92rem; text-decoration: none; transition: opacity .15s ease; }
-.ctaband__button:hover { opacity: .9; }
+.ctaband__button { 
+    display: inline-block; padding: 13px 26px; background: #fff; color: var(--gov-navy); 
+    border-radius: var(--btn-radius, 8px); font-weight: 700; font-size: .92rem; text-decoration: none; 
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease, background-color 0.3s ease; 
+}
+.ctaband__button:hover { 
+    transform: translateY(-2px) scale(1.02);
+    background-color: #f8fafc;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+}
 
 /* Профиль руководителя. */
 .block-profile { display: grid; grid-template-columns: minmax(0, 420px) 1fr; gap: 44px; align-items: start; }
