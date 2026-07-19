@@ -193,11 +193,19 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
     border-radius: 16px; 
     padding: clamp(20px, 3vw, 34px); 
     box-shadow: 0 14px 34px rgba(19, 42, 92, 0.08);
-    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease, background-color 0.35s ease;
+}
+.block-counters:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(19, 42, 92, 0.12);
+    border-color: var(--color-accent, var(--gov-teal));
 }
 :root[data-theme="dark"] .block-counters {
     background: var(--counters-bg, var(--gov-surface));
     border-color: var(--gov-border);
+}
+:root[data-theme="dark"] .block-counters:hover {
+    border-color: var(--color-accent, var(--gov-teal));
 }
 .block-counters__title { color: var(--counters-text, var(--gov-title)); }
 .block-counters__grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0; }
@@ -462,11 +470,12 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
     flex-shrink: 0; 
     background: color-mix(in srgb, var(--counters-text, var(--gov-title)) 8%, transparent); 
     color: var(--counters-text, var(--gov-title)); 
-    transition: background 0.35s ease, color 0.35s ease;
+    transition: background 0.35s ease, color 0.35s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .counter:hover .counter__icon {
-    background: var(--gov-teal);
+    background: var(--color-accent, var(--gov-teal));
     color: #fff;
+    transform: scale(1.1);
 }
 .counter__icon svg { width: 26px; height: 26px; }
 .counter__num { display: flex; align-items: baseline; gap: 4px; }
