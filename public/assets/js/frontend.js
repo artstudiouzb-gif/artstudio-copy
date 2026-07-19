@@ -874,17 +874,18 @@
         });
     })();
 
-    // Интерактивный «прожектор» (Spotlight) для карточек
-    (function () {
-        var cards = document.querySelectorAll('.cat-tile, .contact-card, .project-card, .team-card, .feature-card, .news-card, .person-card, .album-card, .doc-card, .catcard, .testimonial, .block-advantages__item, .mediacard, .imgcard');
-        if (!cards.length) { return; }
-        cards.forEach(function (card) {
-            card.addEventListener('mousemove', function (e) {
-                var rect = card.getBoundingClientRect();
-                var x = e.clientX - rect.left;
-                var y = e.clientY - rect.top;
-                card.style.setProperty('--mouse-x', x + 'px');
-                card.style.setProperty('--mouse-y', y + 'px');
-            });
-        });
-    })();
+    // Интерактивный «прожектор» (Spotlight) для карточек, кнопок и полей ввода
+    document.addEventListener('mousemove', function (e) {
+        var el = e.target.closest(
+            '.cat-tile, .contact-card, .project-card, .team-card, .feature-card, .news-card, .person-card, .album-card, .doc-card, .catcard, .testimonial, .block-advantages__item, .mediacard, .imgcard, .faq-item, .stage, .timeline-item, ' +
+            '.btn, .block-cta__button, .btn-cta, .block-hero__button, .timeline-card__button, .timeline-cta__button, ' +
+            '.a11y-toggle, .site-theme-toggle, .site-search-toggle, ' +
+            'input[type="text"], input[type="email"], input[type="password"], input[type="search"], textarea, select'
+        );
+        if (!el) { return; }
+        var rect = el.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        el.style.setProperty('--mouse-x', x + 'px');
+        el.style.setProperty('--mouse-y', y + 'px');
+    });
