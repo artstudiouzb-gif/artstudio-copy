@@ -171,6 +171,9 @@ HTML
     </div>
     
     <div class="advisor-card" id="serviceAdvisor">
+      <div class="advisor-progress" aria-hidden="true" style="background: rgba(3,32,26,0.06); height: 6px; border-radius: 99px; overflow: hidden; margin-bottom: 35px;">
+        <div class="advisor-bar" id="advisorBar" style="background: var(--gold); height: 100%; width: 33.3%; transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);"></div>
+      </div>
       <!-- Step 1 -->
       <div class="advisor-step active" data-step="1">
         <div class="advisor-title">Шаг 1: Какова ваша сфера деятельности?</div>
@@ -271,17 +274,55 @@ HTML
       <h2>Понимаем продукт, а не только регламенты</h2>
       <p>Отраслевой контекст определяет тонкости лабораторных испытаний, досье и стратегии запуска.</p>
     </div>
-    <div class="sectors">
-      <a class="pill quick" href="#service-permits" data-value="permits">Сельское хозяйство ↗</a>
-      <a class="pill quick" href="#service-permits" data-value="permits">Пищевая промышленность ↗</a>
-      <a class="pill quick" href="#service-permits" data-value="permits">Химическая отрасль ↗</a>
-      <a class="pill quick" href="#service-permits" data-value="permits">Удобрения и СЗР ↗</a>
-      <a class="pill quick" href="#service-permits" data-value="permits">Косметика и парфюмерия ↗</a>
-      <a class="pill quick" href="#service-permits" data-value="permits">БАДы ↗</a>
-      <a class="pill quick" href="#service-permits" data-value="permits">Ветеринария ↗</a>
-      <a class="pill quick" href="#service-iso" data-value="iso">Лаборатории & Тесты ↗</a>
-      <a class="pill quick" href="#service-iso" data-value="iso">HoReCa ↗</a>
-      <a class="pill quick" href="#service-export" data-value="export">Экспорт и импорт ↗</a>
+    <div class="sectors-grid">
+      <a class="sector-card quick" href="#service-permits" data-value="permits">
+        <div class="sector-top">
+          <span class="sector-num">01</span>
+          <span class="sector-arrow">↗</span>
+        </div>
+        <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Сельское хозяйство</h3>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Регистрация СЗР, удобрений, дефолиантов и координация полевых тестов.</p>
+      </a>
+      <a class="sector-card quick" href="#service-permits" data-value="permits">
+        <div class="sector-top">
+          <span class="sector-num">02</span>
+          <span class="sector-arrow">↗</span>
+        </div>
+        <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Пищевая промышленность</h3>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Сертификация БАД, продуктов питания, регламенты ХАССП и гигиена СЭС.</p>
+      </a>
+      <a class="sector-card quick" href="#service-permits" data-value="permits">
+        <div class="sector-top">
+          <span class="sector-num">03</span>
+          <span class="sector-arrow">↗</span>
+        </div>
+        <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Химическая отрасль</h3>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Паспорта безопасности (MSDS), регистрация химвеществ и прекурсоров.</p>
+      </a>
+      <a class="sector-card quick" href="#service-permits" data-value="permits">
+        <div class="sector-top">
+          <span class="sector-num">04</span>
+          <span class="sector-arrow">↗</span>
+        </div>
+        <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Косметика и парфюмерия</h3>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Испытания безопасности, СЭЗ заключения и GMP стандарты производства.</p>
+      </a>
+      <a class="sector-card quick" href="#service-permits" data-value="permits">
+        <div class="sector-top">
+          <span class="sector-num">05</span>
+          <span class="sector-arrow">↗</span>
+        </div>
+        <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Ветеринария</h3>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Регистрация кормовых добавок, вакцин и ветпрепаратов в Комитете ветеринарии.</p>
+      </a>
+      <a class="sector-card quick" href="#service-iso" data-value="iso">
+        <div class="sector-top">
+          <span class="sector-num">06</span>
+          <span class="sector-arrow">↗</span>
+        </div>
+        <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Лаборатории & Тесты</h3>
+        <p style="color:var(--muted);font-size:15px;line-height:1.6">Внедрение ISO 17025, калибровка оборудования и государственная аккредитация.</p>
+      </a>
     </div>
   </div>
 </section>

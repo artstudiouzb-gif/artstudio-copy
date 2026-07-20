@@ -143,6 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            const bar = document.getElementById('advisorBar');
+            if (bar) {
+                const percent = (currentStep / 3) * 100;
+                bar.style.width = percent + '%';
+            }
+
             if (currentStep === 1) {
                 prevBtn.style.visibility = 'hidden';
                 nextBtn.textContent = 'Продолжить';

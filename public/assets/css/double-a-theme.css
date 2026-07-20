@@ -973,24 +973,28 @@ p {
 }
 .advisor-opt {
     border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 20px;
+    border-radius: 18px;
+    padding: 22px 26px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
     font-weight: 600;
-    font-size: 16px; /* UNIFIED STANDARD BODY SIZE */
+    font-size: 16px;
     text-align: left;
-    background: transparent;
-    color: var(--ink);
+    background: #faf9f6;
+    color: var(--navy);
+    box-shadow: 0 4px 10px rgba(3,32,26,0.02);
 }
 .advisor-opt:hover {
-    border-color: var(--emerald);
-    background: #f2f6f5;
+    border-color: var(--gold);
+    background: #fbfaf8;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(3,32,26,0.04);
 }
 .advisor-opt.selected {
-    border-color: var(--emerald);
+    border-color: var(--gold);
     background: var(--navy);
     color: #fff;
+    box-shadow: 0 15px 30px rgba(3,32,26,0.15);
 }
 .advisor-controls {
     display: flex;
@@ -3811,5 +3815,77 @@ p {
     }
     .timeline-dot {
         left: -45px;
+    }
+}
+
+/* ==========================================================================
+   DOUBLE A SOLUTIONS - INDUSTRIES SECTORS GRID
+   ========================================================================== */
+
+.sectors-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+}
+.sector-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 35px;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(3,32,26,0.01);
+}
+.sector-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212,175,55,0.25);
+    box-shadow: var(--shadow);
+}
+.sector-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.sector-num {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold);
+    font-family: var(--serif);
+}
+.sector-arrow {
+    font-size: 18px;
+    color: var(--muted);
+    transition: transform 0.3s, color 0.3s;
+}
+.sector-card:hover .sector-arrow {
+    transform: translate(3px, -3px);
+    color: var(--gold);
+}
+.sector-card h3 {
+    font-size: 22px;
+    margin: 0 0 10px;
+    color: var(--navy);
+    font-family: var(--serif);
+    font-weight: 600;
+}
+.sector-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+}
+@media(max-width: 960px) {
+    .sectors-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media(max-width: 680px) {
+    .sectors-grid {
+        grid-template-columns: 1fr;
     }
 }
