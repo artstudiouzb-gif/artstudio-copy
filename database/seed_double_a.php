@@ -122,6 +122,7 @@ $homeBlocks = [
         'title' => '01. Hero Section',
         'html' => <<<'HTML'
 <section class="hero" id="hero">
+  <div class="hero-glow-2" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow" style="color:var(--gold)">Единая точка входа на новые рынки</div>
