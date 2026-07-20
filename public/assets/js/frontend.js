@@ -64,12 +64,16 @@
                     event: 'command',
                     func: name,
                     args: args || []
-                }), 'https://www.youtube-nocookie.com');
+                }), '*');
             };
             var resume = function () {
                 command('mute');
                 command('setLoop', [true]);
                 command('playVideo');
+                // Отправляем handshake-сообщение "listening", чтобы YouTube начал присылать события о состоянии
+                if (frame.contentWindow) {
+                    frame.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
+                }
             };
 
             frame.addEventListener('load', resume);
@@ -78,23 +82,34 @@
             });
 
             // Слушаем сообщения об изменении состояния плеера YouTube,
-            // чтобы перехватить окончание (playerState = 0 / ENDED) и запустить его заново.
+            // чтобы перехватить окончание или время воспроизведения и запустить ролик заново.
             window.addEventListener('message', function (e) {
-                if (e.origin !== 'https://www.youtube-nocookie.com' && e.origin !== 'https://www.youtube.com') { return; }
+                if (!/https?:\/\/(www\.)?youtube(-nocookie)?\.com/.test(e.origin)) { return; }
                 try {
-                    var data = JSON.parse(e.data);
+                    var data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+                    if (!data) { return; }
+
                     var ended = false;
-                    if (data.event === 'infoDelivery' && data.info && data.info.playerState === 0) {
-                        ended = true;
+                    if (data.event === 'infoDelivery' && data.info) {
+                        // Опережающий перезапуск за 0.3 секунды до конца видео, чтобы избежать черного экрана
+                        if (typeof data.info.currentTime === 'number' && typeof data.info.duration === 'number') {
+                            if (data.info.duration > 0 && data.info.currentTime >= data.info.duration - 0.3) {
+                                ended = true;
+                            }
+                        }
+                        if (data.info.playerState === 0) {
+                            ended = true;
+                        }
                     } else if (data.event === 'onStateChange' && (data.info === 0 || data.data === 0)) {
                         ended = true;
                     }
+
                     if (ended) {
                         resume();
                         command('seekTo', [0, true]);
                     }
                 } catch (err) {
-                    // Игнорируем невалидные сообщения
+                    // Игнорируем невалидные сообщения от сторонних скриптов
                 }
             });
         });
