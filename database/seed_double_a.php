@@ -148,6 +148,7 @@ HTML
     [
         'title' => '02. Trust Strip',
         'html' => <<<'HTML'
+<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="trust-strip">
   <div class="wrap trust-grid">
     <div class="trust-intro"><b>Комплексная модель сопровождения</b><span>Разработка индивидуальной дорожной карты проекта</span></div>
@@ -163,6 +164,7 @@ HTML
     [
         'title' => '03. Service Advisor',
         'html' => <<<'HTML'
+<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section soft" id="tools">
   <div class="wrap">
     <div class="section-head" style="margin-bottom: 50px">
@@ -243,6 +245,7 @@ HTML
     [
         'title' => '04. Services Highlights',
         'html' => <<<'HTML'
+<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section" id="services">
   <div class="wrap">
     <div class="services-split">
@@ -289,6 +292,7 @@ HTML
     [
         'title' => '05. Industries Section',
         'html' => <<<'HTML'
+<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section soft" id="industries">
   <div class="wrap">
     <div class="section-head-centered">
@@ -353,6 +357,7 @@ HTML
     [
         'title' => '06. Method Section',
         'html' => <<<'HTML'
+<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section dark">
   <div class="wrap journey">
     <div class="journey-intro">
@@ -399,6 +404,7 @@ HTML
     [
         'title' => '07. Cases Section',
         'html' => <<<'HTML'
+<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section" id="cases">
   <div class="wrap">
     <div class="section-head">
@@ -445,6 +451,7 @@ HTML
     [
         'title' => '08. FAQ Section',
         'html' => <<<'HTML'
+<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section soft" id="faq">
   <div class="wrap faq-layout">
     <div class="faq-intro">
@@ -575,15 +582,15 @@ HTML
           <div class="service-sublist-title">Что входит в услугу</div>
           <div class="service-subitems">
             <div class="service-subitem">
-              <h4>Маркетинговые исследования</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">📈</span><h4>Маркетинговые исследования</h4></div>
               <p>Оценка емкости рынка, анализ цен конкурентов и выявление надежных дистрибьюторских сетей.</p>
             </div>
             <div class="service-subitem">
-              <h4>Анализ таможенных барьеров</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🛡</span><h4>Анализ таможенных барьеров</h4></div>
               <p>Расчет пошлин, акцизов, импортного НДС и определение нетарифных мер регулирования.</p>
             </div>
             <div class="service-subitem">
-              <h4>Юридическое структурирование</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">⚖</span><h4>Юридическое структурирование</h4></div>
               <p>Выбор оптимальной формы присутствия (дочернее общество, СП, представительство) и налогового режима.</p>
             </div>
           </div>
@@ -612,19 +619,19 @@ HTML
           <div class="service-sublist-title">Отраслевая экспертиза</div>
           <div class="service-subitems">
             <div class="service-subitem">
-              <h4>Сельское хозяйство и агрохимия</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🌱</span><h4>Сельское хозяйство и агрохимия</h4></div>
               <p>Регистрация минеральных удобрений, СЗР и пестицидов. Организация полевых и токсикологических испытаний.</p>
             </div>
             <div class="service-subitem">
-              <h4>Пищевая продукция и БАД</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🍏</span><h4>Пищевая продукция и БАД</h4></div>
               <p>Получение гигиенических заключений СЭС РУз, проведение лабораторных тестов безопасности.</p>
             </div>
             <div class="service-subitem">
-              <h4>Косметика и парфюмерия</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🧴</span><h4>Косметика и парфюмерия</h4></div>
               <p>Разработка технических досье, декларирование соответствия, прохождение санитарно-эпидемиологического контроля.</p>
             </div>
             <div class="service-subitem">
-              <h4>Ветеринария и ветпрепараты</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🐾</span><h4>Ветеринария и ветпрепараты</h4></div>
               <p>Регистрация препаратов и кормовых добавок в Комитете ветеринарии и развития животноводства РУз.</p>
             </div>
           </div>
@@ -653,15 +660,15 @@ HTML
           <div class="service-sublist-title">Ключевые направления</div>
           <div class="service-subitems">
             <div class="service-subitem">
-              <h4>Аудит упаковки и маркировки</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">📦</span><h4>Аудит упаковки и маркировки</h4></div>
               <p>Приведение этикеток и текстовой информации в соответствие техническим регламентам стран импорта.</p>
             </div>
             <div class="service-subitem">
-              <h4>Сертификаты происхождения (СТ-1)</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">📜</span><h4>Сертификаты происхождения (СТ-1)</h4></div>
               <p>Полноценное оформление сертификатов происхождения СТ-1, Form A, фитосанитарных и ветеринарных документов.</p>
             </div>
             <div class="service-subitem">
-              <h4>Инспекционный аудит</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🔍</span><h4>Инспекционный аудит</h4></div>
               <p>Предварительный технологический аудит производства перед визитом зарубежных инспекторов.</p>
             </div>
           </div>
@@ -690,15 +697,15 @@ HTML
           <div class="service-sublist-title">Стандарты качества</div>
           <div class="service-subitems">
             <div class="service-subitem">
-              <h4>ХАССП (HACCP / ISO 22000)</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🛡</span><h4>ХАССП (HACCP / ISO 22000)</h4></div>
               <p>Внедрение систем контроля рисков и пищевой безопасности для производств и экспортеров.</p>
             </div>
             <div class="service-subitem">
-              <h4>Косметическое GMP (ISO 22716)</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🧪</span><h4>Косметическое GMP (ISO 22716)</h4></div>
               <p>Внедрение надлежащей производственной практики на парфюмерно-косметических предприятиях.</p>
             </div>
             <div class="service-subitem">
-              <h4>Аккредитация лабораторий (ISO 17025)</h4>
+              <div class="service-subitem-header"><span class="service-subitem-icon">🔬</span><h4>Аккредитация лабораторий (ISO 17025)</h4></div>
               <p>Разработка СОП, методик калибровки, проведение МСИ и аудит готовности к аккредитации.</p>
             </div>
           </div>

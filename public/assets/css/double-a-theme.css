@@ -4317,3 +4317,54 @@ p {
         position: static;
     }
 }
+
+/* ==========================================================================
+   DOUBLE A SOLUTIONS - LUXURY DIVIDERS & SERVICE ITEM ICONS
+   ========================================================================== */
+.luxury-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+.luxury-divider:before, .luxury-divider:after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(212,175,55,0.25) 50%, rgba(212,175,55,0) 100%);
+}
+.luxury-divider .diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    margin: 0 15px;
+    box-shadow: 0 0 8px rgba(212,175,55,0.4);
+    display: inline-block;
+}
+
+.service-subitem-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.service-subitem-icon {
+    font-size: 16px;
+    color: var(--gold);
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(212,175,55,0.06);
+    border-radius: 8px;
+    border: 1px solid rgba(212,175,55,0.15);
+    flex-shrink: 0;
+}
+.service-subitem h4 {
+    margin: 0 !important;
+}
