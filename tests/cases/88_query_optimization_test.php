@@ -36,11 +36,12 @@ test('Страница не предзагружает все локальные
     assert_contains('array_keys($fontPreloads)', $header);
 });
 
-test('Сервер включает сжатие текста и откладывает тяжёлый hero media', function () {
+test('Сервер сжимает текст, а hero загружает медиа по приоритету первого экрана', function () {
     $htaccess = (string) file_get_contents(APP_ROOT . '/public/.htaccess');
     $hero = (string) file_get_contents(APP_ROOT . '/templates/blocks/hero.php');
     assert_contains('BROTLI_COMPRESS', $htaccess);
     assert_contains('DEFLATE', $htaccess);
     assert_contains('preload="metadata"', $hero);
-    assert_contains('loading="lazy"', $hero);
+    assert_contains('loading="eager"', $hero);
+    assert_not_contains('loading="lazy"', $hero);
 });

@@ -173,6 +173,7 @@ jobs:
           SQL
           cp config/config.example.php config/config.php
           touch storage/installed.lock
+          php -r 'require "app/Core/bootstrap.php"; \App\Core\DemoSeeder::run(\App\Core\Database::pdo());'
 
       - name: Install browser test dependencies
         run: |

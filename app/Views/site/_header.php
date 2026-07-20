@@ -12,6 +12,7 @@ use App\Models\Setting;
 /** @var string $extraHeadCss */
 /** @var string $ogImage */
 /** @var string $ogType */
+/** @var array<int, string> $preloadImages */
 
 $siteName = Setting::get('site_name', 'ArtStudio');
 // Логотип: переопределение на текущий язык (Шапка → логотип для языка),
@@ -143,14 +144,16 @@ if (!empty($menuItems)) {
 }
 
 // --- Переключатель языков ---
-// Если контроллер сообщил языки с реальным контентом сущности — показываем
-// только их; на общих маршрутах (списки, поиск) — все активные языки.
+// Переключатель всегда показывает все активные языки. Наличие перевода не
+// должно лишать посетителя возможности явно сменить язык интерфейса.
 $langHtml = '';
 $activeLangs = Language::active();
+$hrefLangs = $activeLangs;
 $contentLangs = \App\Core\Locale::contentLangs();
 if ($contentLangs !== null) {
-    $activeLangs = array_values(array_filter(
-        $activeLangs,
+    // Для SEO по-прежнему объявляем только реально существующие переводы.
+    $hrefLangs = array_values(array_filter(
+        $hrefLangs,
         static fn (array $l): bool => in_array((string) $l['code'], $contentLangs, true)
     ));
 }
@@ -166,7 +169,7 @@ if ($hcfg['language_switcher']['enabled'] && count($activeLangs) > 1) {
             'flag' => $flags[$code] ?? strtoupper($code),
             default => strtoupper($code),
         };
-        $href = Locale::url($path, $code);
+        $href = Locale::url($path, $code) . '?' . \App\Core\LocalePreference::QUERY . '=' . rawurlencode($code);
         $isActive = $code === $currentLang ? ' is-active' : '';
         $langHtml .= '<a class="site-lang-switcher__item' . $isActive . '" href="' . htmlspecialchars($href, ENT_QUOTES) . '">' . htmlspecialchars((string) $label, ENT_QUOTES) . '</a>';
     }
@@ -206,7 +209,7 @@ $a11yParts = explode(':', (string) ($_COOKIE['a11y'] ?? ''));
 $a11y = [
     'on' => in_array($a11yParts[0] ?? '', $a11ySchemes, true),
     'scheme' => in_array($a11yParts[0] ?? '', $a11ySchemes, true) ? $a11yParts[0] : 'cw',
-    'size' => in_array($a11yParts[1] ?? '', $a11ySizes, true) ? $a11yParts[1] : 'm',
+    'size' => in_array($a11yParts[1] ?? '', $a11ySizes, true) ? $a11yParts[1] : 'l',
     'images' => ($a11yParts[2] ?? '') === 'off' ? 'off' : 'on',
 ];
 $a11yToggle = '<button type="button" class="a11y-toggle" aria-label="' . $et('Версия для слабовидящих') . '" title="' . $et('Версия для слабовидящих') . '" aria-controls="a11y-panel" aria-expanded="' . ($a11y['on'] ? 'true' : 'false') . '">'
@@ -379,10 +382,10 @@ if ($inlineMenu !== '') {
 <?php endif; ?>
 <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES) ?>">
 <?php // hreflang: текущий путь на языках, где контент реально существует
-      // ($activeLangs уже отфильтрован по Locale::contentLangs выше),
+      // ($hrefLangs отфильтрован по Locale::contentLangs выше),
       // + x-default (основной язык). Одинокий hreflang не выводим. ?>
-<?php if (count($activeLangs) > 1): ?>
-<?php foreach ($activeLangs as $hrefLang): ?>
+<?php if (count($hrefLangs) > 1): ?>
+<?php foreach ($hrefLangs as $hrefLang): ?>
 <link rel="alternate" hreflang="<?= htmlspecialchars((string) $hrefLang['code'], ENT_QUOTES) ?>" href="<?= htmlspecialchars($appUrl . Locale::url(Locale::path(), (string) $hrefLang['code']), ENT_QUOTES) ?>">
 <?php endforeach; ?>
 <link rel="alternate" hreflang="x-default" href="<?= htmlspecialchars($appUrl . Locale::url(Locale::path(), \App\Models\Language::defaultCode()), ENT_QUOTES) ?>">
@@ -398,6 +401,24 @@ if ($inlineMenu !== '') {
 <?php if ($ogImageRaw !== ''): ?>
 <meta property="og:image" content="<?= htmlspecialchars($ogImageRaw, ENT_QUOTES) ?>">
 <meta name="twitter:card" content="summary_large_image">
+<?php endif; ?>
+<?php // Первый Hero уже отрендерен/закэширован до header, поэтому его LCP-кандидат
+      // можно начать загружать до блокирующих stylesheet. ?>
+<?php foreach (array_slice(array_values(array_unique($preloadImages ?? [])), 0, 1) as $preloadImage): ?>
+<?= \App\Core\Media::preloadLink((string) $preloadImage, '100vw') ?>
+<?php endforeach; ?>
+<?php
+$cdnBase = \App\Core\Asset::cdnBase();
+$cdnParts = $cdnBase !== '' ? parse_url($cdnBase) : false;
+$cdnOrigin = '';
+if (is_array($cdnParts) && in_array($cdnParts['scheme'] ?? '', ['http', 'https'], true) && !empty($cdnParts['host'])) {
+    $cdnOrigin = $cdnParts['scheme'] . '://' . $cdnParts['host']
+        . (isset($cdnParts['port']) ? ':' . (int) $cdnParts['port'] : '');
+}
+?>
+<?php if ($cdnOrigin !== ''): ?>
+<link rel="preconnect" href="<?= htmlspecialchars($cdnOrigin, ENT_QUOTES) ?>" crossorigin>
+<link rel="dns-prefetch" href="//<?= htmlspecialchars((string) $cdnParts['host'], ENT_QUOTES) ?>">
 <?php endif; ?>
 <?php if ($fontUrl !== '' && $fontFaceName !== ''): ?>
 <link rel="preload" href="<?= htmlspecialchars($fontUrl, ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>

@@ -15,10 +15,11 @@ require __DIR__ . '/../layout/header.php';
 /** @var string|null $error */
 
 $defaultCode = Language::defaultCode();
-$translationLangs = array_values(array_filter(
-    Language::active(),
-    static fn (array $l): bool => (string) $l['code'] !== $defaultCode
-));
+$activeLanguages = Language::active();
+$languages = array_merge(
+    array_values(array_filter($activeLanguages, static fn (array $l): bool => (string) $l['code'] === $defaultCode)),
+    array_values(array_filter($activeLanguages, static fn (array $l): bool => (string) $l['code'] !== $defaultCode))
+);
 
 $action = $isEdit ? '/admin/projects/' . (int) $project['id'] . '/edit' : '/admin/projects/create';
 ?>
@@ -35,32 +36,36 @@ $action = $isEdit ? '/admin/projects/' . (int) $project['id'] . '/edit' : '/admi
         <?php endif; ?>
 
         <div class="form-field">
-            <label for="title">Название проекта</label>
-            <input type="text" id="title" name="title" value="<?= htmlspecialchars($project['title'] ?? '', ENT_QUOTES) ?>" required>
-        </div>
-
-        <div class="form-field">
             <label for="slug">ЧПУ (slug)</label>
             <input type="text" id="slug" name="slug" value="<?= htmlspecialchars($project['slug'] ?? '', ENT_QUOTES) ?>" placeholder="оставьте пустым для автогенерации">
+            <span class="form-hint">Общий адрес для всех языковых версий проекта.</span>
         </div>
 
-        <div class="form-field">
-            <label for="description">Описание<?php if ($translationLangs): ?> <span class="form-hint" style="font-weight:400;">(основной язык)</span><?php endif; ?></label>
-            <textarea id="description" name="description" style="min-height:160px;"><?= htmlspecialchars($project['description'] ?? '', ENT_QUOTES) ?></textarea>
-        </div>
+        <div data-lang-tabs>
+            <div class="lang-tabs">
+                <?php foreach ($languages as $i => $lang): ?>
+                    <?php $code = (string) $lang['code']; ?>
+                    <button type="button" class="lang-tab-btn <?= $i === 0 ? 'is-active' : '' ?>" data-lang-target="<?= htmlspecialchars($code, ENT_QUOTES) ?>">
+                        <?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>
+                        <?php if ($code === $defaultCode): ?><span class="lang-tab-btn__badge">(основной)</span><?php endif; ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
 
-        <?php if ($translationLangs): ?>
-            <div data-lang-tabs style="border:1px solid var(--admin-border,#e3e6ea);border-radius:8px;padding:12px;">
-                <div class="lang-tabs">
-                    <?php foreach ($translationLangs as $i => $lang): ?>
-                        <button type="button" class="lang-tab-btn <?= $i === 0 ? 'is-active' : '' ?>" data-lang-target="<?= htmlspecialchars($lang['code'], ENT_QUOTES) ?>">
-                            <?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
-                <?php foreach ($translationLangs as $i => $lang): ?>
-                    <?php $code = (string) $lang['code']; $t = $translations[$code] ?? []; ?>
-                    <div class="lang-tab-panel <?= $i === 0 ? 'is-active' : '' ?>" data-lang-panel="<?= htmlspecialchars($code, ENT_QUOTES) ?>">
+            <?php foreach ($languages as $i => $lang): ?>
+                <?php $code = (string) $lang['code']; $isDefault = $code === $defaultCode; ?>
+                <div class="lang-tab-panel <?= $i === 0 ? 'is-active' : '' ?>" data-lang-panel="<?= htmlspecialchars($code, ENT_QUOTES) ?>">
+                    <?php if ($isDefault): ?>
+                        <div class="form-field">
+                            <label for="title">Название проекта</label>
+                            <input type="text" id="title" name="title" value="<?= htmlspecialchars($project['title'] ?? '', ENT_QUOTES) ?>" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="description">Описание</label>
+                            <textarea id="description" name="description" data-wysiwyg style="min-height:220px;"><?= htmlspecialchars($project['description'] ?? '', ENT_QUOTES) ?></textarea>
+                        </div>
+                    <?php else: ?>
+                        <?php $t = $translations[$code] ?? []; ?>
                         <p class="form-hint">Перевод для языка «<?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>». Пустые поля на сайте заменяются версией основного языка.</p>
                         <div class="form-field">
                             <label>Название проекта</label>
@@ -68,12 +73,12 @@ $action = $isEdit ? '/admin/projects/' . (int) $project['id'] . '/edit' : '/admi
                         </div>
                         <div class="form-field">
                             <label>Описание</label>
-                            <textarea name="translations[<?= $code ?>][description]" style="min-height:160px;"><?= htmlspecialchars($t['description'] ?? '', ENT_QUOTES) ?></textarea>
+                            <textarea name="translations[<?= $code ?>][description]" data-wysiwyg style="min-height:220px;"><?= htmlspecialchars($t['description'] ?? '', ENT_QUOTES) ?></textarea>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
 
         <?= \App\Core\AdminUi::imageField('cover_image_url', $project['cover_image'] ?? '', [
             'label' => 'Обложка проекта',

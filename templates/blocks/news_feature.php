@@ -33,7 +33,7 @@ $badge = static fn (array $i): string => trim((string) ($i['badge'] ?? ''));
         <a class="newsfeat-lead" href="<?= htmlspecialchars((string) $featured['url'], ENT_QUOTES) ?>">
             <span class="newsfeat-lead__frame">
                 <?php if (!empty($featured['cover'])): ?>
-                    <img class="newsfeat-lead__media" src="<?= htmlspecialchars((string) $featured['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                    <?= \App\Core\Media::picture((string) $featured['cover'], (string) $featured['title'], null, null, 'newsfeat-lead__media', false, '(max-width: 900px) 100vw, 60vw') ?>
                 <?php else: ?>
                     <span class="newsfeat-lead__media newsfeat-lead__media--empty" aria-hidden="true"></span>
                 <?php endif; ?>
@@ -53,11 +53,13 @@ $badge = static fn (array $i): string => trim((string) ($i['badge'] ?? ''));
                 <div class="newsfeat-side__thumbs">
                     <?php foreach ($withThumb as $item): ?>
                         <a class="newsfeat-mini" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
-                            <?php if (!empty($item['cover'])): ?>
-                                <img class="newsfeat-mini__media" src="<?= htmlspecialchars((string) $item['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
-                            <?php else: ?>
-                                <span class="newsfeat-mini__media newsfeat-mini__media--empty" aria-hidden="true"></span>
-                            <?php endif; ?>
+                            <span class="newsfeat-mini__thumb">
+                                <?php if (!empty($item['cover'])): ?>
+                                    <?= \App\Core\Media::picture((string) $item['cover'], (string) $item['title'], null, null, 'newsfeat-mini__media', true, '(max-width: 700px) 100vw, 30vw') ?>
+                                <?php else: ?>
+                                    <span class="newsfeat-mini__media newsfeat-mini__media--empty" aria-hidden="true"></span>
+                                <?php endif; ?>
+                            </span>
                             <span class="newsfeat-mini__body">
                                 <span class="news-meta">
                                     <?php if (!empty($item['published_at'])): ?><time class="newsfeat__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>

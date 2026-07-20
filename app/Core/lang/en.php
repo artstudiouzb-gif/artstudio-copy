@@ -17,6 +17,8 @@ return [
     'Все новости' => 'All news',
     'Все материалы' => 'All materials',
     'Смотреть видео' => 'Watch video',
+    'Пресс-релиз' => 'Press release',
+    'Посмотреть ещё раз' => 'Watch again',
     'Смотреть все' => 'View all',
     'Найти' => 'Search',
     'Сбросить' => 'Reset',
@@ -26,7 +28,6 @@ return [
     'Подписаться' => 'Subscribe',
     'Поделиться' => 'Share',
     'Скачать' => 'Download',
-    'Скачать пресс-релиз' => 'Download press release',
     'Скачать все фото' => 'Download all photos',
     'Печать' => 'Print',
     'Распечатать' => 'Print',
@@ -164,4 +165,11 @@ return [
     // Подписи прокручиваемых полос — их читает экранный диктор.
     'Отзывы — прокрутка вбок' => 'Testimonials — scroll sideways',
     'Карточки — прокрутка вбок' => 'Cards — scroll sideways',
+    'Перевод пока недоступен' => 'Translation is not available yet',
+    'Доступен на другом языке' => 'Available in another language',
+    'Этот материал ещё не переведён на выбранный язык.' => 'This content has not yet been translated into the selected language.',
+    'Этот материал ещё не переведён на выбранный язык. Вы можете открыть его на другом доступном языке.' => 'This content has not yet been translated into the selected language. You can open it in another available language.',
+    'Доступные языки материала' => 'Available content languages',
+    'Посмотреть на языке' => 'View in',
+    'Вернуться на главную' => 'Return to the home page',
 ];

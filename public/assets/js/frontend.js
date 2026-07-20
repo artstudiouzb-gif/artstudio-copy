@@ -1,6 +1,120 @@
 (function () {
     'use strict';
 
+    // MP4 в Hero — декоративный фон, а не видеоплеер. Атрибутов разметки
+    // достаточно в большинстве браузеров, но после возврата на вкладку или
+    // системной паузы autoplay может не возобновиться сам. Восстанавливаем
+    // фон без контролов, звука и видимой кнопки воспроизведения.
+    (function () {
+        var videos = document.querySelectorAll('[data-hero-background-video]');
+        if (!videos.length) { return; }
+
+        videos.forEach(function (video) {
+            var resume = function () {
+                video.controls = false;
+                video.muted = true;
+                video.defaultMuted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.removeAttribute('controls');
+
+                var promise = video.play();
+                if (promise && typeof promise.catch === 'function') {
+                    // Браузер сам повторит попытку после canplay/visibilitychange.
+                    promise.catch(function () {});
+                }
+            };
+
+            video.addEventListener('canplay', resume);
+            video.addEventListener('ended', function () {
+                // Резерв для браузеров, игнорирующих loop после выгрузки вкладки.
+                video.currentTime = 0;
+                resume();
+            });
+            // Опережающий перезапуск за 0.2 секунды до реального окончания видео,
+            // чтобы избежать черного экрана/вспышки и появления кнопок управления.
+            video.addEventListener('timeupdate', function () {
+                if (video.duration && video.currentTime >= video.duration - 0.2) {
+                    video.currentTime = 0;
+                    video.play().catch(function () {});
+                }
+            });
+            video.addEventListener('pause', function () {
+                if (!document.hidden && !video.ended) { resume(); }
+            });
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) { resume(); }
+            });
+
+            resume();
+        });
+    })();
+
+    // YouTube-фон использует те же правила. enablejsapi=1 в iframe позволяет
+    // вернуть воспроизведение после фоновой приостановки вкладки, не открывая
+    // пользователю элементы плеера.
+    (function () {
+        var frames = document.querySelectorAll('[data-hero-youtube-background]');
+        if (!frames.length) { return; }
+
+        frames.forEach(function (frame) {
+            var command = function (name, args) {
+                if (!frame.contentWindow) { return; }
+                frame.contentWindow.postMessage(JSON.stringify({
+                    event: 'command',
+                    func: name,
+                    args: args || []
+                }), '*');
+            };
+            var resume = function () {
+                command('mute');
+                command('setLoop', [true]);
+                command('playVideo');
+                // Отправляем handshake-сообщение "listening", чтобы YouTube начал присылать события о состоянии
+                if (frame.contentWindow) {
+                    frame.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
+                }
+            };
+
+            frame.addEventListener('load', resume);
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) { resume(); }
+            });
+
+            // Слушаем сообщения об изменении состояния плеера YouTube,
+            // чтобы перехватить окончание или время воспроизведения и запустить ролик заново.
+            window.addEventListener('message', function (e) {
+                if (!/https?:\/\/(www\.)?youtube(-nocookie)?\.com/.test(e.origin)) { return; }
+                try {
+                    var data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+                    if (!data) { return; }
+
+                    var ended = false;
+                    if (data.event === 'infoDelivery' && data.info) {
+                        // Опережающий перезапуск за 0.3 секунды до конца видео, чтобы избежать черного экрана
+                        if (typeof data.info.currentTime === 'number' && typeof data.info.duration === 'number') {
+                            if (data.info.duration > 0 && data.info.currentTime >= data.info.duration - 0.3) {
+                                ended = true;
+                            }
+                        }
+                        if (data.info.playerState === 0) {
+                            ended = true;
+                        }
+                    } else if (data.event === 'onStateChange' && (data.info === 0 || data.data === 0)) {
+                        ended = true;
+                    }
+
+                    if (ended) {
+                        resume();
+                        command('seekTo', [0, true]);
+                    }
+                } catch (err) {
+                    // Игнорируем невалидные сообщения от сторонних скриптов
+                }
+            });
+        });
+    })();
+
     // Переключатели главного меню: бургер (мобильные / макет «боковая панель»),
     // а также фон и кнопка закрытия off-canvas панели. Любой из них
     // открывает/закрывает меню через класс body; Esc закрывает.
@@ -804,17 +918,18 @@
         });
     })();
 
-    // Интерактивный «прожектор» (Spotlight) для карточек
-    (function () {
-        var cards = document.querySelectorAll('.cat-tile, .contact-card, .project-card, .team-card');
-        if (!cards.length) { return; }
-        cards.forEach(function (card) {
-            card.addEventListener('mousemove', function (e) {
-                var rect = card.getBoundingClientRect();
-                var x = e.clientX - rect.left;
-                var y = e.clientY - rect.top;
-                card.style.setProperty('--mouse-x', x + 'px');
-                card.style.setProperty('--mouse-y', y + 'px');
-            });
-        });
-    })();
+    // Интерактивный «прожектор» (Spotlight) для карточек, кнопок и полей ввода
+    document.addEventListener('mousemove', function (e) {
+        var el = e.target.closest(
+            '.cat-tile, .contact-card, .project-card, .team-card, .feature-card, .news-card, .person-card, .album-card, .doc-card, .catcard, .testimonial, .block-advantages__item, .mediacard, .imgcard, .faq-item, .stage, .timeline-item, ' +
+            '.btn, .block-cta__button, .btn-cta, .block-hero__button, .timeline-card__button, .timeline-cta__button, ' +
+            '.a11y-toggle, .site-theme-toggle, .site-search-toggle, ' +
+            'input[type="text"], input[type="email"], input[type="password"], input[type="search"]:not(.site-search input), textarea, select'
+        );
+        if (!el) { return; }
+        var rect = el.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        el.style.setProperty('--mouse-x', x + 'px');
+        el.style.setProperty('--mouse-y', y + 'px');
+    });

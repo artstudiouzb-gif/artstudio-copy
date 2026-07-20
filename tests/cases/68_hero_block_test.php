@@ -21,6 +21,48 @@ test('Hero: YouTube-фон рендерит iframe с nocookie-доменом и
     assert_true(str_contains($html, 'youtube-nocookie.com/embed/dQw4w9WgXcQ'), 'iframe YouTube с id');
     assert_true(str_contains($html, 'block-hero--video'), 'класс видео-героя');
     assert_true(str_contains($html, 'autoplay=1&mute=1&loop=1'), 'автозапуск без звука, цикл');
+    assert_contains('playlist=dQw4w9WgXcQ', $html, 'playlist нужен YouTube для бесшовного loop');
+    assert_contains('controls=0', $html, 'стандартные элементы управления отключены');
+    assert_contains('enablejsapi=1', $html, 'фон можно возобновить после системной паузы');
+    assert_contains('data-hero-youtube-background', $html);
+    assert_true(str_contains($html, 'loading="eager"'), 'фон первого экрана загружается сразу');
+    assert_contains('referrerpolicy="strict-origin-when-cross-origin"', $html, 'YouTube получает origin сайта для проверки embed');
+    assert_true(!str_contains($html, 'loading="lazy"'), 'YouTube hero не откладывается lazy-loading');
+});
+
+test('Hero: сохранённая ссылка YouTube включает фон даже при старом bg_type none', function () {
+    $html = render_hero([
+        'title' => 'Заголовок',
+        'bg_type' => 'none',
+        'youtube_url' => 'https://www.youtube.com/watch?v=s_lKTkRGKc8',
+    ]);
+
+    assert_contains('youtube-nocookie.com/embed/s_lKTkRGKc8', $html);
+    assert_contains('block-hero--video', $html);
+    assert_not_contains('block-hero--plain', $html);
+});
+
+test('Hero: сохранённый MP4 включает фон даже при старом bg_type none', function () {
+    $html = render_hero([
+        'title' => 'Заголовок',
+        'bg_type' => 'none',
+        'video_url' => '/uploads/public/hero.mp4',
+    ]);
+
+    assert_contains('<video class="block-hero__video" data-hero-background-video autoplay muted loop playsinline webkit-playsinline preload="metadata"', $html);
+    assert_contains('<source src="/uploads/public/hero.mp4" type="video/mp4">', $html);
+    assert_not_contains(' controls ', $html);
+    assert_contains('block-hero--video', $html);
+    assert_not_contains('block-hero--plain', $html);
+
+    $js = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/js/frontend.js');
+    assert_contains("video.controls = false", $js);
+    assert_contains("video.muted = true", $js);
+    assert_contains("video.loop = true", $js);
+    assert_contains("document.addEventListener('visibilitychange'", $js);
+    assert_contains("command('playVideo')", $js);
+    assert_contains("command('mute')", $js);
+    assert_contains("command('setLoop', [true])", $js);
 });
 
 test('Hero: overlay использует заданный цвет и прозрачность', function () {

@@ -9,6 +9,7 @@ test('Video: извлекает id из разных форматов YouTube', 
     assert_same('dQw4w9WgXcQ', Video::youtubeId('https://youtu.be/dQw4w9WgXcQ'));
     assert_same('dQw4w9WgXcQ', Video::youtubeId('https://www.youtube.com/embed/dQw4w9WgXcQ'));
     assert_same('dQw4w9WgXcQ', Video::youtubeId('https://youtube.com/shorts/dQw4w9WgXcQ'));
+    assert_same('s_lKTkRGKc8', Video::youtubeId('https://www.youtube.com/watch?v=s_lKTkRGKc8'));
 });
 
 test('Video: не-YouTube и мусор -> null', function () {
@@ -24,4 +25,7 @@ test('Video: обложка и embed используют id', function () {
     assert_contains('hqdefault', Video::youtubeThumbnail($id));
     assert_contains($id, Video::youtubeEmbed($id));
     assert_contains('nocookie', Video::youtubeEmbed($id));
+    assert_contains('rel=0', Video::youtubeEmbed($id));
+    assert_contains('controls=0', Video::youtubeEmbed($id));
+    assert_contains('enablejsapi=1', Video::youtubeEmbed($id));
 });

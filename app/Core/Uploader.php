@@ -38,6 +38,7 @@ final class Uploader
         'txt' => 'text/plain',
         'woff2' => 'font/woff2',
         'woff' => 'font/woff',
+        'mp4' => 'video/mp4',
     ];
 
     // Типы, для которых finfo часто возвращает application/octet-stream —
@@ -106,7 +107,7 @@ final class Uploader
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $detectedMime = (string) $finfo->file($sourcePath);
         $expectedMime = self::ALLOWED[$extension];
-        if (!in_array($extension, self::LENIENT_MIME, true) && $detectedMime !== $expectedMime) {
+        if (!self::mimeMatches($extension, $detectedMime, $sourcePath)) {
             throw new RuntimeException('Содержимое файла не соответствует расширению.');
         }
 
@@ -150,6 +151,32 @@ final class Uploader
         ]);
 
         return FileEntry::findById($id);
+    }
+
+    /**
+     * Проверяет фактический MIME. Для MP4 разные версии libmagic возвращают
+     * video/mp4, application/mp4 или octet-stream, поэтому дополнительно
+     * проверяем сигнатуру ISO Base Media (box `ftyp`).
+     */
+    public static function mimeMatches(string $extension, string $detectedMime, string $path): bool
+    {
+        $extension = strtolower($extension);
+        if (!isset(self::ALLOWED[$extension])) {
+            return false;
+        }
+        if (in_array($extension, self::LENIENT_MIME, true)) {
+            return true;
+        }
+        if ($extension !== 'mp4') {
+            return $detectedMime === self::ALLOWED[$extension];
+        }
+        if (!in_array($detectedMime, ['video/mp4', 'application/mp4', 'application/octet-stream'], true)) {
+            return false;
+        }
+
+        $header = @file_get_contents($path, false, null, 0, 12);
+
+        return is_string($header) && strlen($header) >= 12 && substr($header, 4, 4) === 'ftyp';
     }
 
     /**
@@ -278,7 +305,8 @@ final class Uploader
         return max(1200, min(4000, $w));
     }
 
-    public static function optimizeImage(string $path): void
+    /** $downscaleOriginal=false используется для безопасной миграции старых файлов. */
+    public static function optimizeImage(string $path, bool $downscaleOriginal = true): void
     {
         if (!extension_loaded('gd')) {
             return;
@@ -347,7 +375,7 @@ final class Uploader
             // уменьшённый оригинал экономит вес страниц и место на диске, при
             // этом работает и там, где картинка задаётся через CSS background.
             $maxW = self::originalMaxWidth();
-            if ($width > $maxW) {
+            if ($downscaleOriginal && $width > $maxW) {
                 $newH = (int) round($height * ($maxW / $width));
                 $down = imagecreatetruecolor($maxW, $newH);
                 if ($type === IMAGETYPE_PNG) {

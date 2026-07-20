@@ -17,6 +17,8 @@ return [
     'Все новости' => 'Barcha yangiliklar',
     'Все материалы' => 'Barcha materiallar',
     'Смотреть видео' => 'Videoni ko‘rish',
+    'Пресс-релиз' => 'Press-reliz',
+    'Посмотреть ещё раз' => 'Yana ko‘rish',
     'Смотреть все' => 'Barchasini ko‘rish',
     'Найти' => 'Qidirish',
     'Сбросить' => 'Tozalash',
@@ -26,7 +28,6 @@ return [
     'Подписаться' => 'Obuna bo‘lish',
     'Поделиться' => 'Ulashish',
     'Скачать' => 'Yuklab olish',
-    'Скачать пресс-релиз' => 'Press-relizni yuklab olish',
     'Скачать все фото' => 'Barcha suratlarni yuklab olish',
     'Печать' => 'Chop etish',
     'Распечатать' => 'Chop etish',
@@ -164,4 +165,11 @@ return [
     // Подписи прокручиваемых полос — их читает экранный диктор.
     'Отзывы — прокрутка вбок' => 'Sharhlar — yon tomonga aylantirish',
     'Карточки — прокрутка вбок' => 'Kartochkalar — yon tomonga aylantirish',
+    'Перевод пока недоступен' => 'Tarjima hozircha mavjud emas',
+    'Доступен на другом языке' => 'Boshqa tilda mavjud',
+    'Этот материал ещё не переведён на выбранный язык.' => 'Ushbu material tanlangan tilga hali tarjima qilinmagan.',
+    'Этот материал ещё не переведён на выбранный язык. Вы можете открыть его на другом доступном языке.' => 'Ushbu material tanlangan tilga hali tarjima qilinmagan. Uni mavjud bo‘lgan boshqa tilda ochishingiz mumkin.',
+    'Доступные языки материала' => 'Material mavjud bo‘lgan tillar',
+    'Посмотреть на языке' => 'Ushbu tilda ko‘rish',
+    'Вернуться на главную' => 'Bosh sahifaga qaytish',
 ];
