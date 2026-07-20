@@ -159,77 +159,81 @@ HTML
 </section>
 HTML
     ],
-    // 3. Bento Grid Service Advisor (Full Width)
+    // 3. Premium Interactive Diagnostics & Tools Section
     [
         'title' => '03. Service Advisor',
         'html' => <<<'HTML'
-<section class="section soft" id="advisor-section">
+<section class="section soft" id="tools">
   <div class="wrap">
-    <div class="section-head-centered">
-      <div class="eyebrow" style="color:var(--gold)">Интерактивный навигатор</div>
-      <h2 style="font-family:var(--serif); font-weight:600; color:var(--navy)">Подобрать услугу за 60 секунд</h2>
-      <p style="color: var(--muted); margin-top: 10px">Выберите вашу сферу деятельности слева и основную цель справа для автоматического построения маршрута.</p>
-    </div>
-    
-    <div class="bento-advisor" id="bentoAdvisor">
-      <!-- Left side: Industries -->
-      <div class="bento-col">
-        <div class="bento-col-title">1. Ваша сфера деятельности</div>
-        <div class="bento-grid-options" id="bentoIndustries">
-          <div class="bento-opt-card" data-value="agro">
-            <span class="num">01</span>
-            <b>Сельское хозяйство</b>
-            <span>Удобрения, СЗР и агрохимия</span>
-          </div>
-          <div class="bento-opt-card" data-value="food">
-            <span class="num">02</span>
-            <b>Пищевая отрасль</b>
-            <span>БАДы, продукты питания и ХАССП</span>
-          </div>
-          <div class="bento-opt-card" data-value="cosmetic">
-            <span class="num">03</span>
-            <b>Косметика</b>
-            <span>Парфюмерия и стандарты GMP</span>
-          </div>
-          <div class="bento-opt-card" data-value="vet">
-            <span class="num">04</span>
-            <b>Ветеринария</b>
-            <span>Ветпрепараты и кормовые добавки</span>
-          </div>
-        </div>
+    <div class="section-head" style="margin-bottom: 50px">
+      <div>
+        <div class="eyebrow" style="color:var(--gold)">Интерактивные инструменты</div>
+        <h2 style="font-family:var(--serif); font-weight:600; color:var(--navy)">Начните с короткой диагностики</h2>
       </div>
-      
-      <!-- Right side: Goals -->
-      <div class="bento-col">
-        <div class="bento-col-title">2. Ваша главная цель</div>
-        <div class="bento-grid-options" id="bentoGoals">
-          <div class="bento-opt-card" data-value="import">
-            <span class="num">01</span>
-            <b>Импорт под ключ</b>
-            <span>Ввоз и госрегистрация</span>
-          </div>
-          <div class="bento-opt-card" data-value="production">
-            <span class="num">02</span>
-            <b>Локализация</b>
-            <span>Запуск производства в РУз</span>
-          </div>
-          <div class="bento-opt-card" data-value="export">
-            <span class="num">03</span>
-            <b>Выход на экспорт</b>
-            <span>Поставки в ЕС и страны СНГ</span>
-          </div>
-          <div class="bento-opt-card" data-value="iso">
-            <span class="num">04</span>
-            <b>Сертификация ISO</b>
-            <span>ISO 9001, 17025, HACCP</span>
-          </div>
-        </div>
-      </div>
+      <p style="color: var(--muted); font-size:16px; line-height:1.6; max-width:600px">Инструменты помогают сформировать первичный запрос. Итоговые требования подтверждаются экспертом после анализа документов.</p>
     </div>
-    
-    <div class="bento-result-panel" id="bentoResultPanel">
-      <div class="bento-result-placeholder">Выберите отрасль и цель для автоматического расчета маршрута...</div>
-      <div class="bento-result-content" id="bentoResultBody" style="display:none"></div>
+    <div class="tools-layout">
+      <!-- Left Card: Permit Advisor -->
+      <article class="tool-card">
+        <div class="tool-icon" style="background:#f2f6f5; color:var(--emerald); width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:22px">⌁</div>
+        <h3 style="font-family:var(--serif); font-size:24px; color:var(--navy); margin: 24px 0 12px">Какие разрешения могут потребоваться?</h3>
+        <p style="color: var(--muted); margin-bottom: 24px; font-size:16px">Выберите категорию продукта и планируемое действие для мгновенного отчета.</p>
+        <div class="checker">
+          <label style="font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; display: block">Категория продукта</label>
+          <div class="checker-select-wrap">
+            <select id="product" aria-label="Категория продукта">
+              <option value="" disabled selected>выберите категорию</option>
+              <option value="agro">Удобрение / СЗР</option>
+              <option value="food">Пищевой продукт / БАД</option>
+              <option value="cosmetic">Косметика / Парфюмерия</option>
+              <option value="vet">Ветеринарный товар</option>
+            </select>
+          </div>
+          <label style="font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; display: block">Планируемое действие</label>
+          <div class="checker-select-wrap">
+            <select id="action" aria-label="Планируемое действие">
+              <option value="import">Импорт и реализация</option>
+              <option value="production">Открытие производства в РУз</option>
+              <option value="export">Экспорт из Узбекистана</option>
+            </select>
+          </div>
+          <button class="checker-btn" id="checkBtn">Проверить разрешения</button>
+        </div>
+        <div class="checker-result" id="result"></div>
+      </article>
+
+      <!-- Right Card: Service Selector -->
+      <article class="tool-card darkcard" style="background:var(--navy); color:#fff; border-radius:28px">
+        <div class="tool-icon" style="background:rgba(255,255,255,0.06); color:var(--gold); width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:22px">◎</div>
+        <h3 style="font-family:var(--serif); font-size:24px; color:#fff; margin: 24px 0 12px">Подбор услуги за 60 секунд</h3>
+        <p style="color: #a4c0b9; margin-bottom: 24px; font-size:16px">Опишите исходную точку — система предложит подходящий маршрут консультации.</p>
+        <div class="darkcard-links">
+          <button class="darkcard-link quick" data-value="market">Хочу выйти на рынок Узбекистана</button>
+          <button class="darkcard-link quick" data-value="permits">Нужно получить разрешения</button>
+          <button class="darkcard-link quick" data-value="export">Планирую экспорт</button>
+          <button class="darkcard-link quick" data-value="iso">Нужна подготовка к ISO / GMP</button>
+        </div>
+      </article>
+    </div>
+
+    <!-- Bottom Row: Mini tools -->
+    <div class="mini-tools-grid">
+      <article class="mini-tool-card">
+        <b>Личный кабинет</b>
+        <span>Документы, сообщения и задачи в одном защищенном цифровом пространстве.</span>
+      </article>
+      <article class="mini-tool-card">
+        <b>Трекер проекта</b>
+        <span>Этапы, ответственные стороны и контрольные точки в реальном времени.</span>
+      </article>
+      <article class="mini-tool-card">
+        <b>Безопасная загрузка</b>
+        <span>Передача технических заданий и досье с многоуровневым шифрованием.</span>
+      </article>
+      <article class="mini-tool-card">
+        <b>Онлайн-запись</b>
+        <span>Бронирование времени видеозвонка с координатором проекта в один клик.</span>
+      </article>
     </div>
   </div>
 </section>

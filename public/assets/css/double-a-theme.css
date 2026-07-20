@@ -4010,3 +4010,172 @@ p {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   DOUBLE A SOLUTIONS - COMBINED DIAGNOSTICS & TOOLS SECTION
+   ========================================================================== */
+
+.checker-select-wrap {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.checker-select-wrap select {
+    width: 100%;
+    padding: 16px 20px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #faf9f6;
+    color: var(--navy);
+    font-family: var(--serif);
+    font-weight: 600;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+.checker-select-wrap select:focus {
+    border-color: var(--gold);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(212,175,55,0.08);
+}
+.checker-select-wrap:after {
+    content: "▾";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--gold);
+    pointer-events: none;
+}
+.checker-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--navy);
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    border: 1px solid var(--navy);
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.checker-btn:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--navy);
+    box-shadow: 0 10px 20px rgba(212,175,55,0.2);
+}
+.checker-result {
+    margin-top: 25px;
+    border-left: 3px solid var(--gold);
+    background: #fbf9f4;
+    padding: 24px;
+    font-size: 15px;
+    line-height: 1.6;
+    display: none;
+    border-radius: 0 16px 16px 0;
+    color: var(--navy);
+}
+.checker-result.show {
+    display: block;
+    animation: fadeInResult 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Dark Card Selector Links */
+.darkcard-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 28px;
+}
+.darkcard-link {
+    width: 100%;
+    padding: 20px 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+    color: #fff;
+    border-radius: 14px;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.darkcard-link:hover {
+    border-color: var(--gold);
+    background: rgba(255,255,255,0.05);
+    transform: translateX(5px);
+    color: var(--gold);
+}
+.darkcard-link:after {
+    content: "↗";
+    color: var(--gold);
+    font-size: 18px;
+    transition: transform 0.3s;
+}
+.darkcard-link:hover:after {
+    transform: translate(3px, -3px);
+}
+
+/* Mini tools grid */
+.mini-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    margin-top: 50px;
+}
+.mini-tool-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 30px;
+    border-radius: 20px;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+}
+.mini-tool-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212,175,55,0.25);
+    box-shadow: var(--shadow);
+}
+.mini-tool-card b {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--navy);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mini-tool-card b:before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: inline-block;
+}
+.mini-tool-card span {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    display: block;
+}
+
+@media(max-width: 960px) {
+    .mini-tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media(max-width: 580px) {
+    .mini-tools-grid {
+        grid-template-columns: 1fr;
+    }
+}
