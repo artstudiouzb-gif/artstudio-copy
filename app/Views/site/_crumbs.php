@@ -23,7 +23,7 @@ foreach ($crumbs as $c) {
 }
 echo \App\Core\SchemaOrg::render(\App\Core\SchemaOrg::breadcrumbs($crumbsSchema)), "\n";
 ?>
-<nav class="content-crumbs<?= !empty($crumbsClass) ? ' ' . htmlspecialchars((string) $crumbsClass, ENT_QUOTES) : '' ?>" aria-label="<?= htmlspecialchars(t('Хлебные крошки'), ENT_QUOTES) ?>">
+<nav class="content-crumbs corp-crumbs<?= !empty($crumbsClass) ? ' ' . htmlspecialchars((string) $crumbsClass, ENT_QUOTES) : '' ?>" aria-label="<?= htmlspecialchars(t('Хлебные крошки'), ENT_QUOTES) ?>">
     <?php $last = count($crumbs) - 1; ?>
     <?php foreach ($crumbs as $i => $c): ?>
         <?php if (!empty($c['url']) && $i !== $last): ?>

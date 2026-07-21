@@ -15,33 +15,48 @@ $transparentHeader = !empty($page['transparent_header']);
 $isStaticPage = true;
 require __DIR__ . '/_header.php';
 
-// Первый блок — hero (шапка-герой)? Тогда он служит заголовком страницы.
-$firstIsHero = (bool) preg_match('/^\s*<section\b[^>]*\bcms-block--hero\b/', $content);
+// Первый блок — hero (шапка-герой) или page-header? Тогда он служит заголовком страницы.
+$firstIsHero = false;
+$firstType = '';
+if (preg_match('/^\s*<section\b[^>]*\bcms-block--hero\b/', $content)) {
+    $firstIsHero = true;
+    $firstType = 'cms-block--hero';
+} elseif (preg_match('/^\s*<section\b[^>]*\bcms-block--html\b[^>]*>\s*<section\b[^>]*\bpage-header\b/', $content)) {
+    $firstIsHero = true;
+    $firstType = 'page-header';
+}
+
 $pageLead = trim((string) ($page['lead'] ?? ''));
 
 // Хлебные крошки для обычных страниц (не главная, не лендинг).
+$crumbsHtml = '';
 if (empty($page['is_home']) && !$hideChrome) {
     $crumbs = [
         ['label' => \App\Core\Lang::t('Главная'), 'url' => \App\Core\Locale::url('/')],
         ['label' => (string) ($page['title'] ?? '')],
     ];
-    // Если первый блок страницы — hero (шапка-герой), крошки встраиваем внутрь
-    // hero (поверх фона, сверху), а не отдельной серой полосой над ним.
+    // Если первый блок страницы — hero или page-header, крошки встраиваем внутрь
     if ($firstIsHero) {
-        // Помечаем первый hero как «шапку страницы» — CSS убирает отступ между
-        // шапкой сайта и hero (герой встаёт вплотную под меню).
-        $content = preg_replace('/(class="[^"]*\bcms-block--hero\b)/', '$1 cms-block--page-hero', $content, 1);
+        if ($firstType === 'cms-block--hero') {
+            $content = preg_replace('/(class="[^"]*\bcms-block--hero\b)/', '$1 cms-block--page-hero', $content, 1);
+        }
         $crumbsClass = 'content-crumbs--on-hero';
         ob_start();
         require __DIR__ . '/_crumbs.php';
-        $crumbsHtml = ob_get_clean();
+        $heroCrumbs = ob_get_clean();
         unset($crumbsClass);
-        // Вставляем сразу после корневого <div class="block-hero …">.
-        if ($crumbsHtml !== '') {
-            $content = preg_replace('/(<div class="block-hero\b[^>]*>)/', '$1' . addcslashes($crumbsHtml, '\\$'), $content, 1);
+        
+        if ($heroCrumbs !== '') {
+            if ($firstType === 'cms-block--hero') {
+                $content = preg_replace('/(<div class="block-hero\b[^>]*>)/', '$1' . addcslashes($heroCrumbs, '\\$'), $content, 1);
+            } elseif ($firstType === 'page-header') {
+                $content = preg_replace('/(^\s*<section\b[^>]*\bcms-block--html\b[^>]*>\s*<section\b[^>]*\bpage-header\b[^>]*>\s*<div class="wrap\b[^>]*>)/', '$1' . addcslashes($heroCrumbs, '\\$'), $content, 1);
+            }
         }
     } else {
+        ob_start();
         require __DIR__ . '/_crumbs.php';
+        $crumbsHtml = ob_get_clean();
     }
 }
 
@@ -51,10 +66,13 @@ $showLeadHead = empty($page['is_home']) && !$hideChrome && !$firstIsHero && $pag
 if ($showLeadHead): ?>
     <div class="content-pagehead">
         <div class="content-pagehead__inner">
+            <?= $crumbsHtml ?>
             <h1 class="content-pagehead__title"><?= htmlspecialchars((string) ($page['title'] ?? ''), ENT_QUOTES) ?></h1>
             <p class="content-pagehead__lead"><?= nl2br(htmlspecialchars($pageLead, ENT_QUOTES)) ?></p>
         </div>
     </div>
+<?php else: ?>
+    <?= $crumbsHtml ?>
 <?php endif; ?>
 <?php
 $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';

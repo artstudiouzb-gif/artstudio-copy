@@ -1,5 +1,4 @@
 <?php
-
 use App\Core\Locale;
 use App\Models\Project;
 
@@ -14,47 +13,43 @@ $crumbs = [
     ['label' => t('Кейсы'), 'url' => Locale::url('projects')],
     ['label' => (string) $project['title']],
 ];
-require __DIR__ . '/_crumbs.php';
-
 $cover = trim((string) ($project['cover_image'] ?? ''));
 $others = array_values(array_filter(Project::published(), fn (array $p) => (int) $p['id'] !== (int) $project['id']));
 ?>
-<article class="projdetail">
-    <div class="projdetail-head<?= $cover === '' ? ' projdetail-head--no-media' : '' ?>">
-        <div class="projdetail-head__info">
-            <span class="newsdetail__badge"><?= htmlspecialchars(t('Кейс'), ENT_QUOTES) ?></span>
-            <h1 class="projdetail__title"><?= htmlspecialchars((string) $project['title'], ENT_QUOTES) ?></h1>
+<div class="corp-case-header">
+    <div class="corp-wrap">
+        <?php require __DIR__ . '/_crumbs.php'; ?>
+        <h1><?= htmlspecialchars((string) $project['title'], ENT_QUOTES) ?></h1>
+        
+        <div class="corp-case-grid">
+            <div class="corp-case-stat">
+                <b>Отрасль</b>
+                <span>Консалтинг</span>
+            </div>
+            <div class="corp-case-stat">
+                <b>Локация</b>
+                <span>Узбекистан / СНГ</span>
+            </div>
+            <div class="corp-case-stat">
+                <b>Услуга</b>
+                <span>Регистрация</span>
+            </div>
+            <div class="corp-case-stat">
+                <b>Срок реализации</b>
+                <span>6 месяцев</span>
+            </div>
         </div>
-        <?php if ($cover !== ''): ?>
-            <?= \App\Core\Media::picture($cover, (string) $project['title'], null, null, 'projdetail__media', false, '(max-width: 900px) 100vw, 55vw') ?>
-        <?php endif; ?>
     </div>
-    <div class="projdetail__content newsdetail-article__content rich-content"><?= $project['description'] ?></div>
+</div>
 
-    <?php if (!empty($others)): ?>
-        <section class="projdetail-related">
-            <div class="section-head">
-                <h2 class="section-head__title"><?= htmlspecialchars(t('Другие кейсы'), ENT_QUOTES) ?></h2>
-                <a class="section-head__all" href="<?= htmlspecialchars(Locale::url('projects'), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Все кейсы'), ENT_QUOTES) ?> →</a>
-            </div>
-            <div class="projects-grid projects-grid--compact">
-                <?php foreach (array_slice($others, 0, 4) as $item): ?>
-                    <?php $c = trim((string) ($item['cover_image'] ?? '')); ?>
-                    <a class="imgcard" href="<?= htmlspecialchars(Locale::url('projects/' . $item['slug']), ENT_QUOTES) ?>">
-                        <?php if ($c !== ''): ?>
-                            <?= \App\Core\Media::picture($c, (string) $item['title'], null, null, 'imgcard__media', true, '(max-width: 700px) 100vw, 25vw') ?>
-                        <?php else: ?>
-                            <span class="imgcard__media" aria-hidden="true"></span>
-                        <?php endif; ?>
-                        <span class="imgcard__overlay"></span>
-                        <span class="imgcard__body">
-                            <span class="imgcard__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
-                            <span class="imgcard__more"><?= htmlspecialchars(t('Подробнее'), ENT_QUOTES) ?> →</span>
-                        </span>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </section>
+<div class="corp-wrap" style="padding-top: 100px; padding-bottom: 100px;">
+    <?php if ($cover !== ''): ?>
+        <img src="<?= htmlspecialchars($cover, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $project['title'], ENT_QUOTES) ?>" style="width:100%; height:auto; max-height:600px; object-fit:cover; margin-bottom:60px;">
     <?php endif; ?>
-</article>
+
+    <div class="corp-article-body rich-content" style="margin: 0 auto; max-width: 800px;">
+        <?= $project['description'] ?>
+    </div>
+</div>
+
 <?php require __DIR__ . '/_footer.php'; ?>

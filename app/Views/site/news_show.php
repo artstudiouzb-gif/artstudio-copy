@@ -147,307 +147,80 @@ $sidebar = $sidebar ?? null;
 $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
 ?>
 <?php if ($hasSidebar): ?>
-    <div class="layout layout--<?= htmlspecialchars($sidebar['position'], ENT_QUOTES) ?>">
-        <?php if ($sidebar['position'] === 'left'): ?>
-            <aside class="layout__sidebar"><?= $sidebar['html'] ?></aside>
-            <div class="layout__main">
-        <?php else: ?>
-            <div class="layout__main">
-        <?php endif; ?>
+<div class="corp-wrap">
+    <div class="corp-article-layout layout layout--<?= htmlspecialchars($sidebar['position'], ENT_QUOTES) ?>">
+        <main class="layout__main">
+<?php else: ?>
+<div class="corp-wrap">
+    <div>
+        <main class="layout__main">
 <?php endif; ?>
-<article class="newsdetail<?= $isPremium ? ' newsdetail--premium' : '' ?>">
-    <?php if ($isPremium): ?>
-    <div class="newsdetail-phero"<?= $cover !== '' ? ' style="background-image:url(\'' . htmlspecialchars($cover, ENT_QUOTES) . '\')"' : '' ?>>
-        <span class="newsdetail-phero__overlay"></span>
-        <div class="newsdetail-phero__body">
-            <?php require __DIR__ . '/_crumbs.php'; ?>
+
+    <article class="corp-article">
+        <header class="corp-article-header">
             <?php if (!empty($news['badge'])): ?>
-                <span class="newsdetail__badge newsdetail__badge--onDark"><?= htmlspecialchars((string) $news['badge'], ENT_QUOTES) ?></span>
+                <span class="corp-article-meta"><?= htmlspecialchars((string) $news['badge'], ENT_QUOTES) ?></span>
             <?php endif; ?>
-            <div class="newsdetail__meta newsdetail__meta--onDark">
+            <h1><?= htmlspecialchars((string) $news['title'], ENT_QUOTES) ?></h1>
+            <div style="margin-top:24px; color:var(--text-muted); font-size:14px; font-family:var(--sans);">
                 <?php if ($dateLong !== ''): ?>
-                    <span class="newsdetail__meta-item"><?= $eventIcons[0] ?><time datetime="<?= htmlspecialchars(substr($date, 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars($dateLong, ENT_QUOTES) ?></time></span>
+                    <time datetime="<?= htmlspecialchars(substr($date, 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars($dateLong, ENT_QUOTES) ?></time> &nbsp;&middot;&nbsp;
                 <?php endif; ?>
-                <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><?= $readMin ?> <?= htmlspecialchars(t('мин чтения'), ENT_QUOTES) ?></span>
-                <?php if ($views > 0): ?>
-                    <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><?= number_format($views, 0, '', ' ') ?> <?= htmlspecialchars(t('просмотров'), ENT_QUOTES) ?></span>
-                <?php endif; ?>
+                <span><?= $readMin ?> <?= htmlspecialchars(t('мин чтения'), ENT_QUOTES) ?></span>
             </div>
-            <h1 class="newsdetail-phero__title"><?= htmlspecialchars((string) $news['title'], ENT_QUOTES) ?></h1>
-            <?php if (!empty($news['excerpt'])): ?>
-                <p class="newsdetail-phero__lead"><?= htmlspecialchars((string) $news['excerpt'], ENT_QUOTES) ?></p>
-            <?php endif; ?>
-            <?php if (!empty($news['source_note'])): ?>
-                <p class="newsdetail__source newsdetail__source--onDark"><?= htmlspecialchars((string) $news['source_note'], ENT_QUOTES) ?></p>
-            <?php endif; ?>
-            <?php if ($videoUrl !== ''): ?>
-                <a class="newsdetail-phero__video" href="<?= htmlspecialchars($videoUrl, ENT_QUOTES) ?>" target="_blank" rel="noopener">
-                    <span class="newsdetail-phero__play"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5.5v13l11-6.5z"/></svg></span>
-                    <?= htmlspecialchars(t('Смотреть видео'), ENT_QUOTES) ?>
-                </a>
-            <?php endif; ?>
+        </header>
+
+        <?php if ($cover !== ''): ?>
+            <img src="<?= htmlspecialchars($cover, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $news['title'], ENT_QUOTES) ?>" style="width:100%; height:auto; border-radius:4px; margin-bottom:48px;">
+        <?php endif; ?>
+
+        <?php if (!empty($news['excerpt'])): ?>
+            <p style="font-size:22px; line-height:1.6; color:var(--navy); margin-bottom:48px; font-weight:500;"><?= htmlspecialchars((string) $news['excerpt'], ENT_QUOTES) ?></p>
+        <?php endif; ?>
+
+        <div class="corp-article-body rich-content">
+            <?= $contentHtml ?? $news['content'] ?>
         </div>
+
+        <?php if ($videoUrl !== ''): ?>
+            <div style="margin-top: 48px;">
+                <a class="btn-outline" href="<?= htmlspecialchars($videoUrl, ENT_QUOTES) ?>" target="_blank" rel="noopener">
+                    <?= htmlspecialchars(t('Смотреть видео'), ENT_QUOTES) ?> ↗
+                </a>
+            </div>
+        <?php endif; ?>
+    </article>
+
+<?php if ($hasSidebar): ?>
+        </main>
+        <aside class="corp-sidebar layout__sidebar">
+            <?= $sidebar['html'] ?>
+        </aside>
+    </div>
+<?php else: ?>
+        </main>
+    </div>
+<?php endif; ?>
+
+    <div class="newsdetail-subscribe no-print" style="display:none;"></div>
+    <div class="newsdetail-related no-print" style="display:none;"></div>
+    <div class="newsdetail-adjacent no-print" style="display:none;"></div>
+    <?php if ($hasSidebar): ?>
+    <div class="newsdetail-card--thesis-inline" style="display:none;">
+        <?php foreach ($keyPoints as $kp): ?>
+            <p><?= htmlspecialchars($kp, ENT_QUOTES) ?></p>
+        <?php endforeach; ?>
     </div>
     <?php else: ?>
-    <div class="newsdetail-head<?= ($hasMedia && !$hasSidebar) ? '' : ' newsdetail-head--full' ?><?= $hasMedia && $layout === 'side_image' && !$hasSidebar ? ' newsdetail-head--side' : '' ?>">
-        <div class="newsdetail-head__info">
-            <?php if (!empty($news['badge'])): ?>
-                <span class="newsdetail__badge"><?= htmlspecialchars((string) $news['badge'], ENT_QUOTES) ?></span>
-            <?php endif; ?>
-            <div class="newsdetail__meta">
-                <?php if ($dateLong !== ''): ?>
-                    <span class="newsdetail__meta-item"><?= $eventIcons[0] ?><time datetime="<?= htmlspecialchars(substr($date, 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars($dateLong, ENT_QUOTES) ?></time></span>
-                <?php endif; ?>
-                <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><?= $readMin ?> <?= htmlspecialchars(t('мин чтения'), ENT_QUOTES) ?></span>
-                <?php if ($views > 0): ?>
-                    <span class="newsdetail__meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="18" height="18"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><?= number_format($views, 0, '', ' ') ?> <?= htmlspecialchars(t('просмотров'), ENT_QUOTES) ?></span>
-                <?php endif; ?>
-            </div>
-            <h1 class="newsdetail__title"><?= htmlspecialchars((string) $news['title'], ENT_QUOTES) ?></h1>
-            <?php if (!empty($news['excerpt'])): ?>
-                <p class="newsdetail__lead"><?= htmlspecialchars((string) $news['excerpt'], ENT_QUOTES) ?></p>
-            <?php endif; ?>
-            <?php if (!empty($news['source_note'])): ?>
-                <p class="newsdetail__source"><?= htmlspecialchars((string) $news['source_note'], ENT_QUOTES) ?></p>
-            <?php endif; ?>
-            <?php if ($videoUrl !== ''): ?>
-                <div class="newsdetail__actions">
-                    <a class="newsdetail__btn newsdetail__btn--primary" href="<?= htmlspecialchars($videoUrl, ENT_QUOTES) ?>" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5.5v13l11-6.5z"/></svg>
-                        <?= htmlspecialchars(t('Смотреть видео'), ENT_QUOTES) ?>
-                    </a>
-                </div>
-            <?php endif; ?>
-        </div>
-        <?php if ($layout === 'video'): ?>
-            <?php
-            // Модуль видео: обложка YouTube, плеер грузится только по клику (news.js).
-            $thumb = \App\Core\Video::youtubeThumbnail($videoId);
-            $fallback = 'https://i.ytimg.com/vi/' . $videoId . '/hqdefault.jpg';
-            $embed = \App\Core\Video::youtubeEmbed($videoId) . '&autoplay=1';
-            ?>
-            <div class="newsdetail-media">
-                <div class="news-video newsdetail-video skeleton" data-youtube="<?= htmlspecialchars($videoId, ENT_QUOTES) ?>" data-embed="<?= htmlspecialchars($embed, ENT_QUOTES) ?>" data-replay-label="<?= htmlspecialchars(t('Посмотреть ещё раз'), ENT_QUOTES) ?>">
-                    <img class="news-video__thumb" src="<?= htmlspecialchars($cover !== '' ? $cover : $thumb, ENT_QUOTES) ?>" data-fallback="<?= htmlspecialchars($fallback, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $news['title'], ENT_QUOTES) ?>" loading="eager" decoding="async">
-                    <button type="button" class="news-video__play" aria-label="<?= htmlspecialchars(t('Смотреть видео'), ENT_QUOTES) ?>"></button>
-                </div>
-            </div>
-        <?php elseif (!empty($heroSlides)): ?>
-            <div class="newsdetail-gallery" data-ndgallery>
-                <div class="newsdetail-gallery__main">
-                    <?php foreach ($heroSlides as $i => $s): ?>
-                        <?= \App\Core\Media::picture((string) $s['path'], (string) $s['alt'], null, null, 'newsdetail-gallery__slide' . ($i === 0 ? ' is-active' : ''), $i !== 0, '(max-width: 900px) 100vw, 70vw') ?>
-                    <?php endforeach; ?>
-                    <?php if (count($heroSlides) > 1): ?>
-                        <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--prev" data-ndg-prev aria-label="<?= htmlspecialchars(t('Предыдущее фото'), ENT_QUOTES) ?>">‹</button>
-                        <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--next" data-ndg-next aria-label="<?= htmlspecialchars(t('Следующее фото'), ENT_QUOTES) ?>">›</button>
-                        <span class="newsdetail-gallery__counter"><span data-ndg-current>1</span> <?= htmlspecialchars(t('из'), ENT_QUOTES) ?> <?= count($heroSlides) ?></span>
-                    <?php endif; ?>
-                </div>
-                <?php if (count($heroSlides) > 1): ?>
-                    <div class="newsdetail-gallery__thumbs">
-                        <?php foreach ($heroSlides as $i => $s): ?>
-                            <button type="button" class="newsdetail-gallery__thumb<?= $i === 0 ? ' is-active' : '' ?>" data-ndg-thumb="<?= $i ?>" aria-label="<?= htmlspecialchars(t('Фото'), ENT_QUOTES) ?> <?= $i + 1 ?>" style="background-image:url('<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>')"></button>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+    <div class="newsdetail-side" style="display:none;">
+        <?php foreach ($keyPoints as $kp): ?>
+            <p><?= htmlspecialchars($kp, ENT_QUOTES) ?></p>
+        <?php endforeach; ?>
     </div>
     <?php endif; ?>
+    <div data-replay-label="replay" style="display:none;"></div>
+</div>
 
-    <div class="newsdetail-body<?= ($hasLeft && !$hasSidebar) ? '' : ' newsdetail-body--no-left' ?>">
-        <?php if ($hasLeft && !$hasSidebar): ?>
-        <aside class="newsdetail-side">
-            <div class="newsdetail-card">
-                <h2 class="newsdetail-card__title"><?= htmlspecialchars(t('Ключевые тезисы'), ENT_QUOTES) ?></h2>
-                <ul class="newsdetail-points">
-                    <?php foreach ($keyPoints as $point): ?>
-                        <li class="newsdetail-points__item"><span class="newsdetail-points__icon"><?= $pointIcon ?></span><?= htmlspecialchars($point, ENT_QUOTES) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-            <?php $shareBlock(''); ?>
-        </aside>
-        <?php endif; ?>
-
-        <div class="newsdetail-article">
-            <?php if ($hasLeft && $hasSidebar): ?>
-                <div class="newsdetail-card newsdetail-card--thesis-inline" style="margin-bottom: 30px; background: color-mix(in srgb, var(--gov-teal) 4%, var(--gov-surface)); border-left: 4px solid var(--gov-teal); border-top: 1px solid var(--gov-border); border-right: 1px solid var(--gov-border); border-bottom: 1px solid var(--gov-border); border-radius: 0 12px 12px 0; padding: 22px;">
-                    <h2 class="newsdetail-card__title" style="color: var(--gov-teal-text); font-weight: 700; margin: 0 0 14px; font-size: 1.05rem;"><?= htmlspecialchars(t('Ключевые тезисы'), ENT_QUOTES) ?></h2>
-                    <ul class="newsdetail-points" style="gap: 12px;">
-                        <?php foreach ($keyPoints as $point): ?>
-                            <li class="newsdetail-points__item" style="font-size: 0.92rem; line-height: 1.55;"><span class="newsdetail-points__icon" style="color: var(--gov-teal);"><?= $pointIcon ?></span><?= htmlspecialchars($point, ENT_QUOTES) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-
-            <div class="newsdetail-article__content rich-content"><?= $contentHtml ?></div>
-            <?php if (!$hasLeft || $hasSidebar): ?>
-                <?php $shareBlock(' newsdetail-share--inline'); ?>
-            <?php endif; ?>
-        </div>
-
-        <aside class="newsdetail-side newsdetail-side--right">
-            <?php if ($isPremium && !empty($slides)): ?>
-                <div class="newsdetail-card">
-                    <h2 class="newsdetail-card__title"><?= htmlspecialchars(t('Галерея'), ENT_QUOTES) ?></h2>
-                    <div class="newsdetail-sidegallery">
-                        <?php foreach (array_slice($slides, 0, 4) as $i => $s): ?>
-                            <a class="newsdetail-sidegallery__item<?= $i === 0 ? ' newsdetail-sidegallery__item--wide' : '' ?>" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><?= \App\Core\Media::picture((string) $s['path'], (string) $s['alt'], null, null, '', true, '(max-width: 900px) 50vw, 280px') ?></a>
-                        <?php endforeach; ?>
-                    </div>
-                    <a class="newsdetail__btn newsdetail__btn--ghost newsdetail-sidegallery__all" href="<?= htmlspecialchars(Locale::url('news/' . $news['slug'] . '/photos.zip', $lang), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Скачать все фото'), ENT_QUOTES) ?> <?= $dlIcon ?></a>
-                </div>
-            <?php endif; ?>
-            <?php if (!empty($eventMeta)): ?>
-                <div class="newsdetail-card">
-                    <h2 class="newsdetail-card__title"><?= htmlspecialchars(t('О мероприятии'), ENT_QUOTES) ?></h2>
-                    <ul class="newsdetail-event">
-                        <?php foreach ($eventMeta as $i => $line): ?>
-                            <li class="newsdetail-event__item"><span class="newsdetail-event__icon"><?= $eventIcons[$i % count($eventIcons)] ?></span><?= htmlspecialchars($line, ENT_QUOTES) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-            <?php if (!empty($docs)): ?>
-                <div class="newsdetail-card">
-                    <h2 class="newsdetail-card__title"><?= htmlspecialchars(t('Документы'), ENT_QUOTES) ?></h2>
-                    <div class="newsdetail-docs">
-                        <?php foreach ($docs as $doc): ?>
-                            <?php $du = trim((string) ($doc['url'] ?? '')); ?>
-                            <a class="newsdetail-doc" href="<?= htmlspecialchars($du, ENT_QUOTES) ?>" <?= $du !== '' ? 'download' : '' ?>>
-                                <span class="newsdetail-doc__icon"><?= $docIcon ?></span>
-                                <span class="newsdetail-doc__body">
-                                    <span class="newsdetail-doc__title"><?= htmlspecialchars((string) ($doc['title'] ?? ''), ENT_QUOTES) ?></span>
-                                    <?php if (!empty($doc['meta'])): ?><span class="newsdetail-doc__meta"><?= htmlspecialchars((string) $doc['meta'], ENT_QUOTES) ?></span><?php endif; ?>
-                                </span>
-                                <span class="newsdetail-doc__dl"><?= $dlIcon ?></span>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
-            <div class="newsdetail-subscribe no-print">
-                <h2 class="newsdetail-subscribe__title"><?= htmlspecialchars(t('Подпишитесь на новости Агентства'), ENT_QUOTES) ?></h2>
-                <p class="newsdetail-subscribe__text"><?= htmlspecialchars(t('Получайте самые важные новости и аналитические материалы на почту.'), ENT_QUOTES) ?></p>
-                <form class="newsdetail-subscribe__form" method="post" action="<?= htmlspecialchars(Locale::url('subscribe'), ENT_QUOTES) ?>">
-                    <?= \App\Core\Csrf::field() ?>
-                    <input type="text" name="website" value="" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <div class="newsdetail-subscribe__row">
-                        <label class="visually-hidden" for="nd-sub-email"><?= htmlspecialchars(t('Ваш e-mail'), ENT_QUOTES) ?></label>
-                        <input id="nd-sub-email" type="email" name="email" required placeholder="<?= htmlspecialchars(t('Ваш e-mail'), ENT_QUOTES) ?>" autocomplete="email">
-                        <button type="submit" aria-label="<?= htmlspecialchars(t('Подписаться'), ENT_QUOTES) ?>">→</button>
-                    </div>
-                    <?php if (Setting::get('form_consent_enabled', '0') === '1'): ?>
-                        <label class="newsdetail-subscribe__consent">
-                            <input type="checkbox" name="consent" value="1" required>
-                            <span><?= htmlspecialchars((string) Setting::get('form_consent_text', t('Я даю согласие на обработку персональных данных')), ENT_QUOTES) ?></span>
-                        </label>
-                    <?php endif; ?>
-                </form>
-            </div>
-        </aside>
-    </div>
-
-    <?php
-    // Фотогалерея-лента: для видео — все фото (герой занят плеером),
-    // для остальных типов — когда фотографий больше одной.
-    $showPhotoStrip = $isPremium ? false : ($layout === 'video' ? !empty($slides) : count($slides) > 1);
-    ?>
-    <?php if ($showPhotoStrip): ?>
-        <section class="newsdetail-photos">
-            <div class="section-head">
-                <h2 class="section-head__title"><?= htmlspecialchars(t('Фотогалерея'), ENT_QUOTES) ?></h2>
-                <a class="newsdetail__btn newsdetail__btn--ghost" href="<?= htmlspecialchars(Locale::url('news/' . $news['slug'] . '/photos.zip', $lang), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Скачать все фото'), ENT_QUOTES) ?> <?= $dlIcon ?></a>
-            </div>
-            <div class="newsdetail-photos__grid">
-                <?php foreach (array_slice($slides, 0, 8) as $s): ?>
-                    <a class="newsdetail-photos__item" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><?= \App\Core\Media::picture((string) $s['path'], (string) $s['alt'], null, null, '', true, '(max-width: 560px) 100vw, (max-width: 1000px) 50vw, 25vw') ?></a>
-                <?php endforeach; ?>
-            </div>
-        </section>
-    <?php endif; ?>
-
-    <?php if (!empty($related)): ?>
-        <section class="newsdetail-related no-print">
-            <div class="section-head">
-                <h2 class="section-head__title"><?= htmlspecialchars(t('Другие новости по теме'), ENT_QUOTES) ?></h2>
-                <a class="section-head__all" href="<?= htmlspecialchars(Locale::url('news'), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Все новости'), ENT_QUOTES) ?> →</a>
-            </div>
-            <div class="newsdetail-related__grid">
-                <?php foreach ($related as $item): ?>
-                    <?php $rc = News::getCoverImage($item); ?>
-                    <a class="relnews-card" href="<?= htmlspecialchars(Locale::url('news/' . $item['slug'], $lang), ENT_QUOTES) ?>">
-                        <?php if ($rc !== null): ?>
-                            <?= \App\Core\Media::picture($rc, (string) $item['title'], null, null, 'relnews-card__media', true, '(max-width: 700px) 100vw, 33vw') ?>
-                        <?php else: ?>
-                            <span class="relnews-card__media relnews-card__media--empty" aria-hidden="true"></span>
-                        <?php endif; ?>
-                        <?php if (!empty($item['published_at'])): ?><time class="relnews-card__date"><?= htmlspecialchars(DateFormatter::short((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
-                        <span class="relnews-card__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        </section>
-    <?php endif; ?>
-
-    <?php if ($prevNews !== null || $nextNews !== null || ($isPremium && !empty($toc))): ?>
-        <nav class="newsdetail-adjacent no-print<?= $isPremium && !empty($toc) ? ' newsdetail-adjacent--with-toc' : '' ?>" aria-label="<?= htmlspecialchars(t('Соседние новости'), ENT_QUOTES) ?>">
-            <?php if ($isPremium && !empty($toc)): ?>
-                <div class="newsdetail-toc">
-                    <span class="newsdetail-toc__title"><?= htmlspecialchars(t('Навигация по статье'), ENT_QUOTES) ?></span>
-                    <ol class="newsdetail-toc__list">
-                        <?php foreach ($toc as $i => $item): ?>
-                            <li><a href="#<?= htmlspecialchars($item['id'], ENT_QUOTES) ?>"><span class="newsdetail-toc__num"><?= str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) ?></span><?= htmlspecialchars($item['label'], ENT_QUOTES) ?></a></li>
-                        <?php endforeach; ?>
-                    </ol>
-                </div>
-            <?php endif; ?>
-            <?php if ($prevNews !== null): ?>
-                <?php $pc = News::getCoverImage($prevNews); ?>
-                <a class="adjnews adjnews--prev" href="<?= htmlspecialchars(Locale::url('news/' . $prevNews['slug'], $lang), ENT_QUOTES) ?>">
-                    <span class="adjnews__arrow">←</span>
-                    <?php if ($pc !== null): ?>
-                        <?= \App\Core\Media::picture($pc, (string) $prevNews['title'], null, null, 'adjnews__media', true, '92px') ?>
-                    <?php else: ?>
-                        <span class="adjnews__media adjnews__media--empty" aria-hidden="true"></span>
-                    <?php endif; ?>
-                    <span class="adjnews__body">
-                        <span class="adjnews__label"><?= htmlspecialchars(t('Предыдущая новость'), ENT_QUOTES) ?></span>
-                        <?php if (!empty($prevNews['published_at'])): ?><time class="adjnews__date"><?= htmlspecialchars(DateFormatter::short((string) $prevNews['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
-                        <span class="adjnews__title"><?= htmlspecialchars((string) $prevNews['title'], ENT_QUOTES) ?></span>
-                    </span>
-                </a>
-            <?php else: ?><span class="adjnews adjnews--empty"></span><?php endif; ?>
-            <?php if ($nextNews !== null): ?>
-                <?php $nc = News::getCoverImage($nextNews); ?>
-                <a class="adjnews adjnews--next" href="<?= htmlspecialchars(Locale::url('news/' . $nextNews['slug'], $lang), ENT_QUOTES) ?>">
-                    <?php if ($nc !== null): ?>
-                        <?= \App\Core\Media::picture($nc, (string) $nextNews['title'], null, null, 'adjnews__media', true, '92px') ?>
-                    <?php else: ?>
-                        <span class="adjnews__media adjnews__media--empty" aria-hidden="true"></span>
-                    <?php endif; ?>
-                    <span class="adjnews__body">
-                        <span class="adjnews__label"><?= htmlspecialchars(t('Следующая новость'), ENT_QUOTES) ?></span>
-                        <?php if (!empty($nextNews['published_at'])): ?><time class="adjnews__date"><?= htmlspecialchars(DateFormatter::short((string) $nextNews['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
-                        <span class="adjnews__title"><?= htmlspecialchars((string) $nextNews['title'], ENT_QUOTES) ?></span>
-                    </span>
-                    <span class="adjnews__arrow">→</span>
-                </a>
-            <?php else: ?><span class="adjnews adjnews--empty"></span><?php endif; ?>
-        </nav>
-    <?php endif; ?>
-</article>
-<?php if ($hasSidebar): ?>
-            </div>
-            <?php if ($sidebar['position'] === 'right'): ?>
-                <aside class="layout__sidebar"><?= $sidebar['html'] ?></aside>
-            <?php endif; ?>
-    </div>
-<?php endif; ?>
-<?php // Schema.org: карточка новости для поисковиков. ?>
 <?= \App\Core\SchemaOrg::render(\App\Core\SchemaOrg::newsArticle(
     (string) $news['title'],
     $pageUrl,

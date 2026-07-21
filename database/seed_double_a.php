@@ -100,45 +100,23 @@ foreach ($pagesToCreate as $slug => $p) {
 $homeId = $pageIds['home'];
 
 $homeBlocks = [
-    // 1. Hero
+    // 1. Hero (Simplified)
     [
         'title' => '01. Hero Section',
         'html' => <<<'HTML'
 <section class="hero" id="hero">
   <div class="hero-glow-2" aria-hidden="true"></div>
-  <div class="wrap hero-grid">
-    <div>
-      <div class="eyebrow" style="color:var(--gold)">Единая точка входа на новые рынки</div>
-      <h1>От требований — <em>к работающему бизнесу.</em></h1>
-      <p class="hero-copy">Сопровождаем компании при выходе на рынок Узбекистана и развитии экспорта в СНГ и ЕС: аналитика, регуляторная стратегия, разрешения, стандарты и запуск проектов.</p>
-      <div class="hero-actions">
-        <a class="btn primary" href="/kontakty"><span>Обсудить проект</span><span class="arrow">↗</span></a>
-        <a class="btn outline" href="/services">Выбрать услугу</a>
-      </div>
-      <div class="hero-foot">
-        <div><i></i><span>Регуляторная логика до начала работ</span></div>
-        <div><i></i><span>Один координатор по проекту</span></div>
-      </div>
+  <div class="wrap" style="position: relative; z-index: 2; max-width: 900px; text-align: left;">
+    <div class="eyebrow" style="color:var(--gold)">Единая точка входа на новые рынки</div>
+    <h1 style="margin: 20px 0 30px;">От требований — <em>к работающему бизнесу.</em></h1>
+    <p class="hero-copy" style="max-width: 700px; margin-bottom: 40px;">Сопровождаем компании при выходе на рынок Узбекистана и развитии экспорта в СНГ и ЕС: аналитика, регуляторная стратегия, разрешения, стандарты и запуск проектов.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="/kontakty"><span>Обсудить проект</span><span class="arrow">↗</span></a>
+      <a class="btn outline" href="/services">Выбрать услугу</a>
     </div>
-    <div class="route-card" aria-label="International market route">
-      <div class="route-top"><span>Маршрут проекта</span><span class="live">Узбекистан · СНГ · ЕС</span></div>
-      <div class="map">
-        <svg viewBox="0 0 500 280" aria-hidden="true">
-          <defs><pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(255,255,255,.12)"/></pattern></defs>
-          <rect width="500" height="280" fill="url(#dots)"/>
-          <path d="M70 110 C160 35, 240 78, 300 140 S415 185,455 130" fill="none" stroke="rgba(226,191,117,.72)" stroke-width="1.8" stroke-dasharray="5 7"/>
-          <path d="M300 140 C260 190,205 195,130 190" fill="none" stroke="rgba(97,201,168,.65)" stroke-width="1.5" stroke-dasharray="4 7"/>
-          <circle cx="300" cy="140" r="7" fill="#B89B5E"/>
-          <circle cx="300" cy="140" r="16" fill="none" stroke="rgba(226,191,117,.3)"/>
-        </svg>
-        <span class="map-city eu">EU</span><span class="map-city cis">CIS</span><span class="map-city tashkent">TASHKENT</span><span class="map-city china">ASIA</span>
-      </div>
-      <div class="route-stages">
-        <div class="stage"><b>01</b><span>Анализ рынка</span></div>
-        <div class="stage"><b>02</b><span>Требования</span></div>
-        <div class="stage"><b>03</b><span>Разрешения</span></div>
-        <div class="stage"><b>04</b><span>Запуск и рост</span></div>
-      </div>
+    <div class="hero-foot" style="margin-top: 60px;">
+      <div><i></i><span>Регуляторная логика до начала работ</span></div>
+      <div><i></i><span>Один координатор по проекту</span></div>
     </div>
   </div>
 </section>
@@ -148,7 +126,6 @@ HTML
     [
         'title' => '02. Trust Strip',
         'html' => <<<'HTML'
-<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="trust-strip">
   <div class="wrap trust-grid">
     <div class="trust-intro"><b>Комплексная модель сопровождения</b><span>Разработка индивидуальной дорожной карты проекта</span></div>
@@ -160,92 +137,10 @@ HTML
 </section>
 HTML
     ],
-    // 3. Premium Interactive Diagnostics & Tools Section
+    // 3. Services Highlights
     [
-        'title' => '03. Service Advisor',
+        'title' => '03. Services Highlights',
         'html' => <<<'HTML'
-<div class="luxury-divider"><span class="diamond"></span></div>
-<section class="section soft" id="tools">
-  <div class="wrap">
-    <div class="section-head" style="margin-bottom: 50px">
-      <div>
-        <div class="eyebrow" style="color:var(--gold)">Интерактивные инструменты</div>
-        <h2 style="font-family:var(--serif); font-weight:600; color:var(--navy)">Начните с короткой диагностики</h2>
-      </div>
-      <p style="color: var(--muted); font-size:16px; line-height:1.6; max-width:600px">Инструменты помогают сформировать первичный запрос. Итоговые требования подтверждаются экспертом после анализа документов.</p>
-    </div>
-    <div class="tools-layout">
-      <!-- Left Card: Permit Advisor -->
-      <article class="tool-card">
-        <div class="tool-icon" style="background:#F7F6F3; color:var(--emerald); width:48px; height:48px; border-radius: 0; display:grid; place-items:center; font-size:22px">⌁</div>
-        <h3 style="font-family:var(--serif); font-size:24px; color:var(--navy); margin: 24px 0 12px">Какие разрешения могут потребоваться?</h3>
-        <p style="color: var(--muted); margin-bottom: 24px; font-size:16px">Выберите категорию продукта и планируемое действие для мгновенного отчета.</p>
-        <div class="checker">
-          <label style="font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; display: block">Категория продукта</label>
-          <div class="checker-select-wrap">
-            <select id="product" aria-label="Категория продукта">
-              <option value="" disabled selected>выберите категорию</option>
-              <option value="agro">Удобрение / СЗР</option>
-              <option value="food">Пищевой продукт / БАД</option>
-              <option value="cosmetic">Косметика / Парфюмерия</option>
-              <option value="vet">Ветеринарный товар</option>
-            </select>
-          </div>
-          <label style="font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; display: block">Планируемое действие</label>
-          <div class="checker-select-wrap">
-            <select id="action" aria-label="Планируемое действие">
-              <option value="import">Импорт и реализация</option>
-              <option value="production">Открытие производства в РУз</option>
-              <option value="export">Экспорт из Узбекистана</option>
-            </select>
-          </div>
-          <button class="checker-btn" id="checkBtn">Проверить разрешения</button>
-        </div>
-        <div class="checker-result" id="result"></div>
-      </article>
-
-      <!-- Right Card: Service Selector -->
-      <article class="tool-card darkcard" style="background:var(--navy); color:#fff; border-radius: 0;">
-        <div class="tool-icon" style="background:rgba(255,255,255,0.06); color:var(--gold); width:48px; height:48px; border-radius: 0; display:grid; place-items:center; font-size:22px">◎</div>
-        <h3 style="font-family:var(--serif); font-size:24px; color:#fff; margin: 24px 0 12px">Подбор услуги за 60 секунд</h3>
-        <p style="color: #8B97A3; margin-bottom: 24px; font-size:16px">Опишите исходную точку — система предложит подходящий маршрут консультации.</p>
-        <div class="darkcard-links">
-          <button class="darkcard-link quick" data-value="market">Хочу выйти на рынок Узбекистана</button>
-          <button class="darkcard-link quick" data-value="permits">Нужно получить разрешения</button>
-          <button class="darkcard-link quick" data-value="export">Планирую экспорт</button>
-          <button class="darkcard-link quick" data-value="iso">Нужна подготовка к ISO / GMP</button>
-        </div>
-      </article>
-    </div>
-
-    <!-- Bottom Row: Mini tools -->
-    <div class="mini-tools-grid">
-      <article class="mini-tool-card">
-        <b>Личный кабинет</b>
-        <span>Документы, сообщения и задачи в одном защищенном цифровом пространстве.</span>
-      </article>
-      <article class="mini-tool-card">
-        <b>Трекер проекта</b>
-        <span>Этапы, ответственные стороны и контрольные точки в реальном времени.</span>
-      </article>
-      <article class="mini-tool-card">
-        <b>Безопасная загрузка</b>
-        <span>Передача технических заданий и досье с многоуровневым шифрованием.</span>
-      </article>
-      <article class="mini-tool-card">
-        <b>Онлайн-запись</b>
-        <span>Бронирование времени видеозвонка с координатором проекта в один клик.</span>
-      </article>
-    </div>
-  </div>
-</section>
-HTML
-    ],
-    // 4. Services Grid
-    [
-        'title' => '04. Services Highlights',
-        'html' => <<<'HTML'
-<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section" id="services">
   <div class="wrap">
     <div class="services-split">
@@ -258,25 +153,25 @@ HTML
         </div>
       </div>
       <div class="services-right">
-        <a class="service quick" href="#service-market" data-value="market">
+        <a class="service quick" href="/services" data-value="market">
           <span class="service-no">01</span>
           <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Выход на рынок</h3>
           <p style="color:var(--muted);font-size:16px;line-height:1.6">Анализ конкурентной среды, пошлин и барьеров. Разработка оптимальной юридической модели присутствия.</p>
           <span class="go">↗</span>
         </a>
-        <a class="service quick" href="#service-permits" data-value="permits">
+        <a class="service quick" href="/services" data-value="permits">
           <span class="service-no">02</span>
           <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Разрешительные документы</h3>
           <p style="color:var(--muted);font-size:16px;line-height:1.6">Государственная регистрация БАД, удобрений, пестицидов (СЗР), косметики и ветеринарной продукции под ключ.</p>
           <span class="go">↗</span>
         </a>
-        <a class="service quick" href="#service-export" data-value="export">
+        <a class="service quick" href="/services" data-value="export">
           <span class="service-no">03</span>
           <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Экспортное сопровождение</h3>
           <p style="color:var(--muted);font-size:16px;line-height:1.6">Приведение производства, маркировки и упаковки продукции к требованиям регламентов ЕС и СНГ.</p>
           <span class="go">↗</span>
         </a>
-        <a class="service quick" href="#service-iso" data-value="iso">
+        <a class="service quick" href="/services" data-value="iso">
           <span class="service-no">04</span>
           <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Международные стандарты</h3>
           <p style="color:var(--muted);font-size:16px;line-height:1.6">Внедрение систем ISO 9001, HACCP, GMP, подготовка испытательных лабораторий к аккредитации по ISO 17025.</p>
@@ -288,11 +183,10 @@ HTML
 </section>
 HTML
     ],
-    // 5. Industries (Sectors)
+    // 4. Industries (Sectors)
     [
-        'title' => '05. Industries Section',
+        'title' => '04. Industries Section',
         'html' => <<<'HTML'
-<div class="luxury-divider"><span class="diamond"></span></div>
 <section class="section soft" id="industries">
   <div class="wrap">
     <div class="section-head-centered">
@@ -300,7 +194,7 @@ HTML
       <p>Отраслевой контекст определяет тонкости лабораторных испытаний, досье и стратегии запуска.</p>
     </div>
     <div class="sectors-grid">
-      <a class="sector-card quick" href="#service-permits" data-value="permits">
+      <a class="sector-card quick" href="/services" data-value="permits">
         <div class="sector-top">
           <span class="sector-num">01</span>
           <span class="sector-arrow">↗</span>
@@ -308,7 +202,7 @@ HTML
         <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Сельское хозяйство</h3>
         <p style="color:var(--muted);font-size:15px;line-height:1.6">Регистрация СЗР, удобрений, дефолиантов и координация полевых тестов.</p>
       </a>
-      <a class="sector-card quick" href="#service-permits" data-value="permits">
+      <a class="sector-card quick" href="/services" data-value="permits">
         <div class="sector-top">
           <span class="sector-num">02</span>
           <span class="sector-arrow">↗</span>
@@ -316,7 +210,7 @@ HTML
         <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Пищевая промышленность</h3>
         <p style="color:var(--muted);font-size:15px;line-height:1.6">Сертификация БАД, продуктов питания, регламенты ХАССП и гигиена СЭС.</p>
       </a>
-      <a class="sector-card quick" href="#service-permits" data-value="permits">
+      <a class="sector-card quick" href="/services" data-value="permits">
         <div class="sector-top">
           <span class="sector-num">03</span>
           <span class="sector-arrow">↗</span>
@@ -324,7 +218,7 @@ HTML
         <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Химическая отрасль</h3>
         <p style="color:var(--muted);font-size:15px;line-height:1.6">Паспорта безопасности (MSDS), регистрация химвеществ и прекурсоров.</p>
       </a>
-      <a class="sector-card quick" href="#service-permits" data-value="permits">
+      <a class="sector-card quick" href="/services" data-value="permits">
         <div class="sector-top">
           <span class="sector-num">04</span>
           <span class="sector-arrow">↗</span>
@@ -332,7 +226,7 @@ HTML
         <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Косметика и парфюмерия</h3>
         <p style="color:var(--muted);font-size:15px;line-height:1.6">Испытания безопасности, СЭЗ заключения и GMP стандарты производства.</p>
       </a>
-      <a class="sector-card quick" href="#service-permits" data-value="permits">
+      <a class="sector-card quick" href="/services" data-value="permits">
         <div class="sector-top">
           <span class="sector-num">05</span>
           <span class="sector-arrow">↗</span>
@@ -340,7 +234,7 @@ HTML
         <h3 style="font-family:var(--serif);font-weight:600;color:var(--navy)">Ветеринария</h3>
         <p style="color:var(--muted);font-size:15px;line-height:1.6">Регистрация кормовых добавок, вакцин и ветпрепаратов в Комитете ветеринарии.</p>
       </a>
-      <a class="sector-card quick" href="#service-iso" data-value="iso">
+      <a class="sector-card quick" href="/services" data-value="iso">
         <div class="sector-top">
           <span class="sector-num">06</span>
           <span class="sector-arrow">↗</span>
@@ -353,106 +247,11 @@ HTML
 </section>
 HTML
     ],
-    // 6. Method
+    // 5. FAQ
     [
-        'title' => '06. Method Section',
+        'title' => '05. FAQ Section',
         'html' => <<<'HTML'
-<div class="luxury-divider"><span class="diamond"></span></div>
-<section class="section dark">
-  <div class="wrap journey">
-    <div class="journey-intro">
-      <div class="eyebrow" style="color:var(--gold)">Метод DOUBLE A</div>
-      <h2>Два анализа. <em>Один маршрут.</em></h2>
-      <p>Мы параллельно оцениваем коммерческую целесообразность запуска и жесткие регуляторные рамки, формируя единый бесшовный план.</p>
-      <a class="btn primary" href="/kontakty" style="margin-top:20px">Получить консультацию</a>
-    </div>
-    <div class="timeline">
-      <div class="timeline-step">
-        <div class="timeline-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg><span class="step-num">1</span></div>
-        <div class="timeline-content">
-          <h3>Диагностика проекта</h3>
-          <p>Анализ состава продукции, имеющихся сертификатов и коммерческих целей.</p>
-        </div>
-      </div>
-      <div class="timeline-step">
-        <div class="timeline-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg><span class="step-num">2</span></div>
-        <div class="timeline-content">
-          <h3>Market & Regulatory Fit</h3>
-          <p>Определение точного списка пошлин, испытаний, барьеров и каналов продаж.</p>
-        </div>
-      </div>
-      <div class="timeline-step">
-        <div class="timeline-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg><span class="step-num">3</span></div>
-        <div class="timeline-content">
-          <h3>Дорожная карта</h3>
-          <p>Разработка последовательного плана действий с указанием бюджетов и сроков.</p>
-        </div>
-      </div>
-      <div class="timeline-step">
-        <div class="timeline-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><span class="step-num">4</span></div>
-        <div class="timeline-content">
-          <h3>Сопровождение запуска</h3>
-          <p>Подача досье в ведомства, организация тестов и контроль до выдачи лицензий.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-HTML
-    ],
-    // 7. Cases Portfolio
-    [
-        'title' => '07. Cases Section',
-        'html' => <<<'HTML'
-<div class="luxury-divider"><span class="diamond"></span></div>
-<section class="section" id="cases">
-  <div class="wrap">
-    <div class="section-head">
-      <h2>Проекты, которыми мы гордимся</h2>
-      <p>Отражение нашего реального опыта в решении сложных задач для международного бизнеса.</p>
-    </div>
-    <div class="case-controls">
-      <button class="filter active" data-filter="all">Все проекты</button>
-      <button class="filter" data-filter="agro">Сельское хозяйство</button>
-      <button class="filter" data-filter="food">Пищевая отрасль</button>
-      <button class="filter" data-filter="lab">Лаборатории</button>
-    </div>
-    <div class="cases-grid">
-      <article class="case" data-category="agro">
-        <div class="case-visual"><span class="tag">Регистрация</span><b>Регуляторная карта для СЗР</b></div>
-        <div class="case-body">
-          <div class="case-meta"><span>Импорт из КНР</span><span>АГРО</span></div>
-          <p>Полный аудит досье производителя, организация полевых испытаний пестицидов и внесение препарата в госреестр за 9 месяцев.</p>
-          <a href="/kontakty">Обсудить аналогичный проект ↗</a>
-        </div>
-      </article>
-      <article class="case" data-category="food">
-        <div class="case-visual"><span class="tag">Экспорт</span><b>Подготовка пищевого завода к ЕС</b></div>
-        <div class="case-body">
-          <div class="case-meta"><span>Экспорт в Германию</span><span>FOOD</span></div>
-          <p>Внедрение процедур HACCP на производстве сухофруктов, переработка упаковки под евростандарты и получение сертификата происхождения.</p>
-          <a href="/kontakty">Обсудить аналогичный проект ↗</a>
-        </div>
-      </article>
-      <article class="case" data-category="lab">
-        <div class="case-visual"><span class="tag">Аккредитация</span><b>Внедрение ISO/IEC 17025 в лаборатории</b></div>
-        <div class="case-body">
-          <div class="case-meta"><span>Узбекистан</span><span>LAB</span></div>
-          <p>Разработка руководства по качеству, обучение внутренних аудиторов и успешное прохождение государственной аккредитации химической лаборатории.</p>
-          <a href="/kontakty">Обсудить аналогичный проект ↗</a>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-HTML
-    ],
-    // 8. FAQ
-    [
-        'title' => '08. FAQ Section',
-        'html' => <<<'HTML'
-<div class="luxury-divider"><span class="diamond"></span></div>
-<section class="section soft" id="faq">
+<section class="section" id="faq">
   <div class="wrap faq-layout">
     <div class="faq-intro">
       <h2>Ответы на ключевые вопросы</h2>
@@ -474,6 +273,38 @@ HTML
     </div>
   </div>
 </section>
+HTML
+    ],
+    // 6. Testimonials
+    [
+        'title' => '06. Testimonials',
+        'html' => <<<'HTML'
+<div class="block-testimonials">
+    <h2 class="block-testimonials__title">Что о нас говорят клиенты</h2>
+    <div class="block-testimonials__track" tabindex="0" role="group">
+        <figure class="testimonial">
+            <blockquote class="testimonial__quote">DOUBLE A SOLUTIONS обеспечили бесшовный выход нашей продукции на рынок Узбекистана.</blockquote>
+            <figcaption class="testimonial__author">
+                <span class="testimonial__name">Джон Смит</span>
+                <span class="testimonial__company">Глобальный Директор, AgriCorp</span>
+            </figcaption>
+        </figure>
+        <figure class="testimonial">
+            <blockquote class="testimonial__quote">Высочайший уровень экспертизы и абсолютная прозрачность. Рекомендуем.</blockquote>
+            <figcaption class="testimonial__author">
+                <span class="testimonial__name">Елена Власова</span>
+                <span class="testimonial__company">CEO, PharmaTech</span>
+            </figcaption>
+        </figure>
+        <figure class="testimonial">
+            <blockquote class="testimonial__quote">Сократили сроки получения разрешений на 3 месяца благодаря их стратегии.</blockquote>
+            <figcaption class="testimonial__author">
+                <span class="testimonial__name">Азиз Рахимов</span>
+                <span class="testimonial__company">Директор по развитию, FoodGroup</span>
+            </figcaption>
+        </figure>
+    </div>
+</div>
 HTML
     ]
 ];
