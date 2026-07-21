@@ -128,7 +128,7 @@ $homeBlocks = [
           <rect width="500" height="280" fill="url(#dots)"/>
           <path d="M70 110 C160 35, 240 78, 300 140 S415 185,455 130" fill="none" stroke="rgba(226,191,117,.72)" stroke-width="1.8" stroke-dasharray="5 7"/>
           <path d="M300 140 C260 190,205 195,130 190" fill="none" stroke="rgba(97,201,168,.65)" stroke-width="1.5" stroke-dasharray="4 7"/>
-          <circle cx="300" cy="140" r="7" fill="#e2bf75"/>
+          <circle cx="300" cy="140" r="7" fill="#B88E5E"/>
           <circle cx="300" cy="140" r="16" fill="none" stroke="rgba(226,191,117,.3)"/>
         </svg>
         <span class="map-city eu">EU</span><span class="map-city cis">CIS</span><span class="map-city tashkent">TASHKENT</span><span class="map-city china">ASIA</span>
@@ -177,7 +177,7 @@ HTML
     <div class="tools-layout">
       <!-- Left Card: Permit Advisor -->
       <article class="tool-card">
-        <div class="tool-icon" style="background:#f2f6f5; color:var(--emerald); width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:22px">⌁</div>
+        <div class="tool-icon" style="background:#F7F6F3; color:var(--emerald); width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:22px">⌁</div>
         <h3 style="font-family:var(--serif); font-size:24px; color:var(--navy); margin: 24px 0 12px">Какие разрешения могут потребоваться?</h3>
         <p style="color: var(--muted); margin-bottom: 24px; font-size:16px">Выберите категорию продукта и планируемое действие для мгновенного отчета.</p>
         <div class="checker">
@@ -208,7 +208,7 @@ HTML
       <article class="tool-card darkcard" style="background:var(--navy); color:#fff; border-radius:28px">
         <div class="tool-icon" style="background:rgba(255,255,255,0.06); color:var(--gold); width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:22px">◎</div>
         <h3 style="font-family:var(--serif); font-size:24px; color:#fff; margin: 24px 0 12px">Подбор услуги за 60 секунд</h3>
-        <p style="color: #a4c0b9; margin-bottom: 24px; font-size:16px">Опишите исходную точку — система предложит подходящий маршрут консультации.</p>
+        <p style="color: #8B97A3; margin-bottom: 24px; font-size:16px">Опишите исходную точку — система предложит подходящий маршрут консультации.</p>
         <div class="darkcard-links">
           <button class="darkcard-link quick" data-value="market">Хочу выйти на рынок Узбекистана</button>
           <button class="darkcard-link quick" data-value="permits">Нужно получить разрешения</button>
