@@ -486,9 +486,11 @@ img, svg { max-width: 100%; }
 .site-content:has(.page-header),
 .site-content:has(.corp-case-header),
 .site-content:has(.corp-article) { padding-top: 0 !important; }
-.site-content:has(.page-header) > .cms-block:first-child,
-.site-content:has(.corp-case-header) > *:first-child { padding-top: 0 !important; margin-top: 0 !important; }
-.cms-block--html:first-child { padding-block: 0 !important; }
+/* CMS-обёртка вокруг page-header не должна давать верхний отступ (у самой
+   шапки уже есть свой padding). Целимся в блок, который её оборачивает. */
+.cms-block:has(> .page-header) { padding-block-start: 0 !important; margin-block-start: 0 !important; padding-inline: 0 !important; }
+/* Тёмная шапка — фон во всю ширину вьюпорта (контент внутри по .wrap). */
+.page-header { width: 100vw; margin-left: calc(50% - 50vw); }
 
 /* Новость: крошки — тёмной полосой, слитно с шапкой-заголовком. */
 .site-content:has(.corp-article) .content-crumbs {
