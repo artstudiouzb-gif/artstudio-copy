@@ -1,35 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap');
 
 /* ==========================================================================
-   DOUBLE A SOLUTIONS — MODERN EDITION
-   Современный консалтинг: чередование светлых и тёмных секций, кислотный
-   лайм-акцент, заголовки Noto Serif (condensed), текст Noto Sans.
-   Намеренно уходит от гос-агентского navy+gold и от «сплошной темноты».
-   Разметка — классы прототипа; заголовки берут цвет/шрифт из переменных,
-   поэтому переопределяем сами переменные, а свет/тьму задаём контекстом.
+   DOUBLE A SOLUTIONS — MODERN EDITION (палитра прототипа клиента)
+   Современный подход (чередование свет/тьма, крупный serif-condensed, неон-
+   карта, editorial-списки) в фирменных цветах прототипа:
+   глубокий тил #062c37, emerald #0a765f, gold #d5ae62, cream #f5f2e9, mint.
+   Заголовки Noto Serif (condensed), текст Noto Sans.
    ========================================================================== */
 
 :root {
-    /* Тёмная база (по умолчанию) */
-    --ink: #0f120e !important;
-    --panel: #171b13 !important;
-    --panel-2: #0a0c08 !important;
-    --line: #2a3022 !important;
-    --line-soft: #1c2117 !important;
-    --text: #f3f5ef !important;
-    --muted: #9aa294 !important;
-    --lime: #c8f169 !important;         /* заливка-акцент (кнопки, пины) */
-    --accent-text: #c8f169 !important;  /* текстовый акцент (на тёмном) */
-    --route: #4b8a2e !important;
-    --btn-ink: #10130b;                 /* тёмный текст на лайм-кнопке (всегда) */
+    /* Тёмная база (по умолчанию) — глубокий тил прототипа */
+    --ink: #062c37 !important;
+    --panel: #0b3a45 !important;
+    --panel-2: #04222b !important;
+    --line: rgba(200,239,229,0.12) !important;
+    --line-soft: rgba(200,239,229,0.07) !important;
+    --text: #eef4f1 !important;
+    --muted: #a7bcbb !important;
+    --lime: #d5ae62 !important;         /* PRIMARY ACCENT = gold (заливки) */
+    --accent-text: #e4c47a !important;  /* текстовый акцент (gold на тёмном) */
+    --signal: #33b18d !important;       /* «живые» индикаторы, маршрут = emerald/mint */
+    --route: #2caf8b !important;
+    --btn-ink: #143038;                 /* тёмный текст на gold-кнопке */
 
     /* Переменные, на которые ссылается разметка/инлайны */
     --navy: var(--text) !important;
     --gold: var(--accent-text) !important;
-    --emerald: var(--accent-text) !important;
+    --emerald: var(--signal) !important;
     --cream: var(--ink) !important;
     --white: var(--panel) !important;
-    --muted-c: var(--muted) !important;
     --serif: 'Noto Serif', Georgia, 'Times New Roman', serif !important;
     --sans: 'Noto Sans', ui-sans-serif, system-ui, sans-serif !important;
     --radius: 14px !important;
@@ -53,20 +52,29 @@
     --gov-title: var(--text) !important;
 }
 
-/* --- Светлый контекст: применяется к чередуемым светлым секциям.
-       Переопределяет только цветовые переменные — компоненты внутри
-       автоматически становятся «светлыми». --- */
+/* --- Светлый контекст: чередуемые светлые секции (cream + emerald-акцент). --- */
 .trust-strip, .section.soft, .block-testimonials, .ctx-light {
-    --ink: #f5f3ec !important;
+    --ink: #f5f2e9 !important;
     --panel: #ffffff !important;
-    --panel-2: #efece1 !important;
-    --line: rgba(18,22,12,0.12) !important;
-    --line-soft: rgba(18,22,12,0.07) !important;
-    --text: #14170e !important;
-    --muted: #59604d !important;
-    --accent-text: #3f6f18 !important;  /* тёмный лайм для текста на светлом */
+    --panel-2: #eef4f0 !important;
+    --line: #dce5e2 !important;
+    --line-soft: #e8efec !important;
+    --text: #0b2430 !important;
+    --muted: #5f7178 !important;
+    --accent-text: #0a765f !important;  /* emerald для текста на светлом */
+    --signal: #0a765f !important;
+    /* Индирекция var(--navy)=var(--text) захватывает :root-значение, поэтому
+       переопределяем напрямую — иначе инлайн-заголовки остаются светлыми. */
+    --navy: #0b2430 !important;
+    --gold: #0a765f !important;
+    --emerald: #0a765f !important;
     color: var(--text);
 }
+/* Страховка: заголовки/текст на светлых секциях — тёмные (перебивают инлайн). */
+.trust-strip :is(h1,h2,h3,h4,h5,h6),
+.section.soft :is(h1,h2,h3,h4,h5,h6),
+.block-testimonials :is(h1,h2,h3,h4,h5,h6),
+.service-editorial-item:nth-child(even) :is(h1,h2,h3,h4,h5,h6) { color: var(--text) !important; }
 
 /* --- База --- */
 html { background: var(--ink); }
@@ -79,11 +87,11 @@ body {
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
-::selection { background: var(--lime); color: #10130b; }
+::selection { background: var(--lime); color: #143038; }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--serif) !important;
-    font-stretch: 75%;                  /* condensed, если поддерживается */
+    font-stretch: 75%;
     color: var(--text);
     font-weight: 700;
     line-height: 1.05;
@@ -119,7 +127,7 @@ img, svg { max-width: 100%; }
     cursor: pointer; white-space: nowrap;
 }
 .btn.primary, .btn.ink { background: var(--lime); color: var(--btn-ink); }
-.btn.primary:hover, .btn.ink:hover { background: #d7fb84; transform: translateY(-2px); }
+.btn.primary:hover, .btn.ink:hover { background: #e2c07d; transform: translateY(-2px); }
 .btn.outline, .btn.ghost { background: transparent; border-color: var(--line); color: var(--text); }
 .btn.outline:hover, .btn.ghost:hover { border-color: var(--accent-text); color: var(--accent-text); }
 .arrow { font-size: 15px; }
@@ -132,70 +140,69 @@ img, svg { max-width: 100%; }
    ШАПКА (тёмная)
    ========================================================================== */
 .header, .design-header-light, .design-header-sticky {
-    background: rgba(15,18,14,0.85) !important;
+    background: rgba(6,44,55,0.86) !important;
     border-bottom: 1px solid var(--line) !important;
     -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
 }
 .nav { height: 76px; display: flex; align-items: center; gap: 30px; }
 .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .brandmark { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 10px; position: relative; overflow: hidden; background: var(--lime); }
-.brandmark::before, .brandmark::after { content: "A"; position: absolute; top: 5px; font: 800 30px/1 var(--serif); color: #10130b; }
+.brandmark::before, .brandmark::after { content: "A"; position: absolute; top: 5px; font: 800 30px/1 var(--serif); color: #143038; }
 .brandmark::before { left: 8px; }
 .brandmark::after { right: 5px; opacity: .45; transform: scaleX(-1); }
-.brand strong { font-size: 14px; letter-spacing: 0.14em; color: #f3f5ef; font-weight: 800; white-space: nowrap; }
-.brand small { display: block; color: #9aa294; font-size: 9px; letter-spacing: 0.14em; margin-top: 3px; white-space: nowrap; }
+.brand strong { font-size: 14px; letter-spacing: 0.14em; color: #eef4f1; font-weight: 800; white-space: nowrap; }
+.brand small { display: block; color: #a7bcbb; font-size: 9px; letter-spacing: 0.14em; margin-top: 3px; white-space: nowrap; }
 .navlinks { display: flex; gap: 26px; align-items: center; margin-left: auto; }
-.navlinks a { font-size: 13px; font-weight: 600; color: #9aa294; }
-.navlinks a:hover { color: var(--lime); }
+.navlinks a { font-size: 13px; font-weight: 600; color: #a7bcbb; }
+.navlinks a:hover { color: var(--accent-text); }
 .lang { position: relative; }
-.lang-btn { border: 1px solid #2a3022; background: #171b13; border-radius: 8px; padding: 9px 12px; display: flex; gap: 7px; align-items: center; cursor: pointer; font-size: 12px; font-weight: 800; color: #f3f5ef; }
+.lang-btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 9px 12px; display: flex; gap: 7px; align-items: center; cursor: pointer; font-size: 12px; font-weight: 800; color: #eef4f1; }
 .lang-btn:hover { border-color: var(--lime); }
-.lang-menu { position: absolute; right: 0; top: 50px; width: 190px; background: #171b13; border: 1px solid #2a3022; border-radius: 12px; padding: 8px; box-shadow: 0 24px 60px rgba(0,0,0,.5); display: none; z-index: 60; }
+.lang-menu { position: absolute; right: 0; top: 50px; width: 190px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; box-shadow: 0 24px 60px rgba(0,0,0,.5); display: none; z-index: 60; }
 .lang.open .lang-menu { display: grid; }
-.lang-menu button { border: 0; background: transparent; border-radius: 8px; text-align: left; padding: 9px 11px; cursor: pointer; color: #9aa294; font-size: 13px; }
-.lang-menu button:hover, .lang-menu button.active { background: #1c2117; color: var(--lime); }
-.menu-btn { display: none; border: 0; background: transparent; font-size: 24px; color: #f3f5ef; cursor: pointer; margin-left: auto; }
+.lang-menu button { border: 0; background: transparent; border-radius: 8px; text-align: left; padding: 9px 11px; cursor: pointer; color: #a7bcbb; font-size: 13px; }
+.lang-menu button:hover, .lang-menu button.active { background: rgba(200,239,229,0.08); color: var(--accent-text); }
+.menu-btn { display: none; border: 0; background: transparent; font-size: 24px; color: #eef4f1; cursor: pointer; margin-left: auto; }
 
 /* ==========================================================================
-   HERO (тёмный) — крупный serif-condensed, дата-чип с неон-картой
+   HERO (тёмный) — крупный serif, дата-чип с неон-картой
    ========================================================================== */
-.hero { position: relative; padding: 116px 0 96px; background: var(--ink); color: var(--text); overflow: hidden; }
+.hero { position: relative; padding: 116px 0 96px; background: linear-gradient(140deg, #062c37 0%, #073943 58%, #0a5b4c 150%); color: var(--text); overflow: hidden; }
 .hero::before {
     content: ""; position: absolute; inset: 0;
-    background-image: linear-gradient(#1c2117 1px, transparent 1px), linear-gradient(90deg, #1c2117 1px, transparent 1px);
+    background-image: linear-gradient(rgba(200,239,229,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(200,239,229,0.05) 1px, transparent 1px);
     background-size: 46px 46px;
     -webkit-mask-image: radial-gradient(circle at 72% 42%, #000, transparent 76%);
             mask-image: radial-gradient(circle at 72% 42%, #000, transparent 76%);
-    opacity: .55;
 }
-.hero::after { content: ""; position: absolute; width: 620px; height: 620px; right: -6%; top: -18%; background: radial-gradient(circle, rgba(200,241,105,0.10) 0%, transparent 66%); filter: blur(30px); pointer-events: none; }
-.hero-glow-2 { position: absolute; width: 520px; height: 520px; left: -140px; bottom: -180px; background: radial-gradient(circle, rgba(75,138,46,0.14) 0%, transparent 70%); filter: blur(60px); pointer-events: none; }
+.hero::after { content: ""; position: absolute; width: 640px; height: 640px; right: -8%; top: -20%; border: 1px solid rgba(213,174,98,0.18); border-radius: 50%; box-shadow: 0 0 0 70px rgba(255,255,255,0.02), 0 0 0 150px rgba(255,255,255,0.015); pointer-events: none; }
+.hero-glow-2 { position: absolute; width: 540px; height: 540px; left: -150px; bottom: -190px; background: radial-gradient(circle, rgba(51,177,141,0.16) 0%, transparent 70%); filter: blur(60px); pointer-events: none; }
 .hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1.12fr 0.88fr; gap: 56px; align-items: center; }
-.hero h1 { font-size: clamp(42px, 5.4vw, 78px); line-height: 1.0; margin: 20px 0 24px; color: var(--text); font-weight: 800; letter-spacing: -0.02em; -webkit-text-fill-color: currentColor; background: none; }
-.hero h1 em { display: block; font-style: italic; color: var(--lime); -webkit-text-fill-color: var(--lime); background: none; }
-.hero-copy { font-size: 18px !important; line-height: 1.55 !important; color: var(--muted) !important; max-width: 520px; font-weight: 400; }
+.hero h1 { font-size: clamp(42px, 5.4vw, 78px); line-height: 1.0; margin: 20px 0 24px; color: #ffffff; font-weight: 800; letter-spacing: -0.02em; -webkit-text-fill-color: currentColor; background: none; }
+.hero h1 em { display: block; font-style: italic; color: var(--accent-text); -webkit-text-fill-color: var(--accent-text); background: none; }
+.hero-copy { font-size: 18px !important; line-height: 1.55 !important; color: #c7d8d8 !important; max-width: 520px; font-weight: 400; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
-.hero-foot { display: flex; gap: 34px; margin-top: 50px; padding-top: 26px; border-top: 1px solid var(--line); }
-.hero-foot div { display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: 13px; letter-spacing: 0.02em; }
-.hero-foot i { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 12px var(--lime); }
+.hero-foot { display: flex; gap: 34px; margin-top: 50px; padding-top: 26px; border-top: 1px solid rgba(255,255,255,0.12); }
+.hero-foot div { display: flex; gap: 12px; align-items: center; color: #bcd0d0; font-size: 13px; letter-spacing: 0.02em; }
+.hero-foot i { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 12px var(--signal); }
 
 /* Дата-чип */
-.route-card { position: relative; border: 1px solid var(--line); background: linear-gradient(180deg, #171b13, #0a0c08); border-radius: 16px; padding: 20px; box-shadow: 0 40px 100px rgba(0,0,0,.45); z-index: 2; }
-.route-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-.live { display: flex; gap: 8px; align-items: center; color: var(--lime) !important; }
-.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px var(--lime); animation: da-pulse 2s infinite; }
+.route-card { position: relative; border: 1px solid rgba(255,255,255,0.12); background: rgba(4,34,43,0.55); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-radius: 16px; padding: 20px; box-shadow: 0 40px 100px rgba(0,0,0,.4); z-index: 2; }
+.route-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #bcd0d0; font-weight: 600; }
+.live { display: flex; gap: 8px; align-items: center; color: var(--signal) !important; }
+.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 10px var(--signal); animation: da-pulse 2s infinite; }
 @keyframes da-pulse { 0%,100% { opacity: 1; transform: scale(.9);} 50% { opacity: .5; transform: scale(1.35);} }
 
-/* Неон-карта Узбекистана */
-.map, .uz-map { height: 250px; border-radius: 10px; position: relative; overflow: hidden; background: #0a0c08; border: 1px solid #1c2117; }
+/* Неон-карта Узбекистана (gold контур + emerald маршрут) */
+.map, .uz-map { height: 250px; border-radius: 10px; position: relative; overflow: hidden; background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.06); }
 .uz-map svg, .map svg { display: block; width: 100%; height: 100%; }
-.uz-land { fill: rgba(200,241,105,0.05); stroke: var(--lime); stroke-width: 2; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgba(200,241,105,.25)); }
+.uz-land { fill: rgba(213,174,98,0.06); stroke: var(--lime); stroke-width: 2; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgba(213,174,98,.28)); }
 .uz-route { stroke: var(--route); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 0.03 0.045; stroke-dashoffset: 1; animation: uz-route-draw 3.2s ease-in-out forwards; }
-.uz-route--branch { stroke: rgba(75,138,46,.7); animation-delay: 1.1s; animation-duration: 2.2s; }
+.uz-route--branch { stroke: rgba(44,175,139,.7); animation-delay: 1.1s; animation-duration: 2.2s; }
 .uz-pin-dot { fill: var(--lime); }
 .uz-pin--cap .uz-pin-dot { fill: #fff; }
-.uz-pin-ring { fill: none; stroke: rgba(200,241,105,.5); stroke-width: 1.6; animation: uz-pin-pulse 2.4s ease-out infinite; }
-.uz-label { fill: #d8e0cd; font-family: var(--sans); font-size: 28px; font-weight: 500; }
+.uz-pin-ring { fill: none; stroke: rgba(213,174,98,.55); stroke-width: 1.6; animation: uz-pin-pulse 2.4s ease-out infinite; }
+.uz-label { fill: #dbe6e2; font-family: var(--sans); font-size: 28px; font-weight: 500; }
 .uz-label--cap { fill: #fff; font-weight: 700; }
 .uz-pin { opacity: 0; animation: uz-pin-in .5s ease forwards; }
 .uz-pin:nth-of-type(2){animation-delay:.15s} .uz-pin:nth-of-type(3){animation-delay:.3s} .uz-pin:nth-of-type(4){animation-delay:.45s} .uz-pin:nth-of-type(5){animation-delay:.6s} .uz-pin:nth-of-type(6){animation-delay:.75s}
@@ -203,10 +210,10 @@ img, svg { max-width: 100%; }
 @keyframes uz-pin-pulse { 0% { stroke-width: 1.6; opacity: .9; r: 15; } 70% { stroke-width: .4; opacity: 0; r: 27; } 100% { opacity: 0; } }
 @keyframes uz-pin-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-.route-stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 14px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.stage { background: #171b13; padding: 13px 12px; font-size: 11px; letter-spacing: .02em; color: var(--muted); }
+.route-stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; }
+.stage { background: rgba(4,34,43,0.6); padding: 13px 12px; font-size: 11px; letter-spacing: .02em; color: #bcd0d0; }
 .stage:nth-child(4) { display: none; }
-.stage b { display: block; color: var(--lime); font-size: 20px; font-weight: 800; margin-bottom: 4px; font-family: var(--serif); }
+.stage b { display: block; color: var(--accent-text); font-size: 20px; font-weight: 800; margin-bottom: 4px; font-family: var(--serif); }
 
 /* ==========================================================================
    TRUST / STATS (светлая)
@@ -225,7 +232,7 @@ img, svg { max-width: 100%; }
    СЕКЦИИ
    ========================================================================== */
 .section { padding: 108px 0; background: var(--ink); }
-.section.soft { background: var(--ink); }   /* светлый контекст задан выше */
+.section.soft { background: var(--ink); }
 .section-head-centered { text-align: center; max-width: 760px; margin: 0 auto 54px; }
 .section-head-centered h2 { color: var(--text); }
 .section-head-centered p { color: var(--muted); font-size: 17px; margin-top: 16px; }
@@ -237,13 +244,13 @@ img, svg { max-width: 100%; }
 .services-right { display: grid; gap: 12px; }
 .service.quick { position: relative; display: block; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 26px 28px; overflow: hidden; }
 .service.quick::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--lime); transform: scaleY(0); transform-origin: top; transition: transform .3s ease; }
-.service.quick:hover { border-color: color-mix(in srgb, var(--lime) 40%, var(--line)); transform: translateY(-3px); }
+.service.quick:hover { border-color: color-mix(in srgb, var(--lime) 45%, var(--line)); transform: translateY(-3px); }
 .service.quick:hover::before { transform: scaleY(1); }
 .service-no { font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--accent-text); }
 .service.quick h3 { margin: 16px 0 10px; color: var(--text); }
 .service.quick p { color: var(--muted); font-size: 15px; }
 .service .go { position: absolute; right: 24px; top: 24px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); color: var(--muted); }
-.service.quick:hover .go { background: var(--lime); color: #10130b; border-color: var(--lime); transform: rotate(-45deg); }
+.service.quick:hover .go { background: var(--lime); color: #143038; border-color: var(--lime); transform: rotate(-45deg); }
 
 /* Отрасли (светлая) */
 .sectors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -286,13 +293,16 @@ img, svg { max-width: 100%; }
 .page-header h1 { color: var(--text); }
 .page-header p { color: var(--muted); max-width: 640px; font-size: 17px; }
 .site-content { background: var(--ink); }
+.content-crumbs, .breadcrumbs, nav[aria-label="breadcrumb"] { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+.content-crumbs a, .breadcrumbs a { color: var(--muted); }
+.content-crumbs a:hover, .breadcrumbs a:hover { color: var(--accent-text); }
 
-/* Услуги (детально): editorial-список. Нечётные — светлые, чётные — тёмные. */
+/* Услуги (детально): editorial-список, чётные карточки — светлые. */
 .services-editorial-list { display: grid; gap: 16px; }
 .service-editorial-item { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 44px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 36px; }
 .service-editorial-item:nth-child(even) {
-    --panel: #ffffff; --panel-2: #efece1; --line: rgba(18,22,12,0.12);
-    --text: #14170e; --muted: #59604d; --accent-text: #3f6f18;
+    --panel: #ffffff; --panel-2: #eef4f0; --line: #dce5e2;
+    --text: #0b2430; --muted: #5f7178; --accent-text: #0a765f;
     background: var(--panel); color: var(--text);
 }
 .service-editorial-left { position: sticky; top: 100px; align-self: start; }
@@ -303,7 +313,7 @@ img, svg { max-width: 100%; }
 .service-subitems { display: grid; gap: 10px; }
 .service-subitem { border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); padding: 16px 18px; }
 .service-subitem-header { display: flex; align-items: center; gap: 13px; }
-.service-subitem-icon { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent-text) 14%, transparent); color: var(--accent-text); }
+.service-subitem-icon { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent-text) 16%, transparent); color: var(--accent-text); }
 .service-subitem-icon svg, .feather { width: 20px; height: 20px; stroke: currentColor; }
 .service-subitem h4 { margin: 0; font-size: 15px; color: var(--text); font-weight: 700; font-family: var(--sans); }
 .service-subitem p { margin: 10px 0 0; color: var(--muted); font-size: 13.5px; }
@@ -337,12 +347,28 @@ img, svg { max-width: 100%; }
 /* ==========================================================================
    ПОДВАЛ (тёмный)
    ========================================================================== */
-.footer, .design-footer-columns { background: #0a0c08 !important; color: var(--muted); border-top: 1px solid var(--line); padding: 56px 0 26px; }
+.footer, .design-footer-columns { background: #04222b !important; color: var(--muted); border-top: 1px solid var(--line); padding: 56px 0 26px; }
 .footer-grid { display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 40px; }
-.footer h4 { color: #f3f5ef; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
-.footer a { display: block; font-size: 13px; margin: 10px 0; color: #9aa294; }
-.footer a:hover { color: var(--lime); }
-.footer-bottom { display: flex; justify-content: space-between; margin-top: 42px; padding-top: 20px; border-top: 1px solid #2a3022; font-size: 11px; color: #9aa294; }
+.footer h4 { color: #eef4f1; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+.footer a { display: block; font-size: 13px; margin: 10px 0; color: #a7bcbb; }
+.footer a:hover { color: var(--accent-text); }
+.footer-bottom { display: flex; justify-content: space-between; margin-top: 42px; padding-top: 20px; border-top: 1px solid rgba(200,239,229,0.12); font-size: 11px; color: #a7bcbb; }
+
+/* ==========================================================================
+   МОДАЛКА / COOKIE / TOAST (глобальные — скрыты по умолчанию)
+   ========================================================================== */
+.modal { position: fixed; inset: 0; z-index: 100; background: rgba(3,26,32,0.78); -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal.show { display: flex; }
+.modal-card { background: var(--panel); color: var(--text); width: min(760px, 100%); max-height: 90vh; overflow: auto; border-radius: 22px; padding: 34px; position: relative; border: 1px solid var(--line); }
+.modal-close { position: absolute; right: 18px; top: 18px; border: 0; background: var(--panel-2); color: var(--text); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; }
+.modal-card h2 { color: var(--text); margin: 6px 0 16px; }
+.modal-card p { color: var(--muted); }
+.cookie { position: fixed; left: 20px; bottom: 20px; z-index: 80; width: min(390px, calc(100% - 40px)); background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.4); display: none; }
+.cookie.show { display: block; }
+.cookie p { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+.cookie-actions { display: flex; gap: 8px; }
+.toast { position: fixed; right: 20px; bottom: 20px; z-index: 120; background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 14px; padding: 15px 18px; box-shadow: 0 24px 60px rgba(0,0,0,.4); font-size: 13px; transform: translateY(120px); opacity: 0; transition: .3s; }
+.toast.show { transform: none; opacity: 1; }
 
 /* ==========================================================================
    АДАПТИВ
@@ -356,7 +382,7 @@ img, svg { max-width: 100%; }
     .trust-grid { grid-template-columns: 1fr 1fr; }
     .trust-intro { grid-column: 1 / -1; border-right: 0; border-bottom: 1px solid var(--line); }
     .metric { border-bottom: 1px solid var(--line); }
-    .navlinks { position: fixed; inset: 76px 0 auto; background: #0f120e; border-bottom: 1px solid #2a3022; padding: 22px 20px; flex-direction: column; align-items: flex-start; display: none; }
+    .navlinks { position: fixed; inset: 76px 0 auto; background: var(--ink); border-bottom: 1px solid var(--line); padding: 22px 20px; flex-direction: column; align-items: flex-start; display: none; }
     .navlinks.open { display: flex; }
     .menu-btn { display: block; }
     .nav > .btn.ink { display: none; }
