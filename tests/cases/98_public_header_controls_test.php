@@ -24,7 +24,7 @@ test('accessibility controls stay above the header and reflow without overlap', 
 
 test('dropdown search is anchored, constrained and restores focus', function (): void {
     $css = file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/frontend.css');
-    $themeCss = file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/gov-theme.css');
+    $themeCss = file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/da-modern.css');
     $header = file_get_contents(dirname(__DIR__, 2) . '/app/Views/site/_header.php');
     $js = file_get_contents(dirname(__DIR__, 2) . '/public/assets/js/frontend.js');
 

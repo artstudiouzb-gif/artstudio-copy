@@ -2,64 +2,33 @@
 
 declare(strict_types=1);
 
-// Демо-главная: фикстура блоков и бандл-изображения должны быть на месте и
-// валидны, иначе «Загрузить демо-контент» даст сломанную главную.
+// Демо DOUBLE A: кнопка «Демо-контент» разворачивает фирменный сайт (тема,
+// четыре страницы, меню) через общий сидер database/seed_double_a.php.
 
-test('Демо: фикстура главной валидна и содержит ожидаемые блоки', function () {
-    $path = APP_ROOT . '/database/demo_assets/home_blocks.json';
-    assert_true(is_file($path), 'файл фикстуры существует');
-
-    $blocks = json_decode((string) file_get_contents($path), true);
-    assert_true(is_array($blocks) && count($blocks) >= 6, 'минимум 6 блоков главной');
-
-    $types = array_map(static fn ($b) => $b['type'] ?? '', $blocks);
-    foreach (['hero', 'counters', 'cards_grid', 'image_cards', 'news_feature', 'media_gallery'] as $need) {
-        assert_true(in_array($need, $types, true), "есть блок $need");
-    }
-});
-
-test('Демо: все изображения фикстуры бандлятся в demo_assets', function () {
-    $dir = APP_ROOT . '/database/demo_assets';
-    $blocks = json_decode((string) file_get_contents($dir . '/home_blocks.json'), true);
-
-    $images = [];
-    array_walk_recursive($blocks, static function ($v, $k) use (&$images) {
-        if ($k === 'image' && is_string($v) && $v !== '') {
-            $images[] = $v;
-        }
-    });
-    assert_true($images !== [], 'в фикстуре есть изображения');
-
-    foreach (array_unique($images) as $url) {
-        $name = basename($url);
-        assert_true(is_file($dir . '/' . $name), "изображение $name лежит в demo_assets");
-    }
-});
-
-test('Демо: прототипные госстраницы собраны из зарегистрированных блоков', function () {
-    $path = APP_ROOT . '/database/demo_assets/prototype_pages.json';
-    assert_true(is_file($path), 'файл прототипных страниц существует');
-    $pages = json_decode((string) file_get_contents($path), true);
-    assert_true(is_array($pages), 'фикстура страниц валидна');
-
-    foreach (['napravleniya', 'ustoychivyy-ekonomicheskiy-rost', 'analitika', 'press-centr', 'meropriyatiya', 'karera', 'kontakty', 'strategiya-2030'] as $slug) {
-        assert_true(isset($pages[$slug]['ru']['blocks']), "есть страница $slug");
-    }
-    foreach ($pages as $page) {
-        foreach ($page['ru']['blocks'] ?? [] as $block) {
-            $type = (string) ($block[0] ?? '');
-            assert_true(\App\Core\BlockRenderer::defaultsFor($type) !== [], "тип блока $type зарегистрирован");
-        }
-    }
-});
-
-test('Демо: повторный запуск не удаляет страницы и не дополняет настроенное меню', function () {
+test('Демо: DemoSeeder делегирует в сидер DOUBLE A', function () {
     $seeder = (string) file_get_contents(APP_ROOT . '/app/Core/DemoSeeder.php');
-    assert_not_contains('DELETE FROM pages', $seeder);
+    // Демо не должно вайпать пользовательские таблицы из самого класса —
+    // вся логика вынесена в отдельный сидер.
     assert_not_contains('DELETE FROM page_translations', $seeder);
-    assert_contains("SELECT COUNT(*) FROM menu_items", $seeder);
-    assert_contains("prototype_pages.json", $seeder);
-    assert_contains('isUntouchedStarterHome', $seeder);
+    assert_contains('seed_double_a_content', $seeder);
+    assert_contains('seed_double_a.php', $seeder);
+});
+
+test('Демо: сидер DOUBLE A задаёт тему, страницы и меню', function () {
+    $src = (string) file_get_contents(APP_ROOT . '/database/seed_double_a.php');
+    assert_contains('function seed_double_a_content(PDO $pdo): array', $src);
+    assert_contains("'design_site_template' => 'double_a'", $src);
+    foreach (['home', 'o-nas', 'services', 'kontakty'] as $slug) {
+        assert_contains("'{$slug}' =>", $src);
+    }
+    assert_contains('INSERT INTO menu_items', $src);
+    // Блоки главной и внутренних страниц собираются конструктором.
+    assert_contains("Block::create(", $src);
+});
+
+test('Демо: типы блоков сидера зарегистрированы в конструкторе', function () {
+    // Страницы DOUBLE A собраны из html-блоков — тип должен быть известен рендереру.
+    assert_true(\App\Core\BlockRenderer::defaultsFor('html') !== [], 'тип html зарегистрирован');
 });
 
 test('Демо: запуск доступен только в настройках и требует код подтверждения', function () {
