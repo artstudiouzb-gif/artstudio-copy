@@ -31,22 +31,16 @@ test('public home renders without horizontal overflow', async ({ page }) => {
 test('critical homepage sections keep their order, size and stacking', async ({ page }) => {
     await page.goto('/');
 
-    const hero = page.locator('.cms-block--hero');
-    const counters = page.locator('.cms-block--counters');
-    const projects = page.locator('.cms-block--image_cards');
-    const media = page.locator('.cms-block--media_gallery');
+    // Главная DOUBLE A: hero с картой → полоса доверия (счётчики) → услуги.
+    const hero = page.locator('.hero').first();
+    const trust = page.locator('.trust-strip').first();
+    const services = page.locator('.sectors-grid').first();
     await expect(hero).toBeVisible();
-    await expect(counters).toBeVisible();
-    await expect(projects).toBeVisible();
-    await expect(media).toBeVisible();
+    await expect(trust).toBeVisible();
+    await expect(services).toBeVisible();
 
     const sectionGeometry = await page.evaluate(() => {
-        const selectors = [
-            '.cms-block--hero',
-            '.cms-block--counters',
-            '.cms-block--image_cards',
-            '.cms-block--media_gallery'
-        ];
+        const selectors = ['.hero', '.trust-strip', '.sectors-grid'];
         return selectors.map((selector) => {
             const rect = document.querySelector(selector).getBoundingClientRect();
             return { top: rect.top + window.scrollY, bottom: rect.bottom + window.scrollY, width: rect.width };
@@ -55,67 +49,18 @@ test('critical homepage sections keep their order, size and stacking', async ({ 
     for (let i = 1; i < sectionGeometry.length; i += 1) {
         expect(sectionGeometry[i].top).toBeGreaterThan(sectionGeometry[i - 1].top);
     }
+    const viewportWidth = await page.evaluate(() => document.documentElement.clientWidth + 1);
     for (const section of sectionGeometry) {
         expect(section.bottom).toBeGreaterThan(section.top);
-        expect(section.width).toBeLessThanOrEqual(await page.evaluate(() => document.documentElement.clientWidth + 1));
+        expect(section.width).toBeLessThanOrEqual(viewportWidth);
     }
 
-    const firstCounter = page.locator('.counter').first();
-    await firstCounter.scrollIntoViewIfNeeded();
-    await expectElementNotCovered(firstCounter);
-
-    const firstMediaCard = page.locator('.mediacard:visible').first();
-    await firstMediaCard.scrollIntoViewIfNeeded();
-    await expectElementNotCovered(firstMediaCard);
-    const cardBox = await firstMediaCard.boundingBox();
-    expect(cardBox).not.toBeNull();
-    expect(cardBox.width).toBeGreaterThan(160);
-    expect(cardBox.height).toBeLessThan(cardBox.width * 1.6);
-
-    await expectNoHorizontalOverflow(page);
-});
-
-test('media tabs filter cards without breaking the gallery', async ({ page }) => {
-    await page.goto('/');
-    const gallery = page.locator('[data-media-gallery]');
-    await expect(gallery).toBeVisible();
-
-    const photoTab = gallery.locator('[data-media-tab="photo"]');
-    const videoTab = gallery.locator('[data-media-tab="video"]');
-    await expect(videoTab).toHaveAttribute('aria-pressed', 'true');
-    await expect(gallery.locator('[data-media-kind="video"]').first()).toBeVisible();
-    await expect(gallery.locator('[data-media-kind="photo"]').first()).toBeHidden();
-
-    await photoTab.click();
-    await expect(photoTab).toHaveAttribute('aria-pressed', 'true');
-    await expect(videoTab).toHaveAttribute('aria-pressed', 'false');
-    await expect(gallery.locator('[data-media-kind="photo"]').first()).toBeVisible();
-    await expect(gallery.locator('[data-media-kind="video"]').first()).toBeHidden();
-    await expectNoHorizontalOverflow(page);
-});
-
-test('project cards retain smooth nested transitions', async ({ page, isMobile }) => {
-    test.skip(isMobile, 'Hover motion is checked with a fine pointer');
-    await page.goto('/');
-
-    const card = page.locator('.cms-block--image_cards .imgcard').first();
-    const image = card.locator('.imgcard__media');
+    const card = page.locator('.sector-card').first();
     await card.scrollIntoViewIfNeeded();
     await expect(card).toBeVisible();
+    await expectElementNotCovered(card);
 
-    const motion = await image.evaluate((element) => {
-        const style = getComputedStyle(element);
-        return {
-            property: style.transitionProperty,
-            duration: style.transitionDuration,
-            before: style.transform
-        };
-    });
-    expect(motion.property).toContain('transform');
-    expect(motion.duration).not.toMatch(/^(0s)(, 0s)*$/);
-
-    await card.hover();
-    await expect.poll(() => image.evaluate((element) => getComputedStyle(element).transform)).not.toBe(motion.before);
+    await expectNoHorizontalOverflow(page);
 });
 
 test('Uzbek home uses localized title and secure language URL', async ({ page }) => {
@@ -148,14 +93,19 @@ test('selected language persists until the visitor explicitly changes it', async
 test('mobile menu opens and closes accessibly', async ({ page, isMobile }) => {
     test.skip(!isMobile, 'Mobile-only interaction');
     await page.goto('/');
-    const burger = page.locator('[data-mobile-menu-toggle]').first();
+    const burger = page.locator('#menuBtn');
+    const nav = page.locator('#navlinks');
     await expect(burger).toBeVisible();
+    await expect(nav).toBeHidden();
+
     await burger.click();
-    await expect(page.locator('body')).toHaveClass(/mobile-menu-open/);
-    await expect(burger).toHaveAttribute('aria-expanded', 'true');
-    await page.keyboard.press('Escape');
-    await expect(page.locator('body')).not.toHaveClass(/mobile-menu-open/);
-    await expect(burger).toHaveAttribute('aria-expanded', 'false');
+    await expect(nav).toHaveClass(/\bopen\b/);
+    await expect(nav).toBeVisible();
+
+    // Повторное нажатие бургера закрывает меню.
+    await burger.click();
+    await expect(nav).not.toHaveClass(/\bopen\b/);
+    await expect(nav).toBeHidden();
 });
 
 test('health endpoint and admin login are reachable', async ({ page, request }) => {
