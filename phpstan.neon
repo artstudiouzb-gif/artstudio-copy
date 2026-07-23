@@ -11,5 +11,6 @@ parameters:
     # подключён только для воспроизводимых инструментов разработки.
     scanDirectories:
         - app
+        - database
     treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false

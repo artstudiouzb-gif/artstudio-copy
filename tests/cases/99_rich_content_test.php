@@ -35,7 +35,7 @@ test('rich content stylesheet covers editorial elements and responsive tables', 
 });
 
 test('детальный проект использует всю ширину контейнера для rich-content', function (): void {
-    $css = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/gov-theme.css');
+    $css = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/da-modern.css');
 
     assert_contains('.projdetail__content { width: 100%; max-width: none; }', $css);
     assert_false(str_contains($css, '.projdetail__content { max-width: 76ch; }'));

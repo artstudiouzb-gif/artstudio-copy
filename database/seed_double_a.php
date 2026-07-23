@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../app/Core/Cli.php';
-\App\Core\Cli::assertCli();
-
-require __DIR__ . '/../app/Core/bootstrap.php';
+require_once __DIR__ . '/../app/Core/bootstrap.php';
 
 use App\Core\Database;
 use App\Models\Setting;
 use App\Models\Page;
 use App\Models\Block;
 
-$pdo = Database::pdo();
-
-echo "=== Запуск расширенного сидера DOUBLE A SOLUTIONS (Многостраничный режим) ===\n";
-
+/**
+ * Разворачивает демо-сайт DOUBLE A SOLUTIONS: тема, 4 страницы с блоками и меню.
+ * Вызывается CLI-скриптом (внизу файла) и кнопкой «DEMO» в админке
+ * (App\Core\DemoSeeder). Идемпотентно по slug. @return array<string,int>
+ */
+function seed_double_a_content(PDO $pdo): array
+{
 // 1. Дизайн-настройки в БД
 $settings = [
     'design_site_template' => 'double_a',
@@ -30,7 +30,6 @@ foreach ($settings as $key => $val) {
     $stmt = $pdo->prepare('INSERT INTO settings (`key`, `value`) VALUES (:k, :v) ON DUPLICATE KEY UPDATE `value` = :v2');
     $stmt->execute([':k' => $key, ':v' => $val, ':v2' => $val]);
 }
-echo "✓ Настройки темы успешно записаны.\n";
 
 // 2. Список страниц для создания/обновления
 $pagesToCreate = [
@@ -75,7 +74,6 @@ foreach ($pagesToCreate as $slug => $p) {
             ':lt' => $p['layout_type'],
             ':id' => $id
         ]);
-        echo "✓ Обновлена страница: /{$slug} (ID: {$id})\n";
     } else {
         $stmt = $pdo->prepare('INSERT INTO pages (title, slug, status, is_home, layout_type, hide_chrome, transparent_header, created_at) VALUES (:title, :slug, "published", :is_home, :lt, 0, 0, NOW())');
         $stmt->execute([
@@ -85,7 +83,6 @@ foreach ($pagesToCreate as $slug => $p) {
             ':lt' => $p['layout_type']
         ]);
         $id = (int) $pdo->lastInsertId();
-        echo "✓ Создана новая страница: /{$slug} (ID: {$id})\n";
     }
 
     $pageIds[$slug] = $id;
@@ -672,12 +669,25 @@ foreach ($menuItemsList as $m) {
         ':so' => $m['so']
     ]);
 }
-echo "✓ Новые пункты меню настроены.\n";
 
 // 5. Очистка кэша всех измененных страниц
 foreach ($pageIds as $slug => $id) {
     \App\Core\Cache::forgetPrefix('page:' . $id);
 }
-echo "✓ Кэш всех измененных страниц сброшен.\n";
 
-echo "=== Многостраничный портал DOUBLE A SOLUTIONS успешно развернут! ===\n";
+    return [
+        'pages' => count($pageIds),
+        'blocks' => count($homeBlocks) + count($aboutBlocks) + count($servicesBlocks) + count($contactBlocks),
+        'menu' => count($menuItemsList),
+    ];
+}
+
+// Прямой запуск из консоли: php database/seed_double_a.php
+if (PHP_SAPI === 'cli' && isset($argv[0]) && realpath($argv[0]) === __FILE__) {
+    \App\Core\Cli::assertCli();
+    $counts = seed_double_a_content(Database::pdo());
+    echo "=== Демо DOUBLE A SOLUTIONS развёрнуто ===\n";
+    foreach ($counts as $section => $n) {
+        echo sprintf("  %-8s +%d\n", $section, $n);
+    }
+}

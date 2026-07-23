@@ -64,8 +64,8 @@ test('ручное оформление сохраняется отдельно 
     assert_same('30px', DesignSettings::semanticSpacings()['space_premium']);
     assert_same('60px', DesignSettings::semanticSpacings()['space_max']);
 
-    DesignSettings::save(['palette' => 'gov_blue', 'font_style' => 'system']);
-    assert_same('#173a63', \App\Models\Setting::get('color_primary'));
+    DesignSettings::save(['palette' => 'double_a', 'font_style' => 'system']);
+    assert_same('#062c37', \App\Models\Setting::get('color_primary'));
 
     DesignSettings::save(['palette' => 'custom', 'font_style' => 'custom']);
     assert_same('#102030', \App\Models\Setting::get('color_primary'));

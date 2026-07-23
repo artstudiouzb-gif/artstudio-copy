@@ -22,10 +22,10 @@ $logo = trim((string) ($hcfgAll['logo_by_lang'][\App\Core\Locale::current()] ?? 
 if ($logo === '') {
     $logo = (string) Setting::get('logo_url', '');
 }
-// Гос-тема (по утверждённым эскизам): navy #173a63 + бирюзовый #17999b,
-// типографика PT Serif (заголовки) / PT Sans (текст) — см. gov-theme.css.
-$primaryColor = Setting::get('color_primary', '#173a63');
-$accentColor = Setting::get('color_accent', '#17999b');
+// Тема Double A: изумруд #062c37 + золото #d5ae62, типографика
+// Noto Serif Condensed (заголовки) / Noto Sans (текст) — см. da-modern.css.
+$primaryColor = Setting::get('color_primary', '#062c37');
+$accentColor = Setting::get('color_accent', '#d5ae62');
 $semanticColors = \App\Core\DesignSettings::semanticColors();
 $semanticSpacings = \App\Core\DesignSettings::semanticSpacings();
 $font = Setting::get('font_family', "'PT Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif");
@@ -468,19 +468,9 @@ foreach ([(string) $font, (string) $fontHeading] as $selectedFont) {
 <link rel="stylesheet" href="<?= htmlspecialchars($googleFontsHref, ENT_QUOTES) ?>">
 <?php endif; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/fonts.css'), ENT_QUOTES) ?>">
-<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/gov-fonts.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/frontend.css'), ENT_QUOTES) ?>">
-<?php
-$siteTemplate = \App\Models\Setting::get('design_site_template', 'gov');
-if ($siteTemplate === 'double_a'): ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/noto-fonts.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/da-modern.css'), ENT_QUOTES) ?>">
-<?php else: ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/gov-theme.css'), ENT_QUOTES) ?>">
-<?php if ($siteTemplate === 'modern_gov'): ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/modern-gov-theme.css'), ENT_QUOTES) ?>">
-<?php endif; ?>
-<?php endif; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/rich-content.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/a11y.css'), ENT_QUOTES) ?>">
 <style>
@@ -533,7 +523,6 @@ if ($siteTemplate === 'double_a'): ?>
 </div>
 <?php endif; ?>
 <?php if (empty($hideChrome)): // лендинг (группа 6) скрывает шапку сайта ?>
-<?php if ($siteTemplate === 'double_a'): ?>
   <header class="header">
     <div class="wrap nav">
       <a class="brand" href="<?= htmlspecialchars(Locale::url('/', $currentLang), ENT_QUOTES) ?>" aria-label="DOUBLE A SOLUTIONS">
@@ -556,6 +545,7 @@ if ($siteTemplate === 'double_a'): ?>
           <?php endforeach; ?>
         </div>
       </div>
+      <div class="hdr-tools"><?= $searchHtml ?><?= $themeToggle ?><?= $a11yToggle ?></div>
       <?php if ($hcfg['cta']['enabled'] && $hcfg['cta']['text'] !== ''): ?>
         <a class="btn ink" href="<?= htmlspecialchars($hcfg['cta']['url'] !== '' ? $hcfg['cta']['url'] : '#contact', ENT_QUOTES) ?>">
           <?= htmlspecialchars($hcfg['cta']['text'], ENT_QUOTES) ?>
@@ -564,7 +554,6 @@ if ($siteTemplate === 'double_a'): ?>
       <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
     </div>
   </header>
-<?php else: ?>
 <div class="a11y-panel<?= $a11y['on'] ? ' is-open' : '' ?>" id="a11y-panel" role="region" aria-label="<?= $et('Настройки версии для слабовидящих') ?>">
     <div class="a11y-panel__group">
         <b><?= $et('Цвет:') ?></b>
@@ -585,48 +574,6 @@ if ($siteTemplate === 'double_a'): ?>
     </div>
     <a href="#" class="a11y-panel__off"><?= $et('Обычная версия') ?></a>
 </div>
-<?= $topbarHtml ?>
-<?php
-// Свои фоны секций и тень шапки (конструктор шапки). Цвета прошли hex-валидацию
-// в HeaderConfig; тень не включается в прозрачном режиме (пока шапка наложена).
-$midBg = (string) ($hcfg['middlebar']['bg'] ?? '');
-$navBg = (string) ($hcfg['bottombar']['bg'] ?? '');
-$shadowOn = !empty($hcfg['shadow']['enabled']) && !$transparentOn;
-$headerExtraClass = ($midBg !== '' ? ' site-header--mid-bg' : '')
-    . ($navBg !== '' ? ' site-header--nav-bg' : '')
-    . ($shadowOn ? ' site-header--shadow' : '');
-$headerExtraVars = ($midBg !== '' ? '--header-mid-bg:' . $midBg . ';' : '')
-    . ($navBg !== '' ? '--header-nav-bg:' . $navBg . ';' : '')
-    . ($shadowOn ? '--header-shadow-size:' . (int) ($hcfg['shadow']['size'] ?? 14) . 'px;' : '');
-?>
-<header class="site-header site-header--layout-<?= htmlspecialchars($layout, ENT_QUOTES) ?> site-header--logo-<?= htmlspecialchars($logoPos, ENT_QUOTES) ?><?= $navBarHtml !== '' ? ' site-header--has-nav' : '' ?><?= $drawerMenu !== '' ? ' site-header--has-drawer' : '' ?><?= !empty($hcfg['sticky']) ? ' site-header--sticky' : '' ?><?= $transparentOn ? ' site-header--transparent' : '' ?> site-header--h-<?= htmlspecialchars(in_array($hcfg['middlebar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['middlebar']['height'] : 'normal', ENT_QUOTES) ?> site-header--nav-h-<?= htmlspecialchars(in_array($hcfg['bottombar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['bottombar']['height'] : 'normal', ENT_QUOTES) ?> site-header--borders-<?= htmlspecialchars(in_array($hcfg['borders'] ?? 'full', HeaderConfig::BORDER_MODES, true) ? $hcfg['borders'] : 'full', ENT_QUOTES) ?><?= $headerExtraClass ?>" style="--header-logo-width:<?= (int) ($hcfg['logo_width'] ?? 240) ?>px;--header-logo-height:<?= (int) ($hcfg['logo_height'] ?? 48) ?>px;<?= $headerExtraVars ?>"<?= (!empty($hcfg['sticky']) || $transparentOn) ? ' data-header-scroll' : '' ?>>
-    <div class="site-header__inner">
-        <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>
-        <div class="site-header__zone site-header__zone--center"><?= $zones['center'] ?></div>
-        <div class="site-header__zone site-header__zone--right"><?= $zones['right'] ?></div>
-    </div>
-    <?php if ($navBarHtml !== '' || $hasBottomExtras): ?>
-    <div class="site-nav site-nav--align-<?= htmlspecialchars($navAlign, ENT_QUOTES) ?><?= $hasBottomExtras ? ' site-nav--with-extras' : '' ?>">
-        <div class="site-nav__inner">
-            <?php if ($bottomExtras['left'] !== ''): ?><span class="site-nav__extra site-nav__extra--left"><?= $bottomExtras['left'] ?></span><?php endif; ?>
-            <?= $navBarHtml ?>
-            <?php if ($bottomExtras['center'] !== ''): ?><span class="site-nav__extra site-nav__extra--center"><?= $bottomExtras['center'] ?></span><?php endif; ?>
-            <?php if ($bottomExtras['right'] !== ''): ?><span class="site-nav__extra site-nav__extra--right"><?= $bottomExtras['right'] ?></span><?php endif; ?>
-        </div>
-    </div>
-    <?php endif; ?>
-</header>
-<?php if ($drawerMenu !== ''): ?>
-<?php // Off-canvas меню вынесено за пределы <header>, чтобы position:fixed не
-      // зависел от containing block шапки (sticky/трансформации). ?>
-<div class="site-drawer" data-drawer>
-    <div class="site-drawer__backdrop" data-mobile-menu-toggle aria-hidden="true"></div>
-    <div class="site-drawer__panel" role="dialog" aria-label="<?= $et('Меню') ?>" aria-modal="true">
-        <button type="button" class="site-drawer__close" data-mobile-menu-toggle aria-label="<?= $et('Закрыть меню') ?>">&times;</button>
-        <?= $drawerMenu ?>
-    </div>
-</div>
-<?php endif; ?>
 <?php if ($searchType === 'overlay'): ?>
 <div class="site-search-overlay" id="site-search-popover" data-search-overlay hidden role="dialog" aria-modal="true" aria-label="<?= htmlspecialchars(t('Поиск по сайту'), ENT_QUOTES) ?>">
     <form class="site-search-overlay__form" method="get" action="<?= $searchAction ?>" role="search">
@@ -635,7 +582,6 @@ $headerExtraVars = ($midBg !== '' ? '--header-mid-bg:' . $midBg . ';' : '')
         <button type="button" class="site-search-overlay__close" aria-label="<?= $et('Закрыть поиск') ?>" data-search-close>&times;</button>
     </form>
 </div>
-<?php endif; ?>
 <?php endif; ?>
 <?php endif; ?>
 <main class="site-content" id="main-content">

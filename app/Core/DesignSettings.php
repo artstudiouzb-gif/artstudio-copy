@@ -23,11 +23,6 @@ final class DesignSettings
      * 'custom' использует ручные цвета из этого же раздела «Дизайн».
      */
     public const PALETTES = [
-        'gov_blue' => ['Гос-синий', '#173a63', '#17999b'],
-        'classic_red' => ['Классика', '#1a1a1a', '#e63946'],
-        'emerald' => ['Изумруд', '#14532d', '#059669'],
-        'graphite' => ['Графит', '#111827', '#374151'],
-        'violet' => ['Индиго', '#312e81', '#6d28d9'],
         'double_a' => ['Double A', '#062c37', '#d5ae62'],
         'custom' => ['Свои цвета', '', ''],
     ];
@@ -75,8 +70,8 @@ final class DesignSettings
             'label' => 'Цветовая палитра',
             'hint' => 'Основной и акцентный цвета сайта. «Свои цвета» — ручные значения ниже.',
             'group' => 'Цвета и шрифт',
-            'choices' => ['gov_blue' => 'Гос-синий', 'classic_red' => 'Классика', 'emerald' => 'Изумруд', 'graphite' => 'Графит', 'violet' => 'Индиго', 'double_a' => 'Double A', 'custom' => 'Свои цвета'],
-            'default' => 'custom',
+            'choices' => ['double_a' => 'Double A', 'custom' => 'Свои цвета'],
+            'default' => 'double_a',
         ],
         'font_style' => [
             'label' => 'Шрифт сайта',
@@ -87,9 +82,9 @@ final class DesignSettings
         ],
         'site_template' => [
             'label' => 'Шаблон сайта',
-            'hint' => 'Основной визуальный стиль и сетка сайта. «Официальный» — классическая гос-тема с засечками. «Современный» — трендовый дизайн без засечек с просторным расположением блоков и мягкими тенями. «Double A» — премиум-дизайн в темных изумрудных и золотых тонах.',
+            'hint' => 'Премиум-дизайн Double A Solutions: темные изумрудные и золотые тона, шрифты Noto Serif Condensed / Noto Sans.',
             'group' => 'Общие',
-            'choices' => ['gov' => 'Официальный', 'modern_gov' => 'Современный', 'double_a' => 'Double A Solutions'],
+            'choices' => ['double_a' => 'Double A Solutions'],
             'default' => 'double_a',
         ],
         'container' => [
@@ -235,26 +230,6 @@ final class DesignSettings
             'label' => 'Double A Solutions',
             'desc' => 'Премиум-дизайн для Double A Solutions (темный изумруд, золото, шрифт Inter/Georgia).',
             'values' => ['site_template' => 'double_a', 'container' => 'wide', 'radius' => 'large', 'card_gap' => 'md', 'density' => 'spacious', 'font_size' => 'md', 'line_height' => 'relaxed', 'button' => 'pill', 'card_style' => 'elevated', 'sidebar_position' => 'floating', 'catalog_layout' => 'cards_lg', 'header_style' => 'light', 'header_sticky' => 'on', 'search_type' => 'overlay', 'detail_layout' => 'sidebar', 'footer_style' => 'columns', 'mobile_menu' => 'burger', 'mobile_header' => 'fixed', 'type_scale' => 'fluid', 'scroll_top' => 'on', 'palette' => 'double_a', 'font_style' => 'inter'],
-        ],
-        'classic' => [
-            'label' => 'Классический',
-            'desc' => 'Строгий официальный стиль, умеренные отступы.',
-            'values' => ['site_template' => 'gov', 'container' => 'standard', 'radius' => 'small', 'card_gap' => 'sm', 'density' => 'standard', 'font_size' => 'md', 'line_height' => 'normal', 'button' => 'rounded', 'card_style' => 'soft', 'sidebar_position' => 'floating', 'catalog_layout' => 'cards_lg', 'header_style' => 'light', 'header_sticky' => 'on', 'search_type' => 'inline', 'detail_layout' => 'plain', 'footer_style' => 'columns', 'mobile_menu' => 'burger', 'mobile_header' => 'fixed', 'type_scale' => 'fluid', 'scroll_top' => 'on', 'palette' => 'gov_blue', 'font_style' => 'system'],
-        ],
-        'modern' => [
-            'label' => 'Современный',
-            'desc' => 'Крупные скругления, воздух, акцентная шапка.',
-            'values' => ['site_template' => 'modern_gov', 'container' => 'wide', 'radius' => 'large', 'card_gap' => 'md', 'density' => 'spacious', 'font_size' => 'lg', 'line_height' => 'relaxed', 'button' => 'pill', 'card_style' => 'elevated', 'sidebar_position' => 'floating', 'catalog_layout' => 'cards_lg', 'header_style' => 'accent', 'header_sticky' => 'on', 'search_type' => 'overlay', 'detail_layout' => 'sidebar', 'footer_style' => 'columns', 'mobile_menu' => 'burger', 'mobile_header' => 'fixed', 'type_scale' => 'fluid', 'scroll_top' => 'on', 'palette' => 'violet', 'font_style' => 'inter'],
-        ],
-        'minimal' => [
-            'label' => 'Минимал',
-            'desc' => 'Прямые углы, максимум воздуха, список в каталоге.',
-            'values' => ['site_template' => 'gov', 'container' => 'narrow', 'radius' => 'none', 'card_gap' => 'md', 'density' => 'spacious', 'font_size' => 'md', 'line_height' => 'normal', 'button' => 'square', 'card_style' => 'flat', 'sidebar_position' => 'fixed', 'catalog_layout' => 'list', 'header_style' => 'light', 'header_sticky' => 'off', 'search_type' => 'overlay', 'detail_layout' => 'plain', 'footer_style' => 'minimal', 'mobile_menu' => 'burger', 'mobile_header' => 'static', 'type_scale' => 'fluid', 'scroll_top' => 'on', 'palette' => 'graphite', 'font_style' => 'serif'],
-        ],
-        'compact' => [
-            'label' => 'Компактный',
-            'desc' => 'Плотная сетка, маленькие карточки — много данных.',
-            'values' => ['site_template' => 'gov', 'container' => 'standard', 'radius' => 'small', 'card_gap' => 'xs', 'density' => 'compact', 'font_size' => 'sm', 'line_height' => 'tight', 'button' => 'rounded', 'card_style' => 'soft', 'sidebar_position' => 'fixed', 'catalog_layout' => 'cards_sm', 'header_style' => 'light', 'header_sticky' => 'on', 'search_type' => 'inline', 'detail_layout' => 'sidebar', 'footer_style' => 'columns', 'mobile_menu' => 'burger', 'mobile_header' => 'fixed', 'type_scale' => 'fluid', 'scroll_top' => 'on', 'palette' => 'classic_red', 'font_style' => 'system'],
         ],
     ];
 

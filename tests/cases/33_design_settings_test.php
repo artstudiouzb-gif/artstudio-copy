@@ -42,14 +42,14 @@ test('DesignSettings::bodyClasses отражает макет каталога, 
 });
 
 test('DesignSettings::bodyClasses включает тип поиска, шаблон детали и футер', function () {
-    $cls = DesignSettings::bodyClasses(DesignSettings::PRESETS['modern']['values']);
+    $cls = DesignSettings::bodyClasses(DesignSettings::PRESETS['double_a']['values']);
     assert_contains('design-search-overlay', $cls);
     assert_contains('design-detail-sidebar', $cls);
     assert_contains('design-footer-columns', $cls);
     assert_contains('design-cards-elevated', $cls);
     assert_contains('design-sidebar-floating', $cls);
 
-    $min = DesignSettings::bodyClasses(DesignSettings::PRESETS['minimal']['values']);
+    $min = DesignSettings::bodyClasses(['search_type' => 'overlay', 'detail_layout' => 'plain', 'footer_style' => 'minimal'] + DesignSettings::PRESETS['double_a']['values']);
     assert_contains('design-search-overlay', $min);
     assert_contains('design-detail-plain', $min);
     assert_contains('design-footer-minimal', $min);
@@ -59,7 +59,7 @@ test('DesignSettings: масштаб заголовков — статичный
     assert_same('static', DesignSettings::sanitize('type_scale', 'static'));
     assert_same('fluid', DesignSettings::sanitize('type_scale', 'bogus')); // default
 
-    $base = DesignSettings::PRESETS['classic']['values'];
+    $base = DesignSettings::PRESETS['double_a']['values'];
     assert_not_contains('design-type-static', DesignSettings::bodyClasses($base)); // без ключа — плавающие
     assert_contains('design-type-static', DesignSettings::bodyClasses(['type_scale' => 'static'] + $base));
     assert_not_contains('design-type-static', DesignSettings::bodyClasses(['type_scale' => 'fluid'] + $base));
@@ -69,16 +69,16 @@ test('DesignSettings: кнопка «Наверх» — тумблер даёт/
     assert_same('on', DesignSettings::sanitize('scroll_top', 'on'));
     assert_same('on', DesignSettings::sanitize('scroll_top', 'bogus')); // default — включена
 
-    $base = DesignSettings::PRESETS['classic']['values'];
+    $base = DesignSettings::PRESETS['double_a']['values'];
     assert_contains('design-scrolltop', DesignSettings::bodyClasses($base)); // в пресетах включена
     assert_contains('design-scrolltop', DesignSettings::bodyClasses(['scroll_top' => 'on'] + $base));
     assert_not_contains('design-scrolltop', DesignSettings::bodyClasses(['scroll_top' => 'off'] + $base));
 });
 
 test('DesignSettings::cssVariables задаёт тень карточек по стилю', function () {
-    $flat = DesignSettings::cssVariables(DesignSettings::PRESETS['minimal']['values']);
+    $flat = DesignSettings::cssVariables(['card_style' => 'flat'] + DesignSettings::PRESETS['double_a']['values']);
     assert_contains('--card-shadow:none', $flat);
-    $elevated = DesignSettings::cssVariables(DesignSettings::PRESETS['modern']['values']);
+    $elevated = DesignSettings::cssVariables(DesignSettings::PRESETS['double_a']['values']);
     assert_contains('--card-shadow:0 10px 30px', $elevated);
 });
 
@@ -101,10 +101,10 @@ test('Палитра материализуется в color_primary/color_accen
     \App\Models\Setting::set('color_primary', '#010101');
     \App\Models\Setting::set('color_accent', '#020202');
 
-    // Применяем палитру gov_blue — цвета перезаписаны.
-    DesignSettings::save(['palette' => 'gov_blue', 'font_style' => 'serif']);
-    assert_same('#173a63', \App\Models\Setting::get('color_primary'));
-    assert_same('#17999b', \App\Models\Setting::get('color_accent'));
+    // Применяем палитру double_a — цвета перезаписаны.
+    DesignSettings::save(['palette' => 'double_a', 'font_style' => 'serif']);
+    assert_same('#062c37', \App\Models\Setting::get('color_primary'));
+    assert_same('#d5ae62', \App\Models\Setting::get('color_accent'));
     assert_contains('Georgia', \App\Models\Setting::get('font_family'));
 
     // Возврат на custom: ставим ручные значения — save их не перетирает.
@@ -138,8 +138,8 @@ test('Пользовательские конфигурации: сохрани�
     assert_true(isset(DesignSettings::userPresets()[$slug]), 'в списке');
 
     // Меняем всё, затем применяем пресет — опции и ручные цвета вернулись.
-    DesignSettings::save(['palette' => 'gov_blue', 'container' => 'wide']);
-    assert_same('#173a63', \App\Models\Setting::get('color_primary'));
+    DesignSettings::save(['palette' => 'double_a', 'container' => 'wide']);
+    assert_same('#062c37', \App\Models\Setting::get('color_primary'));
 
     assert_true(DesignSettings::applyPreset('user:' . $slug));
     $cur = DesignSettings::current();

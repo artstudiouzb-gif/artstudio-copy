@@ -49,6 +49,11 @@
     --gov-border: var(--line) !important;
     --gov-navy: var(--panel-2) !important;
     --gov-title: var(--text) !important;
+    /* Акцентные алиасы для перенесённой стилизации CMS-блоков (внутренние
+       страницы: новости, проекты, каталог). Бренд-акцент из админки. */
+    --gov-teal: var(--lime) !important;
+    --gov-teal-text: var(--accent-text) !important;
+    --gov-teal-on-dark: var(--accent-text) !important;
 }
 
 /* --- Светлый контекст: чередуемые светлые секции (cream + emerald-акцент). --- */
@@ -596,3 +601,441 @@ html { scroll-behavior: smooth; }
     .uz-route { animation: none; stroke-dashoffset: 0; }
     .uz-pin, .uz-pin-ring, .live::before { animation: none; opacity: 1; }
 }
+
+/* ==========================================================================
+   Перенесённая стилизация стандартных CMS-блоков (новости, проекты, каталог,
+   медиа-галерея, мега-меню, топбар). Ранее — в gov-theme.css, который для темы
+   Double A не подключался, поэтому внутренние страницы были без лоска. Цвета
+   берутся из токенов темы (--gov-* — алиасы на акцент/изумруд Double A).
+   ========================================================================== */
+
+/* Тёмные контексты: текстовый акцент переключается на светлый вариант. */
+.cms-block--bg-navy, .block-hero--media, .site-footer { --gov-teal-text: var(--gov-teal-on-dark); }
+
+/* Топбар: утилитарные иконки наследуют цвет и имеют единый размер. */
+.site-topbar .site-lang-switcher__item { color: inherit; }
+.site-topbar .site-header__divider { background: currentColor; opacity: .3; }
+.site-topbar .site-search-toggle,
+.site-topbar .site-theme-toggle,
+.site-topbar .a11y-toggle {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 7px !important;
+    color: inherit !important;
+}
+.site-topbar .site-search-toggle svg,
+.site-topbar .site-theme-toggle svg,
+.site-topbar .a11y-toggle svg {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+}
+
+/* Прозрачная шапка поверх hero: контролы белые. */
+body .site-header--transparent:not(.is-scrolled) .a11y-toggle,
+body .site-header--transparent:not(.is-scrolled) .site-theme-toggle,
+body .site-header--transparent:not(.is-scrolled) .site-search-toggle,
+body .site-header--transparent:not(.is-scrolled) .site-burger,
+body .site-header--transparent:not(.is-scrolled) .hdr-contact { color: #fff; }
+
+/* Мега-меню: сетка колонок панели (показ/скрытие — во frontend.css). */
+.site-submenu--mega { grid-template-columns: repeat(var(--mega-cols, 3), minmax(0, 1fr)); }
+
+/* Карточки новостей/материалов: реакция, фокус, адаптив, reduced-motion. */
+:where(
+    .news-card__link, .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
+    .newsdocs-item, .doc-card, .album-card, .cat-tile, .media-item, .mediacard
+) {
+    transition: transform .18s ease, box-shadow .18s ease,
+        border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+
+/* Новостям нужна более спокойная реакция: короткий быстрый подъём выглядел
+   дёргано рядом с крупной обложкой и плотной правой колонкой. */
+:where(.news-card, .news-card__link, .newsfeat-lead, .newsfeat-mini, .newsfeat-text) {
+    transition: transform .38s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .38s ease, border-color .38s ease, color .28s ease;
+}
+
+:where(
+    .news-card__link, .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
+    .newsdocs-item, .doc-card, .album-card, .cat-tile, .media-item, .mediacard
+):focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--gov-teal) 72%, #fff);
+    outline-offset: 3px;
+}
+
+/* Карточка новости содержит ссылку: эффект принадлежит ссылке и доступен
+   клавиатуре, но визуально применяется к внешней рамке карточки. */
+.news-card:has(.news-card__link:focus-visible) {
+    border-color: var(--gov-teal);
+    box-shadow: 0 10px 30px rgba(19, 42, 92, .10);
+}
+.news-card__link:focus-visible { outline-offset: -3px; }
+
+@media (hover: hover) and (pointer: fine) {
+    :where(
+        .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
+        .newsdocs-item, .doc-card, .album-card, .cat-tile
+    ):hover {
+        transform: translateY(-3px);
+    }
+    :where(.newsfeat-lead, .newsfeat-mini, .newsfeat-text):hover {
+        transform: translateY(-1px);
+    }
+    .newsfeat-text:hover {
+        transform: none !important;
+    }
+    .news-card:hover {
+        transform: translateY(-2px);
+    }
+    :where(.news-card__link, .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
+        .newsdocs-item, .doc-card, .album-card, .cat-tile, .media-item,
+        .mediacard):hover :where(.newsfeat__more,
+        .doc-card__dl, .media-item__action, .news-card__more) {
+        transform: translateX(3px);
+    }
+}
+
+:where(
+    .news-card__link, .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
+    .newsdocs-item, .doc-card, .album-card, .cat-tile, .media-item, .mediacard
+):active {
+    transform: translateY(0);
+}
+
+:where(.newsfeat__more, .doc-card__dl,
+    .media-item__action, .news-card__more) {
+    transition: transform .18s ease, color .18s ease;
+}
+
+/* Grid/flex-элементы не должны расширять страницу длинным заголовком или URL. */
+:where(
+    .site-header__inner, .site-header__zone, .site-nav__inner,
+    .cms-columns, .cms-columns__col, .newsfeat-grid, .newsfeat-side,
+    .newsfeat-side__thumbs, .newsfeat-side__texts, .block-newsdocs,
+    .news-index__grid, .block-news__grid, .news-card, .newsdocs-item,
+    .doc-card, .contact-cards, .cat-grid
+) > * {
+    min-width: 0;
+}
+
+:where(.newsfeat-lead__title, .newsfeat-mini__title, .newsfeat-text__title,
+    .newsdocs-item__title, .doc-card__title, .news-card__title,
+    .site-menu__text) {
+    overflow-wrap: anywhere;
+}
+
+/* Четыре колонки слишком узки на планшете; до мобильного они становятся двумя. */
+@media (max-width: 1024px) and (min-width: 721px) {
+    .cms-columns--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cms-columns--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+    .site-header__inner {
+        flex-wrap: nowrap;
+        gap: 10px;
+        padding-inline: 16px;
+    }
+    .site-header__zone { min-width: 0; flex-wrap: nowrap; gap: 10px; }
+    .site-header__zone--center { justify-content: flex-start; }
+    .site-header__zone--right { flex: 0 0 auto; }
+    .site-header__logo { min-width: 0; max-width: 100%; }
+    .site-header__logo img {
+        width: min(var(--header-logo-width, 240px), 48vw);
+        height: min(var(--header-logo-height, 48px), 48px);
+        max-width: 100%;
+    }
+    .site-header__logo span {
+        max-width: min(54vw, 240px);
+        overflow-wrap: anywhere;
+        font-size: clamp(0.75rem, 3.4vw, 0.9375rem);
+    }
+    .site-burger, .site-search-toggle, .site-theme-toggle { flex: 0 0 auto; }
+    body.mobile-menu-open { overflow: hidden; }
+    body.design-mmenu-burger .site-menu {
+        max-height: calc(100dvh - 72px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+    body.design-mmenu-burger .site-menu__link {
+        width: 100%;
+        min-height: 44px;
+        white-space: normal;
+    }
+    /* Раскрытая панель имеет собственный сплошной фон и не должна наследовать
+       белый текст прозрачной шапки поверх hero. Переменные темы сохраняют
+       правильный контраст и в светлом, и в тёмном режиме. */
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link {
+        color: var(--gov-title);
+    }
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link:hover,
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link:focus-visible {
+        color: var(--gov-teal-text, var(--gov-teal));
+    }
+
+    .newsfeat-grid, .block-newsdocs { gap: 24px; }
+    .newsfeat-side__thumbs, .newsfeat-side__texts { gap: 18px; }
+    .news-index__grid, .block-news__grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .newsdocs-item {
+        grid-template-columns: 80px minmax(0, 1fr) auto;
+        gap: 12px;
+    }
+    .doc-card { grid-template-columns: auto minmax(0, 1fr); gap: 12px; }
+    .doc-card__dl { grid-column: 2; justify-self: start; }
+    .section-head { align-items: flex-start; }
+}
+
+@media (max-width: 420px) {
+    .site-header__inner { padding-inline: 12px; }
+    .site-header__logo img { width: min(var(--header-logo-width, 240px), 42vw); }
+    .site-header__logo span { max-width: 46vw; }
+    .newsdocs-item { grid-template-columns: 68px minmax(0, 1fr); }
+    .ctaband__lead { align-items: flex-start; flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :where(
+        .news-card__link, .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
+        .newsdocs-item, .doc-card, .album-card, .cat-tile, .media-item, .mediacard
+    ) {
+        transition: none;
+    }
+}
+
+/* Hero: надзаголовок и кнопки. */
+.block-hero__eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--gov-teal-text); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: 0.8125rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
+.block-hero__eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--gov-teal); }
+.block-hero--media .block-hero__button:not(.block-hero__button--ghost) { background: var(--hero-btn, #16406e) !important; }
+.block-hero:not(.block-hero--media) .block-hero__button:not(.block-hero__button--ghost) { background: var(--hero-btn, var(--gov-navy)) !important; }
+.block-hero__button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(22, 64, 110, 0.3);
+}
+.block-hero--media .block-hero__button:not(.block-hero__button--ghost):hover {
+    background: color-mix(in srgb, var(--hero-btn, #16406e) 86%, #fff) !important;
+    box-shadow: 0 8px 20px rgba(23, 153, 155, 0.35);
+}
+.block-hero__button--ghost { background: transparent !important; border: 1px solid rgba(255,255,255,.5) !important; }
+
+/* Детальная страница проекта — контент на всю ширину. */
+.projdetail__content { width: 100%; max-width: none; }
+
+/* Лента новостей (лид/мини/текст), рубрики и медиа-галерея. */
+.newsfeat-lead__frame { position: relative; display: block; height: 100%; border-radius: var(--radius); overflow: hidden; }
+.newsfeat-lead__media { display: block; width: 100%; height: 100%; min-height: 260px; background: #24425f center/cover no-repeat; object-fit: cover; transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) !important; }
+.newsfeat-lead:hover .newsfeat-lead__media { transform: scale(1.04) !important; }
+.newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 22%, var(--gov-surface)), var(--gov-surface)); }
+/* Подложка под текстом — затемнение снизу, чтобы белый читался на любом фото. */
+.newsfeat-lead__over {
+    position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-direction: column;
+    align-items: flex-start; gap: 10px; padding: 22px;
+    /* Плотность подобрана так, чтобы белый текст держал 4.5:1 даже
+       на самой светлой обложке, а не только 3:1 «как крупный текст». */
+    background: linear-gradient(to top,
+        color-mix(in srgb, var(--gov-navy) 96%, transparent),
+        color-mix(in srgb, var(--gov-navy) 82%, transparent) 58%,
+        transparent);
+}
+.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.35rem; color: #fff; line-height: 1.32; }
+.newsfeat-lead__excerpt {
+    color: rgba(255,255,255,.86); line-height: 1.5; font-size: .93rem;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+/* На широком экране плитка тянется ровно на высоту правой колонки — колонки
+   всегда заканчиваются вровень, независимо от длины заголовков. */
+@media (min-width: 901px) { .newsfeat-grid { align-items: stretch; } }
+/* В одну колонку высоту задаёт пропорция, а не растяжка по соседу.
+   На узком экране плитка вытянута вертикально: иначе подложка с текстом
+   занимает больше половины картинки. */
+@media (max-width: 900px) { .newsfeat-lead__media { height: auto; min-height: 0; aspect-ratio: 16/10; } }
+@media (max-width: 560px) { .newsfeat-lead__media { aspect-ratio: 4/5; } }
+.newsfeat-side { display: flex; flex-direction: column; gap: 24px; }
+.newsfeat-side__thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+@media (max-width: 560px) { .newsfeat-side__thumbs { grid-template-columns: 1fr; } }
+/* Разделение колонок — отступом, без вертикальной линии: линий в блоке и так много. */
+.newsfeat-side__texts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid color-mix(in srgb, var(--gov-border) 55%, transparent); padding-top: 20px; }
+@media (max-width: 560px) { .newsfeat-side__texts { grid-template-columns: 1fr; } }
+.newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
+/* Обязательно ПОСЛЕ базового правила: специфичность одинаковая, решает порядок. */
+.newsfeat__date--on-media { color: rgba(255,255,255,.88); }
+.newsfeat__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; }
+.newsfeat-mini { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--gov-ink); }
+.newsfeat-mini__thumb { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; border-radius: 8px; overflow: hidden; background: #24425f; }
+.newsfeat-mini__media { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) !important; }
+.newsfeat-mini:hover .newsfeat-mini__media { transform: scale(1.04) !important; }
+.newsfeat-mini__media--empty { display: block; width: 100%; height: 100%; background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
+.newsfeat-mini__body { display: flex; flex-direction: column; gap: 6px; }
+.newsfeat-mini__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
+.newsfeat-text { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--gov-ink); }
+
+/* Рубрика карточки. На фото — плашка (нужен свой фон для читаемости),
+   без фото — просто набранная метка. */
+/* Рубрика — типографская метка с акцентной чертой, а не залитая плашка:
+   цветной прямоугольник в углу обложки — узнаваемый приём новостных
+   порталов. Метка стоит на одной строке с датой, поэтому не занимает
+   отдельную строку и не сдвигает соседей по ряду, у которых рубрики нет. */
+.news-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; }
+.news-badge {
+    display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%;
+    color: var(--gov-teal-text); font-size: .8rem; font-weight: 700; line-height: 1.3;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.news-badge::before { content: ""; flex: none; width: 14px; height: 2px; background: currentColor; }
+/* На обложке акцентный цвет не держит контраст — метка становится белой. */
+.news-badge--on-media { color: #fff; }
+.newsfeat-text__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
+.newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--color-accent, var(--gov-teal)); }
+/* Заголовок лида белый на фото — при наведении оставляем чистым белый при зуме обложки */
+.newsfeat-lead:hover .newsfeat-lead__title { text-decoration: none !important; }
+@media (max-width: 560px) { .newsfeat-lead__over { padding: 14px; } .newsfeat-lead__title { font-size: 1.12rem; } }
+
+/* --- Медиа-галерея: переключатели --- */
+.media-tabs { 
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: auto;
+    margin-left: 20px;
+    background: color-mix(in srgb, var(--gov-border) 16%, var(--gov-bg));
+    padding: 3px;
+    border: 1px solid var(--gov-border);
+    border-radius: 24px;
+}
+.media-tabs__tab { 
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px !important;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    padding: 0 16px;
+    cursor: pointer;
+    text-transform: none;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--gov-muted);
+    border-radius: 20px;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-family, 'PT Sans', sans-serif); 
+}
+.media-tabs__tab::after {
+    display: none !important;
+}
+.media-tabs__tab.is-active::after {
+    display: none !important;
+}
+.media-tabs__tab.is-active { 
+    color: #fff !important;
+    background: var(--color-accent, var(--gov-teal)) !important;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-accent, var(--gov-teal)) 30%, transparent);
+}
+.media-tabs__tab:hover:not(.is-active) {
+    color: var(--gov-title);
+    background: color-mix(in srgb, var(--gov-border) 35%, transparent);
+}
+
+/* --- Доп. блоки: карусель, счётчики, медиакарточки, CTA, поиск --- */
+/* Карусель проектов: плавный слайд треков (не отключать вложенные переходы). */
+.imgcard__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #24425f center/cover no-repeat; transform: scale(1.001); transition: transform .7s cubic-bezier(.22, 1, .36, 1); will-change: transform; }
+
+.block-counters { 
+    background: var(--counters-bg, var(--gov-surface));
+    border: 1px solid var(--gov-border);
+    border-radius: 16px; 
+    padding: clamp(20px, 3vw, 34px); 
+    box-shadow: 0 14px 34px rgba(19, 42, 92, 0.08);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease, background-color 0.35s ease;
+}
+.block-counters:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(19, 42, 92, 0.12);
+    border-color: var(--color-accent, var(--gov-teal));
+}
+:root[data-theme="dark"] .block-counters {
+    background: var(--counters-bg, var(--gov-surface));
+    border-color: var(--gov-border);
+}
+:root[data-theme="dark"] .block-counters:hover {
+    border-color: var(--color-accent, var(--gov-teal));
+}
+.block-counters__title { color: var(--counters-text, var(--gov-title)); }
+.block-counters__grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0; }
+/* --- Секции: маркер конца блока счётчиков (используется тестом) --- */
+
+.counter__icon { 
+    display: grid; 
+    place-items: center; 
+    width: 50px; 
+    height: 50px; 
+    margin-top: 2px; 
+    border-radius: 50%; 
+    flex-shrink: 0; 
+    background: color-mix(in srgb, var(--counters-text, var(--gov-title)) 8%, transparent); 
+    color: var(--counters-text, var(--gov-title)); 
+    transition: background 0.35s ease, color 0.35s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.counter:hover .counter__icon {
+    background: var(--color-accent, var(--gov-teal));
+    color: #fff;
+    transform: scale(1.1);
+}
+.counter__icon svg { width: 26px; height: 26px; }
+
+/* Медиакарточки: зум обложки без подъёма карточки. */
+.mediacard__img { 
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; 
+    transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.mediacard:hover .mediacard__img {
+    transform: scale(1.05);
+}
+.mediacard__play, .mediacard__duration { position: relative; z-index: 1; }
+
+/* CTA-блок: пользовательский цвет кнопки перекрывает тему. */
+.block-cta[style*="--cta-btn"] a, .block-cta[style*="--cta-btn"] .block-cta__button { background: var(--cta-btn) !important; }
+
+/* Поиск в шапке: показывается только выбранный в дизайне вариант. */
+body.design-search-inline .site-header .site-search { display: inline-flex; }
+body.design-search-inline .site-header .site-search-toggle { display: none; }
+body.design-search-overlay .site-header .site-search { display: none; }
+body.design-search-overlay .site-header .site-search-toggle { display: grid; }
+
+/* --- Утилиты в шапке double_a: поиск, тема, доступность --- */
+.header .hdr-tools { display: inline-flex; align-items: center; gap: 6px; }
+.header .hdr-tools .site-theme-toggle,
+.header .hdr-tools .a11y-toggle,
+.header .hdr-tools .site-search-toggle,
+.header .hdr-tools .site-search button {
+    display: inline-grid; place-items: center; width: 38px; height: 38px;
+    padding: 0; border: 1px solid var(--line); border-radius: 10px;
+    background: transparent; color: var(--text); cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.header .hdr-tools .a11y-toggle span { display: none; }
+.header .hdr-tools .site-theme-toggle:hover,
+.header .hdr-tools .a11y-toggle:hover,
+.header .hdr-tools .site-search-toggle:hover,
+.header .hdr-tools .site-search button:hover {
+    border-color: color-mix(in srgb, var(--lime) 55%, var(--line));
+    color: var(--accent-text);
+}
+.header .hdr-tools .site-theme-toggle svg,
+.header .hdr-tools .a11y-toggle svg,
+.header .hdr-tools .site-search-toggle svg { width: 18px; height: 18px; }
+.header .hdr-tools .site-search { display: inline-flex; align-items: center; gap: 6px; }
+.header .hdr-tools .site-search input {
+    width: 150px; height: 38px; padding: 0 12px; border: 1px solid var(--line);
+    border-radius: 10px; background: color-mix(in srgb, var(--panel) 60%, transparent);
+    color: var(--text); font: inherit; font-size: .9rem;
+}
+.header .hdr-tools .site-search input::placeholder { color: var(--muted); }
+@media (max-width: 900px) { .header .hdr-tools { display: none; } }

@@ -22,7 +22,7 @@ test('Хлебные крошки публичных шаблонов перев
 });
 
 test('Ведущая новость на главной — цельная плитка с текстом на обложке', function () {
-    $css = file_get_contents(APP_ROOT . '/public/assets/css/gov-theme.css');
+    $css = file_get_contents(APP_ROOT . '/public/assets/css/da-modern.css');
     assert_true($css !== false, 'CSS гос-темы доступен');
     // Текст лежит на обложке: рамка позиционирует затемняющую подложку.
     assert_contains('.newsfeat-lead__frame { position: relative;', (string) $css);

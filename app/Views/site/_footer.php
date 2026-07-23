@@ -26,9 +26,6 @@ if ($privacyPageId > 0) {
 </div>
 </main>
 <?php if (empty($hideChrome)): // лендинг (группа 6) скрывает футер сайта ?>
-<?php
-$siteTemplate = \App\Models\Setting::get('design_site_template', 'gov');
-if ($siteTemplate === 'double_a'): ?>
   <footer class="footer">
     <div class="wrap footer-grid">
       <div>
@@ -89,140 +86,6 @@ if ($siteTemplate === 'double_a'): ?>
 
   <!-- Global Toast -->
   <div class="toast" id="toast"></div>
-<?php else: ?>
-<?php
-$footerCfg = \App\Core\FooterConfig::get();
-$footerStyle = $footerCfg['style'];
-$phone = Setting::get('contact_phone', '');
-$email = Setting::get('contact_email', '');
-$address = Setting::get('contact_address', '');
-$footerLang = \App\Core\Locale::current();
-$footerMenu = [];
-try { $footerMenu = \App\Models\MenuItem::activeForLang($footerLang); } catch (\Throwable $e) {}
-$footerSocial = $hcfg['social_buttons'] ?? [];
-$footerBottom = \App\Core\FooterConfig::renderBottom($footerCfg['bottom'], $siteName);
-
-// Логотип подвала: тёмный фон → используем светлый (тёмный) вариант логотипа —
-// сначала для текущего языка, затем общий, иначе обычный логотип.
-$footerHcfg = \App\Core\HeaderConfig::get();
-$footerLogo = trim((string) ($footerHcfg['logo_light_by_lang'][$footerLang] ?? ''));
-if ($footerLogo === '') { $footerLogo = trim((string) ($footerHcfg['logo_light'] ?? '')); }
-if ($footerLogo === '') { $footerLogo = $logo; }
-
-// Рендер одного виджета колонки подвала.
-$renderFooterWidget = function (array $col) use ($footerLogo, $siteName, $address, $phone, $email, $footerMenu, $footerLang, $footerSocial, $privacyUrl): string {
-    switch ($col['widget']) {
-        case 'about':
-            $h = '';
-            if ($footerLogo !== '') {
-                $h .= '<img class="site-footer__logo" src="' . htmlspecialchars($footerLogo, ENT_QUOTES) . '" alt="' . htmlspecialchars($siteName, ENT_QUOTES) . '">';
-            } else {
-                $h .= '<div class="site-footer__name">' . htmlspecialchars($siteName, ENT_QUOTES) . '</div>';
-            }
-            if ($address !== '') { $h .= '<p class="site-footer__line">' . htmlspecialchars($address, ENT_QUOTES) . '</p>'; }
-            if ($phone !== '') { $h .= '<p class="site-footer__line"><a href="tel:' . htmlspecialchars(preg_replace('/[^0-9+]/', '', $phone) ?? '', ENT_QUOTES) . '">' . htmlspecialchars($phone, ENT_QUOTES) . '</a></p>'; }
-            if ($email !== '') { $h .= '<p class="site-footer__line"><a href="mailto:' . htmlspecialchars($email, ENT_QUOTES) . '">' . htmlspecialchars($email, ENT_QUOTES) . '</a></p>'; }
-            return $h;
-        case 'menu':
-            if (empty($footerMenu)) { return ''; }
-            $h = '<ul>';
-            foreach ($footerMenu as $mi) {
-                if (!empty($mi['is_divider'])) { continue; }
-                $h .= '<li><a href="' . htmlspecialchars(\App\Models\MenuItem::resolveUrl($mi, $footerLang), ENT_QUOTES) . '">' . htmlspecialchars((string) $mi['title'], ENT_QUOTES) . '</a></li>';
-            }
-            return $h . '</ul>';
-        case 'contacts':
-            $h = '';
-            if ($address !== '') { $h .= '<p class="site-footer__line">' . htmlspecialchars($address, ENT_QUOTES) . '</p>'; }
-            if ($phone !== '') { $h .= '<p class="site-footer__line"><a href="tel:' . htmlspecialchars(preg_replace('/[^0-9+]/', '', $phone) ?? '', ENT_QUOTES) . '">' . htmlspecialchars($phone, ENT_QUOTES) . '</a></p>'; }
-            if ($email !== '') { $h .= '<p class="site-footer__line"><a href="mailto:' . htmlspecialchars($email, ENT_QUOTES) . '">' . htmlspecialchars($email, ENT_QUOTES) . '</a></p>'; }
-            if ($privacyUrl !== '') { $h .= '<p class="site-footer__line"><a href="' . htmlspecialchars($privacyUrl, ENT_QUOTES) . '">' . htmlspecialchars(t('Политика конфиденциальности'), ENT_QUOTES) . '</a></p>'; }
-            return $h;
-        case 'social':
-            if (empty($footerSocial)) { return ''; }
-            $h = '<div class="site-footer__social">';
-            foreach ($footerSocial as $btn) {
-                $h .= '<a class="site-footer__social-link" href="' . htmlspecialchars((string) $btn['url'], ENT_QUOTES) . '" target="_blank" rel="noopener" aria-label="' . htmlspecialchars((string) $btn['network'], ENT_QUOTES) . '">' . \App\Core\SocialIcons::glyph((string) $btn['network']) . '</a>';
-            }
-            return $h . '</div>';
-        case 'subscribe':
-            // Форма подписки в подвале (постит в /subscribe, как и блок).
-            $ts = (string) time();
-            return '<p class="site-footer__line">' . htmlspecialchars(t('Будьте в курсе наших новостей и аналитических материалов.'), ENT_QUOTES) . '</p>'
-                . '<form class="footer-subscribe" method="post" action="/subscribe">'
-                . \App\Core\Csrf::field()
-                . '<div style="position:absolute;left:-9999px;" aria-hidden="true"><input type="text" name="hp_website" tabindex="-1" autocomplete="off"></div>'
-                . '<input type="hidden" name="hp_ts" value="' . htmlspecialchars($ts, ENT_QUOTES) . '">'
-                . '<input type="email" name="email" placeholder="' . htmlspecialchars(t('Ваш e-mail'), ENT_QUOTES) . '" aria-label="E-mail" required>'
-                . '<button type="submit" aria-label="' . htmlspecialchars(t('Подписаться'), ENT_QUOTES) . '">&rarr;</button>'
-                . '</form>'
-                . '<div data-push-optin></div>'; // сюда push.js добавляет кнопку уведомлений
-        case 'text':
-            // Уже очищено санитайзером при сохранении.
-            return '<div class="site-footer__text">' . $col['text'] . '</div>';
-        default:
-            return '';
-    }
-};
-?>
-<?php if ($footerStyle === 'columns' && !empty($footerCfg['columns'])): ?>
-<footer class="site-footer site-footer--columns">
-    <div class="site-footer__inner">
-        <?php foreach ($footerCfg['columns'] as $col): ?>
-            <?php $inner = $renderFooterWidget($col); ?>
-            <?php if ($inner === '' && $col['widget'] !== 'text') { continue; } // пустые колонки скрываем ?>
-            <div class="site-footer__col site-footer__col--<?= htmlspecialchars($col['widget'], ENT_QUOTES) ?>">
-                <?php if ($col['heading'] !== ''): ?><div class="site-footer__heading"><?= htmlspecialchars($col['heading'], ENT_QUOTES) ?></div><?php endif; ?>
-                <?= $inner ?>
-            </div>
-        <?php endforeach; ?>
-    </div>
-    <div class="site-footer__bottom">
-        <div class="site-footer__bottom-inner">
-            <div class="site-footer__bottom-col site-footer__bottom-col--left">
-                <?= htmlspecialchars($footerBottom, ENT_QUOTES) ?>
-            </div>
-            <div class="site-footer__bottom-col site-footer__bottom-col--middle">
-                <?php if ($privacyUrl !== ''): ?>
-                    <a href="<?= htmlspecialchars($privacyUrl, ENT_QUOTES) ?>"><?= htmlspecialchars(t('Политика конфиденциальности'), ENT_QUOTES) ?></a>
-                <?php endif; ?>
-            </div>
-            <div class="site-footer__bottom-col site-footer__bottom-col--right">
-                <?php $footerCounters = \App\Core\SecurityHeaders::injectScriptNonce((string) Setting::get('footer_counters', '')); ?>
-                <?php if (trim($footerCounters) !== ''): ?>
-                    <div class="site-footer__counters">
-                        <?= $footerCounters ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</footer>
-<?php else: ?>
-<footer class="site-footer">
-    <div class="site-footer__bottom">
-        <div class="site-footer__bottom-inner">
-            <div class="site-footer__bottom-col site-footer__bottom-col--left">
-                <?= htmlspecialchars($footerBottom, ENT_QUOTES) ?>
-            </div>
-            <div class="site-footer__bottom-col site-footer__bottom-col--middle">
-                <?php if ($privacyUrl !== ''): ?>
-                    <a href="<?= htmlspecialchars($privacyUrl, ENT_QUOTES) ?>"><?= htmlspecialchars(t('Политика конфиденциальности'), ENT_QUOTES) ?></a>
-                <?php endif; ?>
-            </div>
-            <div class="site-footer__bottom-col site-footer__bottom-col--right">
-                <?php $footerCounters = \App\Core\SecurityHeaders::injectScriptNonce((string) Setting::get('footer_counters', '')); ?>
-                <?php if (trim($footerCounters) !== ''): ?>
-                    <div class="site-footer__counters">
-                        <?= $footerCounters ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</footer>
-<?php endif; ?>
-<?php endif; ?>
 <?php endif; ?>
 <?php // Плавающая кнопка «Наверх» — видимостью управляет класс body.design-scrolltop
       // (тумблер в «Дизайн») и JS (появляется после прокрутки). ?>
@@ -232,9 +95,7 @@ $renderFooterWidget = function (array $col) use ($footerLogo, $siteName, $addres
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/a11y.js'), ENT_QUOTES) ?>" defer></script>
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/frontend.js'), ENT_QUOTES) ?>" defer></script>
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/forms.js'), ENT_QUOTES) ?>" defer></script>
-<?php if (\App\Models\Setting::get('design_site_template', 'gov') === 'double_a'): ?>
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/double-a.js'), ENT_QUOTES) ?>" defer></script>
-<?php endif; ?>
 <?php $cspNonce = \App\Core\SecurityHeaders::nonce(); ?>
 <?php if (\App\Core\WebPush::isEnabled()): ?>
 <script nonce="<?= $cspNonce ?>">window.__pushEnabled = true; window.__pushLabels = <?= json_encode([

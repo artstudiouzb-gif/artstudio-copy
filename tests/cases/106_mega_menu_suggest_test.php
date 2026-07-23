@@ -56,7 +56,7 @@ test('Мега-меню: шапка получает класс и число к
     assert_contains('site-submenu--mega', $header);
     assert_contains('--mega-cols:', $header);
 
-    $css = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/gov-theme.css');
+    $css = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/da-modern.css');
     // Раскладка включается только на десктопе: на мобильных меню вертикальное.
     assert_contains('.site-submenu--mega', $css);
     assert_contains('repeat(var(--mega-cols, 3), minmax(0, 1fr))', $css);
