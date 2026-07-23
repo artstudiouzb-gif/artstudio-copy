@@ -473,7 +473,7 @@ foreach ([(string) $font, (string) $fontHeading] as $selectedFont) {
 <?php
 $siteTemplate = \App\Models\Setting::get('design_site_template', 'gov');
 if ($siteTemplate === 'double_a'): ?>
-<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/double-a-theme.css'), ENT_QUOTES) ?>">
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/da-modern.css'), ENT_QUOTES) ?>">
 <?php else: ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/gov-theme.css'), ENT_QUOTES) ?>">
 <?php if ($siteTemplate === 'modern_gov'): ?>
@@ -548,9 +548,10 @@ if ($siteTemplate === 'double_a'): ?>
       </nav>
       <div class="lang" id="lang">
         <button class="lang-btn" id="langBtn" aria-expanded="false" aria-label="Choose language"><b id="langCode"><?= strtoupper($currentLang) ?></b><span>⌄</span></button>
-        <div class="lang-menu" id="langMenu">
-          <?php foreach ($activeLangs as $l): ?>
-            <button data-lang="<?= htmlspecialchars((string) $l['code'], ENT_QUOTES) ?>"><?= htmlspecialchars($l['name'], ENT_QUOTES) ?></button>
+        <div class="lang-menu" id="langMenu" role="menu">
+          <?php $lpath = Locale::path(); foreach ($activeLangs as $l): $lc = (string) $l['code'];
+            $lhref = Locale::url($lpath, $lc) . '?' . \App\Core\LocalePreference::QUERY . '=' . rawurlencode($lc); ?>
+            <a role="menuitem" hreflang="<?= htmlspecialchars($lc, ENT_QUOTES) ?>" href="<?= htmlspecialchars($lhref, ENT_QUOTES) ?>"<?= $lc === $currentLang ? ' class="is-active" aria-current="true"' : '' ?>><?= htmlspecialchars($l['name'], ENT_QUOTES) ?></a>
           <?php endforeach; ?>
         </div>
       </div>

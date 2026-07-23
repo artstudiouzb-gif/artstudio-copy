@@ -88,6 +88,9 @@ if ($textWidth !== '' && preg_match('/^(\d+(?:\.\d+)?)(px|%|vw)$/', $textWidth, 
     $heroRootStyle .= '--hero-text-width:' . $twNumber . $twParts[2] . ';';
 }
 
+$showMap = !empty($data['show_map']);
+$mapCaption = trim((string) ($data['map_caption'] ?? '')) !== '' ? (string) $data['map_caption'] : 'Присутствие · Узбекистан';
+
 $heroWidth = ($data['width'] ?? 'full') === 'standard' ? 'standard' : 'full';
 $heroHeight = in_array($data['height'] ?? 'regular', ['regular', 'full', 'custom'], true) ? $data['height'] : 'regular';
 $customHeight = (string) ($data['custom_height'] ?? '720px');
@@ -103,7 +106,7 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
 ?>
 <?php // Без медиа и без своего фона hero — это просто шапка страницы:
       // карточка с рамкой и подложкой в этой роли читается как чужой блок. ?>
-<div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= (!$hasMedia && $heroBg === '') ? ' block-hero--plain' : '' ?><?= $heroBg !== '' ? ' block-hero--bgcolor' : '' ?><?= ($bgType === 'video' || $bgType === 'youtube') ? ' block-hero--video' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?> block-hero--pos-<?= $textPos ?>"<?= $heroRootStyle !== '' ? ' style="' . $heroRootStyle . '"' : '' ?>>
+<div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= (!$hasMedia && $heroBg === '') ? ' block-hero--plain' : '' ?><?= $heroBg !== '' ? ' block-hero--bgcolor' : '' ?><?= ($bgType === 'video' || $bgType === 'youtube') ? ' block-hero--video' : '' ?><?= $showMap ? ' block-hero--with-map' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?> block-hero--pos-<?= $textPos ?>"<?= $heroRootStyle !== '' ? ' style="' . $heroRootStyle . '"' : '' ?>>
     <?php if ($bgType === 'video' && $videoFile !== ''): ?>
         <video class="block-hero__video" data-hero-background-video autoplay muted loop playsinline webkit-playsinline preload="metadata"
                disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
@@ -120,7 +123,8 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
         <?= Media::picture($image, '', null, null, 'block-hero__image', false, '100vw', true, 'block-hero__media') ?>
     <?php endif; ?>
     <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true" style="--hero-scrim: rgba(<?= $hex2rgb($ovColor) ?>, <?= $ovOpacity ?>);"></div><?php endif; ?>
-    <div class="block-hero__inner">
+    <?php if ($showMap): ?><span class="block-hero__decor" aria-hidden="true"></span><?php endif; ?>
+    <div class="block-hero__inner<?= $showMap ? ' block-hero__inner--split' : '' ?>">
         <div class="block-hero__text<?= $panelOn ? ' block-hero__text--panel' : '' ?>"<?= $textStyle !== '' ? ' style="' . $textStyle . '"' : '' ?>>
             <?php if ($eyebrow !== ''): ?><span class="block-hero__eyebrow"><?= htmlspecialchars($eyebrow, ENT_QUOTES) ?></span><?php endif; ?>
             <?php if ($title !== ''): ?><?php $hTag = $data['_heading_tag'] ?? 'h1'; ?><<?= $hTag ?> class="block-hero__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></<?= $hTag ?>><?php endif; ?>
@@ -143,5 +147,10 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
             </div>
             <?php endif; ?>
         </div>
+        <?php if ($showMap): ?>
+            <aside class="block-hero__aside">
+                <?php $caption = $mapCaption; include __DIR__ . '/../partials/uz_map.php'; ?>
+            </aside>
+        <?php endif; ?>
     </div>
 </div>

@@ -553,6 +553,11 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <div class="form-field"><label for="button2_url">Кнопка 2 — ссылка</label><input type="text" id="button2_url" name="button2_url" value="<?= htmlspecialchars($data['button2_url'] ?? '', ENT_QUOTES) ?>"></div>
             <div class="form-field"><label for="video_button_text">Кнопка «Смотреть видео» — текст</label><input type="text" id="video_button_text" name="video_button_text" value="<?= htmlspecialchars($data['video_button_text'] ?? '', ENT_QUOTES) ?>"></div>
             <div class="form-field"><label for="video_button_url">Кнопка «Смотреть видео» — ссылка</label><input type="text" id="video_button_url" name="video_button_url" value="<?= htmlspecialchars($data['video_button_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field">
+                <label class="hb-switch"><input type="checkbox" name="show_map" value="1" <?= !empty($data['show_map']) ? 'checked' : '' ?>><span class="hb-switch__track"></span> Карта Узбекистана с локациями</label>
+                <span class="form-hint">Добавляет справа карточку с SVG-картой Узбекистана, пинами городов и анимированным маршрутом. Hero становится двухколоночным (текст слева, карта справа).</span>
+            </div>
+            <div class="form-field"><label for="map_caption">Подпись карты</label><input type="text" id="map_caption" name="map_caption" value="<?= htmlspecialchars($data['map_caption'] ?? '', ENT_QUOTES) ?>" placeholder="Присутствие · Узбекистан"></div>
         <?php endif; ?>
 
         <?php if ($type === 'news_feature'): ?>

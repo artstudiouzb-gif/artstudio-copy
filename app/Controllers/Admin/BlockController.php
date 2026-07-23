@@ -696,6 +696,8 @@ final class BlockController
                     'button2_url' => $safe(trim((string) ($_POST['button2_url'] ?? ''))),
                     'video_button_text' => trim((string) ($_POST['video_button_text'] ?? '')),
                     'video_button_url' => $safe(trim((string) ($_POST['video_button_url'] ?? ''))),
+                    'show_map' => !empty($_POST['show_map']),
+                    'map_caption' => TextProcessor::typographPlain(trim((string) ($_POST['map_caption'] ?? '')), $locale),
                 ];
             case 'cards_grid':
             case 'image_cards':
