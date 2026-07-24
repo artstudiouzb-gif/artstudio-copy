@@ -144,6 +144,28 @@ HTML
 </section>
 HTML
     ],
+    // 2b. Trust — стандарты и регуляторы (соцпруф)
+    [
+        'title' => '02b. Стандарты и регуляторы',
+        'html' => <<<'HTML'
+<section class="section" style="padding-top:56px;padding-bottom:56px">
+  <div class="wrap">
+    <div class="trust-logos">
+      <span class="trust-logos__label">Работаем по международным стандартам и с регуляторами Узбекистана</span>
+      <div class="trust-logos__row">
+        <span class="trust-chip">ISO 9001</span>
+        <span class="trust-chip">HACCP</span>
+        <span class="trust-chip">GMP</span>
+        <span class="trust-chip">ISO 17025</span>
+        <span class="trust-chip">СЭС РУз</span>
+        <span class="trust-chip">Минсельхоз</span>
+        <span class="trust-chip">Госстандарт</span>
+      </div>
+    </div>
+  </div>
+</section>
+HTML
+    ],
     // 3. Services Highlights
     [
         'title' => '03. Services Highlights',
@@ -185,6 +207,27 @@ HTML
           <span class="go">↗</span>
         </a>
       </div>
+    </div>
+  </div>
+</section>
+HTML
+    ],
+    // 3b. Как мы работаем (методология → результат)
+    [
+        'title' => '03b. Как мы работаем',
+        'html' => <<<'HTML'
+<section class="section soft">
+  <div class="wrap">
+    <div class="section-head-centered">
+      <div class="eyebrow" style="color:var(--gold)">Методология</div>
+      <h2>Как мы приводим к результату</h2>
+      <p>Прозрачный маршрут: от анализа требований до подтверждённого результата, с одним координатором на весь проект.</p>
+    </div>
+    <div class="process-grid">
+      <div class="process-step"><span class="process-step__num">01</span><h3>Диагностика</h3><p>Анализ продукта, рынка и применимых регламентов. Оценка рисков и барьеров входа.</p></div>
+      <div class="process-step"><span class="process-step__num">02</span><h3>Стратегия</h3><p>Дорожная карта: юридическая модель, перечень разрешений, сроки и бюджет.</p></div>
+      <div class="process-step"><span class="process-step__num">03</span><h3>Разрешения</h3><p>Подготовка досье, лабораторные испытания, государственная регистрация под ключ.</p></div>
+      <div class="process-step process-step--result"><span class="process-step__num">04</span><h3>Результат</h3><p>Продукт легально на рынке. Сопровождение и поддержка после запуска.</p></div>
     </div>
   </div>
 </section>
@@ -292,22 +335,31 @@ HTML
         <figure class="testimonial">
             <blockquote class="testimonial__quote">DOUBLE A SOLUTIONS обеспечили бесшовный выход нашей продукции на рынок Узбекистана.</blockquote>
             <figcaption class="testimonial__author">
-                <span class="testimonial__name">Джон Смит</span>
-                <span class="testimonial__company">Глобальный Директор, AgriCorp</span>
+                <span class="testimonial__avatar" aria-hidden="true">ДС</span>
+                <span class="testimonial__meta">
+                    <span class="testimonial__name">Джон Смит</span>
+                    <span class="testimonial__company">Глобальный Директор, AgriCorp</span>
+                </span>
             </figcaption>
         </figure>
         <figure class="testimonial">
             <blockquote class="testimonial__quote">Высочайший уровень экспертизы и абсолютная прозрачность. Рекомендуем.</blockquote>
             <figcaption class="testimonial__author">
-                <span class="testimonial__name">Елена Власова</span>
-                <span class="testimonial__company">CEO, PharmaTech</span>
+                <span class="testimonial__avatar" aria-hidden="true">ЕВ</span>
+                <span class="testimonial__meta">
+                    <span class="testimonial__name">Елена Власова</span>
+                    <span class="testimonial__company">CEO, PharmaTech</span>
+                </span>
             </figcaption>
         </figure>
         <figure class="testimonial">
             <blockquote class="testimonial__quote">Сократили сроки получения разрешений на 3 месяца благодаря их стратегии.</blockquote>
             <figcaption class="testimonial__author">
-                <span class="testimonial__name">Азиз Рахимов</span>
-                <span class="testimonial__company">Директор по развитию, FoodGroup</span>
+                <span class="testimonial__avatar" aria-hidden="true">АР</span>
+                <span class="testimonial__meta">
+                    <span class="testimonial__name">Азиз Рахимов</span>
+                    <span class="testimonial__company">Директор по развитию, FoodGroup</span>
+                </span>
             </figcaption>
         </figure>
     </div>
@@ -316,9 +368,31 @@ HTML
     ]
 ];
 
+// CTA-band выводится последним (после блока аналитики ниже).
+$ctaBandHtml = <<<'HTML'
+<section class="cta-band">
+  <div class="wrap cta-band__inner">
+    <div class="cta-band__text">
+      <div class="eyebrow">Следующий шаг</div>
+      <h2>Готовы вывести продукт на рынок Узбекистана?</h2>
+      <p>Обсудим ваш продукт, применимые требования и оптимальный маршрут вывода — на первичной консультации.</p>
+    </div>
+    <a class="btn primary" href="/kontakty"><span>Обсудить проект</span><span class="arrow">↗</span></a>
+  </div>
+</section>
+HTML;
+
 foreach ($homeBlocks as $idx => $b) {
     Block::create($homeId, 'ru', 'html', $b['title'], ['html' => $b['html']], '', null, 0);
 }
+// Кейсы с результатом на главной — динамический блок «Проекты» (отмеченные
+// «показать на главном»): карточки с метрикой результата.
+Block::create($homeId, 'ru', 'projects_list', 'Кейсы', ['title' => 'Реализованные кейсы', 'limit' => 3], '', null, 0);
+// Аналитика/инсайты (thought leadership) — динамический блок последних новостей
+// (graceful-пусто, если материалов ещё нет).
+Block::create($homeId, 'ru', 'news_latest', 'Аналитика', ['title' => 'Аналитика и инсайты', 'limit' => 3], '', null, 0);
+// Финальный CTA-band — последним, перед подвалом.
+Block::create($homeId, 'ru', 'html', '07. Призыв к действию', ['html' => $ctaBandHtml], '', null, 0);
 
 
 // ==========================================
@@ -667,6 +741,70 @@ foreach ($menuItemsList as $m) {
         ':title' => $m['title'],
         ':val' => $m['val'],
         ':so' => $m['so']
+    ]);
+}
+
+// 4c. Кейсы (проекты) с измеримым результатом — «доказательство результата».
+// Идемпотентно по slug (uq_projects_slug). is_featured=1 — попадают в блок
+// «Проекты» на главной. Метрика выводится бейджем на карточке и в шапке кейса.
+$projectRows = [
+    ['Импорт СЗР для агрохолдинга', 'import-szr-agroholding',
+        '<p>Полный цикл государственной регистрации средств защиты растений и ввод на рынок Узбекистана под ключ: досье, полевые испытания, токсиколого-гигиеническая экспертиза, включение в госреестр.</p>',
+        '−3 месяца', 'к плановому сроку вывода на рынок'],
+    ['Локализация косметического бренда', 'localizaciya-kosmetiki',
+        '<p>Сертификация и запуск линейки косметики с нуля: оценка безопасности, СЭЗ-заключения, разрешительные документы и сопровождение первых поставок.</p>',
+        '18 SKU', 'выведено на рынок за один цикл'],
+    ['Экспорт продуктов питания в ЕС', 'eksport-pitaniya-es',
+        '<p>Приведение производства, маркировки и упаковки к регламентам ЕС, внедрение системы HACCP и подготовка к аудиту.</p>',
+        '5 стран', 'рынков ЕС открыто для поставок'],
+];
+$pstmt = $pdo->prepare(
+    'INSERT INTO projects (title, slug, description, result_metric, result_label, status, is_featured, sort_order, created_at)
+     VALUES (:t, :s, :d, :rm, :rl, \'published\', 1, :so, NOW())
+     ON DUPLICATE KEY UPDATE title = :t2, description = :d2, result_metric = :rm2,
+        result_label = :rl2, status = \'published\', is_featured = 1, sort_order = :so2'
+);
+foreach ($projectRows as $i => $pr) {
+    $pstmt->execute([
+        ':t' => $pr[0], ':t2' => $pr[0],
+        ':s' => $pr[1],
+        ':d' => $pr[2], ':d2' => $pr[2],
+        ':rm' => $pr[3], ':rm2' => $pr[3],
+        ':rl' => $pr[4], ':rl2' => $pr[4],
+        ':so' => $i, ':so2' => $i,
+    ]);
+}
+
+// 4d. Демо-новости (аналитика/инсайты) — наполняют /news и блок «Аналитика»
+// на главной. Идемпотентно по slug (uq_news_slug); author_id NULL (nullable).
+$newsRows = [
+    ['Новые требования к регистрации БАД в 2026 году', 'trebovaniya-registracii-bad-2026', 'Аналитика', 14,
+        'Разбираем ключевые изменения в регуляторной базе Узбекистана и что это значит для импортёров и производителей БАД.',
+        '<p>С 2026 года в силу вступает обновлённый порядок государственной регистрации биологически активных добавок. Ключевые изменения касаются состава досье, требований к лабораторным исследованиям и сроков рассмотрения.</p><p>Мы подготовили практический разбор: какие документы потребуются, как сократить сроки и избежать типичных отказов.</p>'],
+    ['Экспорт в ЕС: обновление регламентов маркировки', 'eksport-es-markirovka', 'Экспорт', 10,
+        'Что изменилось в маркировке и упаковке продукции для рынков Евросоюза и как привести производство в соответствие.',
+        '<p>Регламенты ЕС по маркировке продолжают ужесточаться. Разбираем, какие требования применяются к пищевой и косметической продукции и как подготовить упаковку к экспорту.</p>'],
+    ['ISO 17025: как аккредитовать лабораторию', 'iso-17025-akkreditaciya', 'Стандарты', 6,
+        'Пошаговый разбор подготовки испытательной лаборатории к аккредитации по ISO/IEC 17025.',
+        '<p>Аккредитация лаборатории по ISO/IEC 17025 — обязательное условие признания результатов испытаний. Рассказываем о ключевых этапах: система менеджмента, валидация методик, подготовка к оценке.</p>'],
+    ['Открытие представительства в Ташкенте', 'predstavitelstvo-tashkent', 'Новости', 2,
+        'Расширяем присутствие для более быстрого сопровождения клиентов на рынке Узбекистана.',
+        '<p>Мы открыли новое представительство в Ташкенте. Это позволит быстрее сопровождать проекты клиентов и работать в непосредственном контакте с регуляторами.</p>'],
+];
+$nstmt = $pdo->prepare(
+    'INSERT INTO news (title, slug, excerpt, badge, content, status, published_at, layout_type, sidebar_layout, created_at)
+     VALUES (:t, :s, :e, :b, :c, \'published\', DATE_SUB(NOW(), INTERVAL :d DAY), \'standard\', \'right_sidebar\', NOW())
+     ON DUPLICATE KEY UPDATE title = :t2, excerpt = :e2, badge = :b2, content = :c2,
+        status = \'published\', published_at = DATE_SUB(NOW(), INTERVAL :d2 DAY)'
+);
+foreach ($newsRows as $nr) {
+    $nstmt->execute([
+        ':t' => $nr[0], ':t2' => $nr[0],
+        ':s' => $nr[1],
+        ':e' => $nr[4], ':e2' => $nr[4],
+        ':b' => $nr[2], ':b2' => $nr[2],
+        ':c' => $nr[5], ':c2' => $nr[5],
+        ':d' => $nr[3], ':d2' => $nr[3],
     ]);
 }
 
