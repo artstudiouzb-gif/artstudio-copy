@@ -1329,3 +1329,17 @@ body.design-search-overlay .site-header .site-search-toggle { display: grid; }
 }
 .corp-case-result b { font-family: var(--serif); font-size: clamp(28px, 3.4vw, 38px); font-weight: 800; color: #e4c47a; line-height: 1; letter-spacing: -.02em; }
 .corp-case-result span { font-size: 14px; color: #bcd0d0; letter-spacing: .01em; }
+
+/* --- Метрика результата в домашних блоках «Проекты». --- */
+/* projects_list (.project-card): метрика над заголовком. */
+.project-card__metric { padding: 16px 14px 0; display: flex; flex-direction: column; gap: 2px; }
+.project-card__metric b { font-family: var(--serif); font-size: 24px; font-weight: 800; color: var(--accent-text); line-height: 1; letter-spacing: -.01em; }
+.project-card__metric span { font-size: 13px; color: var(--muted); }
+/* image_cards (.imgcard, «текст поверх фото»): золотой бейдж-пилюля поверх обложки. */
+.imgcard__badge {
+    position: absolute; top: 14px; left: 14px; z-index: 3;
+    display: inline-flex; align-items: center;
+    background: var(--lime); color: var(--btn-ink, #143038);
+    font-family: var(--serif); font-weight: 800; font-size: 15px; letter-spacing: -.01em;
+    padding: 6px 14px; border-radius: 999px; box-shadow: 0 6px 18px rgba(0,0,0,.28);
+}

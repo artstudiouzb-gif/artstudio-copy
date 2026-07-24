@@ -385,6 +385,9 @@ HTML;
 foreach ($homeBlocks as $idx => $b) {
     Block::create($homeId, 'ru', 'html', $b['title'], ['html' => $b['html']], '', null, 0);
 }
+// Кейсы с результатом на главной — динамический блок «Проекты» (отмеченные
+// «показать на главном»): карточки с метрикой результата.
+Block::create($homeId, 'ru', 'projects_list', 'Кейсы', ['title' => 'Реализованные кейсы', 'limit' => 3], '', null, 0);
 // Аналитика/инсайты (thought leadership) — динамический блок последних новостей
 // (graceful-пусто, если материалов ещё нет).
 Block::create($homeId, 'ru', 'news_latest', 'Аналитика', ['title' => 'Аналитика и инсайты', 'limit' => 3], '', null, 0);
