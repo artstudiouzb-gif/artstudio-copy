@@ -144,6 +144,28 @@ HTML
 </section>
 HTML
     ],
+    // 2b. Trust — стандарты и регуляторы (соцпруф)
+    [
+        'title' => '02b. Стандарты и регуляторы',
+        'html' => <<<'HTML'
+<section class="section" style="padding-top:56px;padding-bottom:56px">
+  <div class="wrap">
+    <div class="trust-logos">
+      <span class="trust-logos__label">Работаем по международным стандартам и с регуляторами Узбекистана</span>
+      <div class="trust-logos__row">
+        <span class="trust-chip">ISO 9001</span>
+        <span class="trust-chip">HACCP</span>
+        <span class="trust-chip">GMP</span>
+        <span class="trust-chip">ISO 17025</span>
+        <span class="trust-chip">СЭС РУз</span>
+        <span class="trust-chip">Минсельхоз</span>
+        <span class="trust-chip">Госстандарт</span>
+      </div>
+    </div>
+  </div>
+</section>
+HTML
+    ],
     // 3. Services Highlights
     [
         'title' => '03. Services Highlights',
@@ -185,6 +207,27 @@ HTML
           <span class="go">↗</span>
         </a>
       </div>
+    </div>
+  </div>
+</section>
+HTML
+    ],
+    // 3b. Как мы работаем (методология → результат)
+    [
+        'title' => '03b. Как мы работаем',
+        'html' => <<<'HTML'
+<section class="section soft">
+  <div class="wrap">
+    <div class="section-head-centered">
+      <div class="eyebrow" style="color:var(--gold)">Методология</div>
+      <h2>Как мы приводим к результату</h2>
+      <p>Прозрачный маршрут: от анализа требований до подтверждённого результата, с одним координатором на весь проект.</p>
+    </div>
+    <div class="process-grid">
+      <div class="process-step"><span class="process-step__num">01</span><h3>Диагностика</h3><p>Анализ продукта, рынка и применимых регламентов. Оценка рисков и барьеров входа.</p></div>
+      <div class="process-step"><span class="process-step__num">02</span><h3>Стратегия</h3><p>Дорожная карта: юридическая модель, перечень разрешений, сроки и бюджет.</p></div>
+      <div class="process-step"><span class="process-step__num">03</span><h3>Разрешения</h3><p>Подготовка досье, лабораторные испытания, государственная регистрация под ключ.</p></div>
+      <div class="process-step process-step--result"><span class="process-step__num">04</span><h3>Результат</h3><p>Продукт легально на рынке. Сопровождение и поддержка после запуска.</p></div>
     </div>
   </div>
 </section>
@@ -321,6 +364,22 @@ HTML
         </figure>
     </div>
 </div>
+HTML
+    ],
+    // 7. Финальный CTA-band (перед подвалом)
+    [
+        'title' => '07. Призыв к действию',
+        'html' => <<<'HTML'
+<section class="cta-band">
+  <div class="wrap cta-band__inner">
+    <div class="cta-band__text">
+      <div class="eyebrow">Следующий шаг</div>
+      <h2>Готовы вывести продукт на рынок Узбекистана?</h2>
+      <p>Обсудим ваш продукт, применимые требования и оптимальный маршрут вывода — на первичной консультации.</p>
+    </div>
+    <a class="btn primary" href="/kontakty"><span>Обсудить проект</span><span class="arrow">↗</span></a>
+  </div>
+</section>
 HTML
     ]
 ];

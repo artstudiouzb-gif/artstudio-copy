@@ -1264,3 +1264,56 @@ body.design-search-overlay .site-header .site-search-toggle { display: grid; }
     text-transform: uppercase;
 }
 .testimonial__meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+/* ==========================================================================
+   Опыт консалтинговых фирм: доверие (стандарты/регуляторы), методология
+   «как мы работаем → результат», финальный CTA-band.
+   ========================================================================== */
+
+/* --- Доверие: полоса стандартов и регуляторов (соцпруф без «чужих логотипов»). --- */
+.trust-logos { display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
+.trust-logos__label { font-size: 14px; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+.trust-logos__row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.trust-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 10px 18px; font-size: 14px; font-weight: 700; letter-spacing: .02em;
+    color: var(--text); background: color-mix(in srgb, var(--panel) 55%, transparent);
+    font-family: var(--serif);
+}
+.trust-chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-text); }
+
+/* --- Методология: 4 шага «диагностика → … → результат». --- */
+.process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; counter-reset: step; }
+.process-step {
+    position: relative; border: 1px solid var(--line); border-radius: var(--radius, 16px);
+    background: var(--panel); padding: 30px 26px 28px;
+    transition: transform .28s cubic-bezier(.22,1,.36,1), border-color .28s ease, box-shadow .28s ease;
+}
+.process-step:hover { transform: translateY(-4px); border-color: var(--accent-text); box-shadow: 0 20px 44px rgba(4,34,43,.10); }
+.process-step__num { display: inline-block; font-family: var(--serif); font-weight: 800; font-size: 15px; letter-spacing: .1em; color: var(--accent-text); margin-bottom: 16px; }
+.process-step h3 { font-family: var(--serif); color: var(--navy); font-size: 21px; font-weight: 700; margin: 0 0 10px; }
+.process-step p { color: var(--muted); font-size: 15px; margin: 0; line-height: 1.6; }
+.process-step--result { border-color: color-mix(in srgb, var(--lime) 55%, var(--line)); background: color-mix(in srgb, var(--lime) 8%, var(--panel)); }
+.process-step:not(:last-child)::after {
+    content: ""; position: absolute; right: -12px; top: 50%; z-index: 2;
+    width: 12px; height: 12px; border-top: 2px solid var(--accent-text); border-right: 2px solid var(--accent-text);
+    transform: translateY(-50%) rotate(45deg); opacity: .6;
+}
+@media (max-width: 900px) { .process-grid { grid-template-columns: repeat(2, 1fr); } .process-step:not(:last-child)::after { display: none; } }
+@media (max-width: 520px) { .process-grid { grid-template-columns: 1fr; } }
+
+/* --- Финальный CTA-band перед подвалом. --- */
+.cta-band { background: linear-gradient(140deg, #062c37 0%, #073943 58%, #0a5b4c 150%); position: relative; overflow: hidden; }
+.cta-band::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(200,239,229,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(200,239,229,0.05) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(circle at 82% 30%, #000, transparent 70%);
+            mask-image: radial-gradient(circle at 82% 30%, #000, transparent 70%);
+}
+.cta-band__inner { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 32px; padding: clamp(48px, 6vw, 84px) 0; flex-wrap: wrap; }
+.cta-band .eyebrow { color: #e4c47a !important; }
+.cta-band h2 { color: #fff; margin: 14px 0 12px; font-size: clamp(28px, 3.4vw, 44px); }
+.cta-band p { color: #c7d8d8; font-size: 17px; max-width: 520px; margin: 0; }
+.cta-band__text { max-width: 640px; }
