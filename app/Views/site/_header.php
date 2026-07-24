@@ -292,7 +292,7 @@ foreach ([(string) $font, (string) $fontHeading] as $selectedFont) {
         <?php endforeach; ?>
       </nav>
       <div class="lang" id="lang">
-        <button class="lang-btn" id="langBtn" aria-expanded="false" aria-label="Choose language"><b id="langCode"><?= strtoupper($currentLang) ?></b><span>⌄</span></button>
+        <button class="lang-btn" id="langBtn" aria-expanded="false" aria-label="Choose language"><b id="langCode"><?= strtoupper($currentLang) ?></b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div class="lang-menu" id="langMenu" role="menu">
           <?php $lpath = Locale::path(); foreach ($activeLangs as $l): $lc = (string) $l['code'];
             $lhref = Locale::url($lpath, $lc) . '?' . \App\Core\LocalePreference::QUERY . '=' . rawurlencode($lc); ?>

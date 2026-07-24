@@ -1110,3 +1110,23 @@ body.design-search-overlay .site-header .site-search-toggle { display: grid; }
     --accent-text: #e4c47a !important;
 }
 :root[data-theme="light"] .footer { background: #04222b !important; }
+
+/* ==========================================================================
+   Аудит ui-ux-pro-max: тап-цели ≥44px, зазоры ≥8px, микро-типографика, иконки.
+   ========================================================================== */
+
+/* P2 — Touch & Interaction. Зазор между контролами шапки ≥8px. */
+.header .hdr-tools { gap: 8px; }
+
+/* Тач-цели, реально показываемые на мобильных: гамбургер, язык, строки меню. */
+.menu-btn { min-width: 44px; min-height: 44px; text-align: center; }
+@media (max-width: 960px) {
+    .lang-btn { min-height: 44px; }
+    .navlinks a { display: block; width: 100%; padding: 12px 2px; } /* строки выпадашки ≥44px */
+}
+
+/* P6 — Typography: микро-подписи не мельче 12px (тэглайн 9px — декоративный, оставлен). */
+.metric span, .stage, .route-top { font-size: 12px; }
+
+/* P4 — иконка-шеврон у переключателя языка (SVG вместо глифа ⌄, одно семейство с прочими контролами). */
+.lang-btn svg { width: 11px; height: 11px; flex: 0 0 auto; }
